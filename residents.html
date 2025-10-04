@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regeneración Lab - Residents</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="mockup-container">
+        <div class="mockup-label">Scholars & Artists in Residence</div>
+        <div class="mockup">
+            <header class="site-header">
+                <h1 class="site-title">Regeneración</h1>
+                <p class="site-tagline">Research Lab for Indigenous Studies & Anti-Colonial Thought</p>
+                <nav class="site-nav">
+                    <a href="homepage.html">Home</a>
+                    <a href="about.html">About</a>
+                    <a href="#" class="active">Residents</a>
+                    <a href="#">Projects</a>
+                    <a href="#">Support</a>
+                </nav>
+            </header>
+
+            <div class="content-area">
+                <div class="article-header">
+                    <h1 class="article-title">Scholars & Artists in Residence</h1>
+                    <p style="font-size: 1.1em; margin-top: 15px;">The residency program supports Indigenous scholars,
+                        artists, and organizers developing projects that advance decolonial theory and practice.
+                        Residents receive research support, platform space, and community connection.</p>
+                </div>
+
+                <div class="nav-tabs">
+                    <button class="active" onclick="showTab('current')">Current</button>
+                    <button onclick="showTab('past')">Past</button>
+                    <button onclick="showTab('apply')">Apply</button>
+                </div>
+
+                <div id="current" class="tab-content active">
+                    <div class="resident-list">
+                        <div class="resident-card">
+                            <h4>Dr. Maria Santos</h4>
+                            <div class="year">Summer 2025</div>
+                            <p>Working on Indigenous mapping practices and counter-cartography as tools for land defense
+                                and sovereignty claims.</p>
+                        </div>
+                        <div class="resident-card">
+                            <h4>Jordan Blackwater</h4>
+                            <div class="year">Spring-Fall 2025</div>
+                            <p>Multimedia artist exploring water memory, ceremony, and environmental violence through
+                                video installation and sound.</p>
+                        </div>
+                        <div class="resident-card">
+                            <h4>Dr. Samuel Ortiz</h4>
+                            <div class="year">2025</div>
+                            <p>Researching border militarization's impact on Indigenous communities and developing
+                                community-based documentation methods.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="past" class="tab-content">
+                    <div class="resident-list">
+                        <div class="resident-card">
+                            <h4>Kira Yellowhorse</h4>
+                            <div class="year">2024</div>
+                            <p>Developed oral history archive project documenting Indigenous resistance to border
+                                infrastructure across three generations.</p>
+                        </div>
+                        <div class="resident-card">
+                            <h4>Dr. Rosa Mendez</h4>
+                            <div class="year">2024</div>
+                            <p>Created bilingual educational materials on Indigenous food sovereignty and seed keeping
+                                practices in the borderlands.</p>
+                        </div>
+                        <div class="resident-card">
+                            <h4>Alex Chen-Garcia</h4>
+                            <div class="year">2023-2024</div>
+                            <p>Mixed-media artist whose residency resulted in exhibition exploring settler colonialism
+                                through family archives and speculative fiction.</p>
+                        </div>
+                        <div class="resident-card">
+                            <h4>Dr. Thomas Begay</h4>
+                            <div class="year">2023</div>
+                            <p>Worked on translation project bringing Diné perspectives into conversation with anarchist
+                                theory and mutual aid practices.</p>
+                        </div>
+                        <div class="resident-card">
+                            <h4>Marina Lopez</h4>
+                            <div class="year">2023</div>
+                            <p>Poet and organizer who developed workshop series on language revitalization as
+                                anti-colonial practice.</p>
+                        </div>
+                        <div class="resident-card">
+                            <h4>Dr. David Redhorse</h4>
+                            <div class="year">2022-2023</div>
+                            <p>Completed research on Indigenous critiques of border abolition movements and developed
+                                framework for land-based analysis.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="apply" class="tab-content">
+                    <div style="max-width: 720px;">
+                        <h3
+                            style="font-family: 'Libre Baskerville', Georgia, serif; font-size: 1.6em; margin-bottom: 20px;">
+                            Apply for Residency</h3>
+
+                        <p style="margin-bottom: 20px;">We offer 3-12 month residencies for Indigenous scholars,
+                            artists, and organizers. Residents receive research support, workspace, and platform for
+                            sharing work. We prioritize projects that:</p>
+
+                        <ul style="margin-left: 30px; margin-bottom: 25px; line-height: 1.8;">
+                            <li>Center Indigenous epistemologies and methodologies</li>
+                            <li>Connect theory to practice and organizing</li>
+                            <li>Challenge settler-colonial frameworks</li>
+                            <li>Build connections across movements and geographies</li>
+                            <li>Make knowledge accessible beyond academic audiences</li>
+                        </ul>
+
+                        <p style="margin-bottom: 25px;"><strong>Application periods:</strong> We review applications on
+                            a rolling basis. Next cohort begins Fall 2025.</p>
+
+                        <a href="#" class="btn">Download Application</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
