@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regeneración Lab - Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="site-header">
+            <div class="header-content">
+                <h1 class="site-title">Regeneración</h1>
+                <p class="site-subtitle">Research Lab for Indigenous Studies & Anti-Colonial Thought</p>
+            </div>
+            <nav class="filter-nav">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="article">Articles</button>
+                <button class="filter-btn" data-filter="book">Books</button>
+                <button class="filter-btn" data-filter="essay">Essays</button>
+                <button class="filter-btn" data-filter="research">Research</button>
+                <button class="filter-btn" data-filter="archive">Archive</button>
+            </nav>
+        </header>
+
+        <main class="catalog">
+            <div class="catalog-header">
+                <span class="col-index">Index</span>
+                <span class="col-title">Title</span>
+                <span class="col-author">Author / Creator</span>
+                <span class="col-type">Type</span>
+            </div>
+
+            <div class="catalog-list" id="catalogList">
+                <!-- Items will be dynamically loaded here -->
+            </div>
+        </main>
+
+        <aside class="detail-panel" id="detailPanel">
+            <button class="close-btn" id="closeBtn">&times;</button>
+            <div class="detail-content" id="detailContent">
+                <!-- Detail view will be loaded here -->
+            </div>
+        </aside>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
