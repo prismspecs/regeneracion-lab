@@ -55,6 +55,12 @@ body {
     font-size: 1em;
     font-weight: 600;
     letter-spacing: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.logo.visible {
+    opacity: 1;
 }
 
 .menu-btn,
@@ -147,12 +153,12 @@ body {
 
 /* Hero Section */
 .hero-section {
-    min-height: 80vh;
+    min-height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-unit);
-    border-bottom: 1px solid var(--color-text);
+    padding: 100px var(--spacing-unit) 80px;
+    border-bottom: none;
 }
 
 .hero-content {
@@ -169,7 +175,7 @@ body {
     letter-spacing: 2px;
     border: 1px solid var(--color-text);
     padding: 8px 16px;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
 }
 
 .hero-title {
@@ -177,7 +183,7 @@ body {
     font-size: clamp(2.5em, 7vw, 6em);
     font-weight: 700;
     line-height: 1.1;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
     text-align: center;
     margin-left: auto;
     margin-right: auto;
@@ -210,14 +216,32 @@ body {
 
 /* Marquee Section */
 .marquee-section {
+    position: relative;
     overflow: hidden;
     border-bottom: 1px solid var(--color-text);
-    background: var(--color-text);
+    background-image: url('vikam-doag.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: var(--color-bg);
-    padding: 20px 0;
+    padding: 25px 0;
+    z-index: 50;
+}
+
+.marquee-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1;
 }
 
 .marquee {
+    position: relative;
+    z-index: 2;
     white-space: nowrap;
 }
 

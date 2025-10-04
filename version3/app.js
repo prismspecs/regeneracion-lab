@@ -31,14 +31,37 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// Show/hide navbar logo based on scroll position
+const navLogo = document.getElementById('navLogo');
+const heroTitle = document.querySelector('.hero-title');
+
+function handleNavLogoVisibility() {
+    if (heroTitle) {
+        const heroTitleRect = heroTitle.getBoundingClientRect();
+        const heroTitleBottom = heroTitleRect.bottom;
+
+        // Show logo when hero title is scrolled past the header
+        if (heroTitleBottom < 100) {
+            navLogo.classList.add('visible');
+        } else {
+            navLogo.classList.remove('visible');
+        }
+    }
+}
+
+window.addEventListener('scroll', handleNavLogoVisibility);
+window.addEventListener('load', handleNavLogoVisibility);
+
 // Smooth scroll to top
-const backToTopLinks = document.querySelectorAll('a[href="#"]');
-backToTopLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+document.addEventListener('DOMContentLoaded', () => {
+    const backToTopLinks = document.querySelectorAll('a[href="#"]');
+    backToTopLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
     });
 });
