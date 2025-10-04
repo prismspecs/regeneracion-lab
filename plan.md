@@ -1,0 +1,168 @@
+# Regeneración Lab Project Plan
+
+## Project Overview
+
+Three-project contract for Amrah focusing on digital humanities and Indigenous studies platforms.
+
+**Rate:** $100/hour  
+**Total scope:** 90–180 hours across all projects
+
+---
+
+## Project 1: Main Research Lab Website (Primary Focus)
+
+**Budget:** $3,000–$5,000 (30–50 hours)  
+**Timeline:** Landing page by mid-October (extended from mid-September)  
+**Platform:** WordPress  
+**Hosting:** Pantheon (UCSB-hosted)
+
+### URLs
+
+- Production: `regeneracionlab.org` (with redirect from `regen.english.ucsb.edu`)
+- Development: https://dev-regen-eng-ucsb-edu-v01.pantheonsite.io/
+
+### Site Structure
+
+- Landing page (home)
+- About page
+- Scholar/artist-in-residence profiles
+- Projects page
+- Fund us page (grants received)
+- Links to related projects
+
+### Design Aesthetic
+
+**Core theme:** Turn-of-the-century anarchist newspaper aesthetic inspired by the Mexican anarchist newspaper *Regeneración* (1900-1918).
+
+**Visual approach:**
+- Clean, minimal, accessible
+- Easy to read with strong focus on content
+- Nature-evoking color palette: whites, grays, blacks, with greens, blues, browns, muted reds/oranges
+- River imagery is central (water justice theme)
+- Consider experimental navigation: image warping, data moshing, scroll storytelling
+- Composed elements from photos (shrubs, rocks, shells, water features)
+
+**Reference sites:**
+
+- **Primary style:** https://fuckhope.noblogs.org/ (anarchist aesthetic)
+- **Fonts/historical design:** https://archivomagon.net/en/periodicos/regeneracion-1900-1918/
+- **Navigation/scroll storytelling:** https://www.culturehack.io/
+- **Design and video integration:** https://emergencemagazine.org/
+- **Archive/clearinghouse structure:** https://www.indigenousaction.org/
+- **Clean design:** https://waterjustice-tech.org/ (previous collaboration with Theodora Dryer)
+- **Purple background angle:** https://thenewcentre.org/about/
+- **Other references:** 
+  - https://webresidencies.akademie-solitude.de/carrier-bag/
+  - https://cyberfeminismindex.com/
+  - https://slateandash.com/
+
+### Technical Details
+
+- **CMS:** WordPress (confirmed)
+- **Hosting:** Pantheon (UCSB)
+- **Access:** SFTP/SSH interface available
+- **Backups:** Daily backups via Pantheon
+- **Development:** Dev environment with push capability built into Pantheon
+- **Note:** Previous platform auto-deletes content after 30 days of inactivity
+
+### Content Development
+
+**Priority order:**
+1. Home page
+2. About page
+3. Residencies (scholar/artist profiles with bios and photos)
+4. Projects page
+
+**Assets:** [Shared photos folder](https://drive.google.com/file/d/1DzN2GWVg51Bj7NV5EgQElXvDm3zvfzT0/view?ts=68dc0d9b)
+
+**Visual inspiration:** "Motates" (cooking holes) photo for main site vibe
+
+### Communication
+
+- Primary channels: Google Drive and email
+- Timesheet: Biweekly or monthly
+- Finance: Coordinate with Amrah
+- No additional stakeholders for approvals (just need resident info for profiles)
+
+---
+
+## Project 2: Indigenous Border Studies Syllabus Platform
+
+**Budget:** $2,000–$6,000 (20–60 hours)  
+**Timeline:** End of fall semester  
+**Note:** Budget range due to uncertainty around creative hub complexity
+
+### Structure
+
+- Online course format with thematic modules
+- Topic pages
+- About page
+- Films and readings links
+- Definition flashcards (flip cards)
+- Questions and activities
+- Timelines
+- Short lecture videos
+- Creative hub for project submissions and networking (may start as simple contact list)
+
+### Reference
+
+- https://library.saintheron.com/ (more relevant for syllabus design)
+
+---
+
+## Project 3: Tribal Community Historical Site
+
+**Budget:** $4,000–$7,000 (40–70 hours)
+
+### Structure
+
+- General historical info page
+- About page
+- Maps
+- Archival records
+- Timeline
+- Videos
+- Other creative elements
+
+---
+
+## Current Action Items
+
+- [ ] Connect with web admin for Pantheon credentials
+- [ ] Confirm final domain/hosting configuration
+- [ ] Establish check-in schedule
+- [ ] Receive initial content for home and about pages
+- [x] Collect resident bios and photos for profiles (Updated with Indigenous Action members)
+- [ ] Set up WordPress on Pantheon dev environment
+- [ ] Begin landing page design (target: mid-October)
+
+---
+
+## Design Decisions Made
+
+- **CMS:** WordPress (confirmed)
+- **Color palette:** Minimal base (white/gray/black) with nature colors (greens, blues, browns, muted reds/oranges)
+- **Fonts:** Clean, accessible, inspired by turn-of-century anarchist newspapers
+- **Vibe:** Clean, minimal, accessible, with experimental/trippy navigation elements
+- **Primary theme:** Rivers and water justice
+- **Historical inspiration:** Mexican anarchist newspaper *Regeneración*
+
+---
+
+## Notes
+
+- "Regeneración" means "Regeneration" in Spanish
+- Previous successful collaboration on water justice website
+- All three projects are interconnected through Indigenous studies and social justice themes
+- Accessibility is a priority across all platforms
+
+## Content Updates
+
+### October 4, 2025
+**Resident Profiles Updated** - All 4 prototype versions now feature real Indigenous Action members:
+- **Klee Benally** - Diné artist, activist, and musician (Indigenous Action, Haul No!, Diné No Nukes)
+- **Leona Morgan** - Diné activist working on uranium mining resistance and nuclear justice (Diné No Nukes)
+- **Louise Benally** - Land defense organizer (Protect the Peaks, Indigenous Action)
+
+These profiles replace placeholder content and align with the project's anti-colonial research focus and connection to Indigenous Action's clearinghouse model (reference site: https://www.indigenousaction.org/)
+

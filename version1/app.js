@@ -130,8 +130,8 @@ class RegeneracionApp {
                     <div class="project-meta">May 15, 2025</div>
                     <h3 style="font-family: 'Libre Baskerville', Georgia, serif; font-size: 1.3em; margin-bottom: 10px;">
                         New Resident Scholar Announced</h3>
-                    <p>We're excited to welcome Dr. Maria Santos as our Summer 2025 resident scholar. Maria will be
-                        developing curriculum on Indigenous mapping practices and counter-cartography.</p>
+                    <p>We're excited to welcome Klee Benally as our Summer 2025 resident scholar. Klee will be
+                        developing curriculum on Indigenous anarchism and anti-colonial resistance practices.</p>
                 </div>
                 <div style="background: white; border-left: 4px solid var(--color-primary-text); padding: 25px;">
                     <div class="project-meta">April 22, 2025</div>
@@ -224,22 +224,19 @@ class RegeneracionApp {
                 <div id="current" class="tab-content active">
                     <div class="resident-list">
                         <div class="resident-card">
-                            <h4>Dr. Maria Santos</h4>
+                            <h4>Klee Benally</h4>
                             <div class="year">Summer 2025</div>
-                            <p>Working on Indigenous mapping practices and counter-cartography as tools for land defense
-                                and sovereignty claims.</p>
+                            <p>Diné artist, activist, and musician working on anti-colonial organizing, Indigenous anarchism, and resistance movements. Known for work with Indigenous Action, Haul No!, and Diné No Nukes.</p>
                         </div>
                         <div class="resident-card">
-                            <h4>Jordan Blackwater</h4>
+                            <h4>Leona Morgan</h4>
                             <div class="year">Spring-Fall 2025</div>
-                            <p>Multimedia artist exploring water memory, ceremony, and environmental violence through
-                                video installation and sound.</p>
+                            <p>Diné activist and organizer working on uranium mining resistance and nuclear justice. Co-founder of Diné No Nukes, fighting environmental racism and extractive industries on Indigenous lands.</p>
                         </div>
                         <div class="resident-card">
-                            <h4>Dr. Samuel Ortiz</h4>
+                            <h4>Louise Benally</h4>
                             <div class="year">2025</div>
-                            <p>Researching border militarization's impact on Indigenous communities and developing
-                                community-based documentation methods.</p>
+                            <p>Organizer with Protect the Peaks and Indigenous Action. Works on land defense, Indigenous resistance, and community-based organizing and workshops.</p>
                         </div>
                     </div>
                 </div>

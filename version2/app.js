@@ -3,7 +3,7 @@ const catalogData = [
     {
         id: '00-01',
         title: 'Indigenous Sovereignty and Border Politics',
-        author: 'Dr. Maria Santos',
+        author: 'Klee Benally',
         type: 'research',
         year: '2024',
         description: 'An examination of how Indigenous communities navigate and resist colonial borders imposed across traditional territories. This research explores sovereignty claims, movement rights, and the ongoing impacts of border militarization on Indigenous peoples.',
@@ -20,12 +20,12 @@ const catalogData = [
     },
     {
         id: '00-03',
-        title: 'Water as Relative: Indigenous Water Justice',
-        author: 'Jordan Blackwater',
+        title: 'Nuclear Colonialism and Uranium Mining Resistance',
+        author: 'Leona Morgan',
         type: 'article',
         year: '2024',
-        description: 'Exploring the relationship between Indigenous communities and water through the lens of kinship and reciprocity. This article challenges Western property frameworks and centers Indigenous water governance.',
-        tags: ['water justice', 'environmental', 'kinship', 'governance']
+        description: 'Documenting the ongoing struggle against uranium mining and nuclear colonialism on Diné lands. This article examines environmental racism, health impacts, and community-led resistance through Diné No Nukes and Haul No! organizing.',
+        tags: ['nuclear justice', 'environmental', 'resistance', 'uranium mining']
     },
     {
         id: '00-04',
@@ -47,12 +47,12 @@ const catalogData = [
     },
     {
         id: '00-06',
-        title: 'Counter-Cartographies: Mapping as Resistance',
-        author: 'Dr. Samuel Ortiz',
+        title: 'Land Defense and Sacred Site Protection',
+        author: 'Louise Benally',
         type: 'research',
         year: '2024',
-        description: 'Research exploring how Indigenous communities create alternative maps that center traditional place names, seasonal territories, and relationships to land that challenge colonial cartography.',
-        tags: ['mapping', 'cartography', 'land', 'place names']
+        description: 'Research exploring community-based organizing for land defense and protection of sacred sites. Documents decades of resistance through Protect the Peaks and Indigenous Action, centering traditional governance and Indigenous autonomy.',
+        tags: ['land defense', 'sacred sites', 'organizing', 'resistance']
     },
     {
         id: '00-07',
