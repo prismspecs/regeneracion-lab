@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regeneración Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Navigation Overlay -->
+    <div class="nav-overlay" id="navOverlay">
+        <button class="close-nav" id="closeNav" aria-label="Close menu">✕</button>
+        <nav class="main-nav">
+            <a href="#home" class="nav-item">HOME</a>
+            <a href="#about" class="nav-item">ABOUT</a>
+            <a href="#residents" class="nav-item">RESIDENTS</a>
+            <a href="#projects" class="nav-item">PROJECTS</a>
+            <a href="#archive" class="nav-item">ARCHIVE</a>
+            <a href="#stories" class="nav-item">STORIES</a>
+            <a href="#support" class="nav-item">SUPPORT</a>
+        </nav>
+    </div>
+
+    <!-- Fixed Header -->
+    <header class="site-header" id="siteHeader">
+        <button class="menu-btn" id="menuBtn">+ MENU</button>
+        <div class="header-logo" id="headerLogo">REGENERACIÓN LAB</div>
+        <div class="header-right"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Hero Section -->
+        <section class="hero-section" id="home">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="hero-badge">ANTI-COLONIAL RESEARCH</div>
+                <h1 class="hero-title">
+                    <span class="title-line">REGENERACIÓN LAB</span>
+                </h1>
+                <p class="hero-subtitle">Research Lab for Indigenous Studies & Anti-Colonial Thought</p>
+                <div class="hero-actions">
+                    <a href="#about" class="hero-link">→ LEARN MORE</a>
+                    <a href="#archive" class="hero-link">→ EXPLORE ARCHIVE</a>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <span>↓</span>
+            </div>
+        </section>
+
+        <!-- Marquee Section -->
+        <section class="marquee-section">
+            <div class="marquee">
+                <div class="marquee-content">
+                    <span>INDIGENOUS STUDIES</span>
+                    <span>DECOLONIAL THEORY</span>
+                    <span>BORDER POLITICS</span>
+                    <span>ANTI-COLONIAL PRACTICE</span>
+                    <span>INDIGENOUS STUDIES</span>
+                    <span>DECOLONIAL THEORY</span>
+                    <span>BORDER POLITICS</span>
+                    <span>ANTI-COLONIAL PRACTICE</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about-section" id="about">
+            <div class="section-content">
+                <div class="section-label">ABOUT THE LAB</div>
+                <h2 class="section-title">An anti-colonial project of Indigenous nihilism, for a non-European anarchy.
+                </h2>
+                <div class="section-body">
+                    <p class="drop-cap">Named after the anarchist newspaper published by the Flores Magón brothers from
+                        1900-1918, Regeneración Lab carries forward their spirit of radical critique while centering
+                        Indigenous epistemologies often erased in traditional anarchist narratives.</p>
+                    <p>We are a research collective working at the intersections of Indigenous studies, border politics,
+                        anarchist theory, and decolonial practice. Based in the Southwest but connected to networks
+                        across Turtle Island and beyond, we create space for scholarship and cultural production that
+                        refuses settler-colonial frameworks.</p>
+                    <blockquote class="pull-quote">
+                        "Refusal, clarity, sabotage. Photocopy spirit; networked circulation."
+                    </blockquote>
+                    <p>We prioritize accessibility—all our resources are freely available. We practice citation politics
+                        that center Indigenous and BIPOC scholars. We reject extractive research models. We understand
+                        archives not as sites of preservation but as tools for present struggles.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Residents Section -->
+        <section class="residents-section" id="residents">
+            <div class="section-label">CURRENT RESIDENTS</div>
+            <h2 class="cta-title">SCHOLARS & ARTISTS IN RESIDENCE</h2>
+            <div class="residents-grid">
+                <div class="resident-card">
+                    <div class="card-header">
+                        <span class="card-index">01</span>
+                        <span class="card-type">ARTIST / ORGANIZER</span>
+                    </div>
+                    <h3 class="card-title">Klee Benally</h3>
+                    <div class="card-year">Summer 2025</div>
+                    <p class="card-desc">Diné artist, activist, and musician working on anti-colonial organizing,
+                        Indigenous anarchism, and resistance movements. Known for work with Indigenous Action, Haul No!,
+                        and Diné No Nukes.</p>
+                </div>
+                <div class="resident-card">
+                    <div class="card-header">
+                        <span class="card-index">02</span>
+                        <span class="card-type">ACTIVIST</span>
+                    </div>
+                    <h3 class="card-title">Leona Morgan</h3>
+                    <div class="card-year">Spring-Fall 2025</div>
+                    <p class="card-desc">Diné activist and organizer working on uranium mining resistance and nuclear
+                        justice. Co-founder of Diné No Nukes, fighting environmental racism and extractive industries on
+                        Indigenous lands.</p>
+                </div>
+                <div class="resident-card">
+                    <div class="card-header">
+                        <span class="card-index">03</span>
+                        <span class="card-type">ORGANIZER</span>
+                    </div>
+                    <h3 class="card-title">Louise Benally</h3>
+                    <div class="card-year">2025</div>
+                    <p class="card-desc">Organizer with Protect the Peaks and Indigenous Action. Works on land defense,
+                        Indigenous resistance, and community-based organizing and workshops.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="projects-section" id="projects">
+            <div class="section-label">CURRENT PROJECTS</div>
+            <div class="projects-list">
+                <div class="project-item">
+                    <div class="project-header">
+                        <h3 class="project-title">Indigenous Border Studies Syllabus</h3>
+                        <span class="project-status">ACTIVE / 2025</span>
+                    </div>
+                    <p class="project-desc">A pop education platform offering thematic modules, readings, films, and
+                        community dialogue on Indigenous perspectives on borders, sovereignty, and movement.</p>
+                    <a href="#" class="project-link">→ ACCESS SYLLABUS</a>
+                </div>
+                <div class="project-item">
+                    <div class="project-header">
+                        <h3 class="project-title">Community Historical Archive</h3>
+                        <span class="project-status">ONGOING</span>
+                    </div>
+                    <p class="project-desc">Digital preservation of tribal histories, maps, archival records, and oral
+                        testimonies, created in collaboration with community members.</p>
+                    <a href="#archive" class="project-link">→ EXPLORE ARCHIVE</a>
+                </div>
+                <div class="project-item">
+                    <div class="project-header">
+                        <h3 class="project-title">Water Justice & Technology</h3>
+                        <span class="project-status">RESEARCH / 2024-2025</span>
+                    </div>
+                    <p class="project-desc">Exploring the intersections of Indigenous water rights, environmental
+                        monitoring, and technological sovereignty in the Southwest.</p>
+                    <a href="#" class="project-link">→ LEARN MORE</a>
+                </div>
+                <div class="project-item">
+                    <div class="project-header">
+                        <h3 class="project-title">Decolonial Methods Workshop</h3>
+                        <span class="project-status">NETWORK / 2025</span>
+                    </div>
+                    <p class="project-desc">A series of gatherings and online resources for researchers working to
+                        decolonize academic methodologies and knowledge production.</p>
+                    <a href="#" class="project-link">→ JOIN NETWORK</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Archive Section -->
+        <section class="archive-section" id="archive">
+            <div class="archive-header">
+                <div class="section-label">RESEARCH ARCHIVE</div>
+                <h2 class="section-title">Browse Our Collection</h2>
+                <div class="filter-nav">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="article">Articles</button>
+                    <button class="filter-btn" data-filter="book">Books</button>
+                    <button class="filter-btn" data-filter="essay">Essays</button>
+                    <button class="filter-btn" data-filter="research">Research</button>
+                    <button class="filter-btn" data-filter="archive">Archive</button>
+                </div>
+            </div>
+
+            <div class="catalog-container">
+                <div class="catalog-grid" id="catalogGrid">
+                    <!-- Items will be dynamically loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Stories Section -->
+        <section class="stories-section" id="stories">
+            <div class="section-label">FEATURED STORIES</div>
+            <h2 class="section-title">Latest from the Lab</h2>
+            <div class="stories-grid">
+                <article class="story-card large">
+                    <div class="story-image">
+                        <div class="story-badge">NEW</div>
+                    </div>
+                    <div class="story-content">
+                        <div class="story-tag">FEATURE</div>
+                        <h3 class="story-title">Indigenous Sovereignty and Border Politics</h3>
+                        <p class="story-author">Klee Benally • 2024</p>
+                        <p class="story-excerpt">An examination of how Indigenous communities navigate and resist
+                            colonial borders imposed across traditional territories.</p>
+                        <a href="#" class="story-link">→ READ MORE</a>
+                    </div>
+                </article>
+                <article class="story-card">
+                    <div class="story-content">
+                        <div class="story-tag">ESSAY</div>
+                        <h3 class="story-title">Nuclear Colonialism and Uranium Mining Resistance</h3>
+                        <p class="story-author">Leona Morgan • 2024</p>
+                        <p class="story-excerpt">Documenting the ongoing struggle against uranium mining and nuclear
+                            colonialism on Diné lands.</p>
+                        <a href="#" class="story-link">→ READ MORE</a>
+                    </div>
+                </article>
+                <article class="story-card">
+                    <div class="story-content">
+                        <div class="story-tag">INTERVIEW</div>
+                        <h3 class="story-title">Land Defense and Sacred Site Protection</h3>
+                        <p class="story-author">Louise Benally • 2024</p>
+                        <p class="story-excerpt">Research exploring community-based organizing for land defense and
+                            protection of sacred sites.</p>
+                        <a href="#" class="story-link">→ READ MORE</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Support Section -->
+        <section class="support-section" id="support">
+            <div class="support-content">
+                <h2 class="support-title">SUPPORT OUR WORK</h2>
+                <p class="support-text">Regeneración Lab operates through community support and grant funding. Your
+                    contribution helps us maintain this platform, support resident scholars, and keep our resources
+                    freely accessible.</p>
+                <div class="support-actions">
+                    <a href="#" class="support-btn primary">→ CONTRIBUTE</a>
+                    <a href="#" class="support-btn">LEARN ABOUT GRANTS</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <h4>CONNECT</h4>
+                    <a href="#" class="footer-link">Subscribe</a>
+                    <a href="#" class="footer-link">Newsletter</a>
+                    <a href="#" class="footer-link">Contact</a>
+                </div>
+                <div class="footer-col">
+                    <h4>ENGAGE</h4>
+                    <a href="#residents" class="footer-link">Residency</a>
+                    <a href="#projects" class="footer-link">Projects</a>
+                    <a href="#archive" class="footer-link">Archive</a>
+                </div>
+                <div class="footer-col">
+                    <h4>SOCIAL</h4>
+                    <a href="#" class="footer-link">Twitter</a>
+                    <a href="#" class="footer-link">Instagram</a>
+                    <a href="#" class="footer-link">Email</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 Regeneración Lab. All resources freely available under Creative Commons.</p>
+                <a href="#home" class="back-to-top">↑ BACK TO TOP</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Archive Detail Panel -->
+    <aside class="detail-panel" id="detailPanel">
+        <button class="close-btn" id="closeDetail" aria-label="Close detail">✕</button>
+        <div class="detail-content" id="detailContent">
+            <!-- Detail view will be loaded here -->
+        </div>
+    </aside>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
