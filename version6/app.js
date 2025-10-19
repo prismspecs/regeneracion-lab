@@ -233,9 +233,8 @@ class RegeneracionApp {
     async loadResidentsContent() {
         return `
             <div class="fade-in">
-                <div class="article-header">
+                <div class="article-header" style="border-bottom: none; padding-bottom: 0;">
                     <h1 class="article-title">Scholars & Artists in Residence</h1>
-                    <p style="font-size: 1.1em; margin-top: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
                 </div>
 
                 <div class="nav-tabs">
@@ -335,13 +334,8 @@ class RegeneracionApp {
     async loadProjectsContent() {
         return `
             <div class="fade-in">
-                <div class="article-header">
-                    <h1 class="article-title">Research Projects</h1>
-                    <p style="font-size: 1.1em; margin-top: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </div>
-
                 <section class="section">
-                    <h2 class="section-header">Active Projects</h2>
+                    <h2 class="section-header" style="border-bottom-color: var(--color-earth-brown);">Active Research Projects</h2>
                     <div class="projects-grid">
                         <div class="project-card">
                             <div class="item-badge">ACTIVE</div>
@@ -360,7 +354,7 @@ class RegeneracionApp {
                 </section>
 
                 <section class="section">
-                    <h2 class="section-header">Archive Projects</h2>
+                    <h2 class="section-header">Archived Projects</h2>
                     <div class="projects-grid">
                         <div class="project-card">
                             <h3>Consectetur Archive</h3>
@@ -415,12 +409,13 @@ class RegeneracionApp {
     async loadSupportContent() {
         return `
             <div class="fade-in">
-                <div class="article-header">
+                <div class="article-header" style="border-bottom: none; padding-bottom: 0;">
                     <h1 class="article-title">Support Our Work</h1>
-                    <p style="font-size: 1.1em; margin-top: 15px;">Regeneración Lab operates through community support 
-                        and grant funding. Your contribution helps us maintain this platform, support resident scholars, 
-                        and keep these resources freely accessible.</p>
                 </div>
+                
+                <p style="font-size: 1.1em; margin-bottom: 40px;">Regeneración Lab operates through community support 
+                    and grant funding. Your contribution helps us maintain this platform, support resident scholars, 
+                    and keep these resources freely accessible.</p>
 
                 <div class="support-box" style="margin-top: 40px;">
                     <h3>Ways to Support</h3>
