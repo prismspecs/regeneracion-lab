@@ -39,7 +39,6 @@ body {
     background: var(--color-bg-page);
     color: var(--color-primary-text);
     line-height: 1.7;
-    text-align: justify;
 }
 
 .mockup-container {
