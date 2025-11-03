@@ -198,35 +198,53 @@ class RegeneracionApp {
 
     async loadAboutContent() {
         return `
-            <article class="article-content fade-in">
-                <div class="article-header">
+            <div class="fade-in">
+                <div class="article-header" style="border-bottom: none; padding-bottom: 0;">
                     <h1 class="article-title">About Regeneración Lab</h1>
                 </div>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                <article class="article-content">
+                    <p>The Regeneración Lab is grounded in the rebellious political concept of regeneración that emerged in the late nineteenth century and inspired the 1910 Mexican revolution. Our work centers community-based research justice, creative-critical practices, and decolonial praxis.</p>
 
-                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <p>Named after the anarchist newspaper published by the Flores Magón brothers from 1900-1918, our lab carries forward their spirit of radical critique while centering Indigenous epistemologies often erased in traditional anarchist narratives.</p>
 
-                <h3>Our Approach</h3>
+                    <h3>Our Approach</h3>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                    <p>We create space for research, dialogue, and cultural production that challenges settler-colonial frameworks and imagines otherwise. Our work brings together scholars, artists, and activists working at the intersections of Indigenous studies, border politics, and decolonial theory.</p>
 
-                <div class="quote-block">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </div>
+                    <h3>Director</h3>
+                </article>
 
-                <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.</p>
+                <section class="section">
+                    <div class="project-card" style="max-width: 100%;">
+                        <h3>Amrah Salomón</h3>
+                        <p class="item-meta">Laboratory Director</p>
+                        <p>Amrah Salomón is a scholar, educator, and practitioner of research justice working at the intersections of Indigenous studies, critical race theory, and decolonial methodologies. Their work centers community-based research praxis and the development of frameworks that challenge extractive knowledge production.</p>
+                        <p style="margin-top: 15px;">At the Regeneración Lab, Dr. Salomón develops collaborative projects with Indigenous communities, supports resident scholars and artists, and builds educational resources for students and activists engaged in anti-colonial work.</p>
+                    </div>
+                </section>
 
-                <h3>History & Context</h3>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-
-                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-                <h3>What We Do</h3>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            </article>
+                <section class="section">
+                    <h2 class="section-header">Contact Us</h2>
+                    <div style="max-width: 600px;">
+                        <form class="contact-form">
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.85em; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;">Name</label>
+                                <input type="text" name="name" required style="width: 100%; padding: 12px; border: 2px solid var(--color-primary-text); font-family: inherit; font-size: 1em;">
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.85em; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;">Email</label>
+                                <input type="email" name="email" required style="width: 100%; padding: 12px; border: 2px solid var(--color-primary-text); font-family: inherit; font-size: 1em;">
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.85em; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;">Message</label>
+                                <textarea name="message" required rows="6" style="width: 100%; padding: 12px; border: 2px solid var(--color-primary-text); font-family: inherit; font-size: 1em; resize: vertical;"></textarea>
+                            </div>
+                            <button type="submit" class="btn">→ SEND MESSAGE</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
         `;
     }
 
@@ -250,27 +268,9 @@ class RegeneracionApp {
                                 <span class="grid-index">01</span>
                                 <span class="grid-type">SCHOLAR</span>
                             </div>
-                            <h4>Lorem Ipsum</h4>
-                            <div class="year">2025</div>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                        </div>
-                        <div class="resident-card">
-                            <div class="grid-header">
-                                <span class="grid-index">02</span>
-                                <span class="grid-type">ARTIST</span>
-                            </div>
-                            <h4>Dolor Sit</h4>
-                            <div class="year">2025</div>
-                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                        </div>
-                        <div class="resident-card">
-                            <div class="grid-header">
-                                <span class="grid-index">03</span>
-                                <span class="grid-type">ORGANIZER</span>
-                            </div>
-                            <h4>Amet Consectetur</h4>
-                            <div class="year">2025</div>
-                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <h4>B.T. Werner</h4>
+                            <div class="year">2025-2026</div>
+                            <p>B.T. (they / them) is a subversive physicist conducting transdisciplinary research into the ways that resistance movements affect relationships between societies and the More-Than-Human World.</p>
                         </div>
                     </div>
                 </div>
@@ -282,27 +282,18 @@ class RegeneracionApp {
                                 <span class="grid-index">01</span>
                                 <span class="grid-type">SCHOLAR</span>
                             </div>
-                            <h4>Adipiscing Elite</h4>
-                            <div class="year">2024</div>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt.</p>
+                            <h4>Omar Zahzah</h4>
+                            <div class="year">Past Resident</div>
+                            <p>Scholar, poet, and activist working at the intersections of Palestinian liberation, Arab diaspora studies, and anti-colonial literature.</p>
                         </div>
                         <div class="resident-card">
                             <div class="grid-header">
                                 <span class="grid-index">02</span>
-                                <span class="grid-type">ACTIVIST</span>
+                                <span class="grid-type">SCHOLAR</span>
                             </div>
-                            <h4>Tempor Incididunt</h4>
-                            <div class="year">2024</div>
-                            <p>Ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
-                        </div>
-                        <div class="resident-card">
-                            <div class="grid-header">
-                                <span class="grid-index">03</span>
-                                <span class="grid-type">ARTIST</span>
-                            </div>
-                            <h4>Labore Dolore</h4>
-                            <div class="year">2023-2024</div>
-                            <p>Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.</p>
+                            <h4>Lyra Monteiro</h4>
+                            <div class="year">Past Resident</div>
+                            <p>Public historian and scholar engaged in critical race studies, Indigenous histories, and decolonial museum practices.</p>
                         </div>
                     </div>
                 </div>
@@ -339,35 +330,41 @@ class RegeneracionApp {
                     <div class="projects-grid">
                         <div class="project-card">
                             <div class="item-badge">ACTIVE</div>
-                            <h3>Lorem Ipsum Project</h3>
-                            <p class="item-meta">Active • 2025</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                            <a href="#" class="item-link">→ EXPLORE</a>
+                            <h3>Reclaiming Homelands: Indigenous North San Diego County</h3>
+                            <p class="item-meta">Critical Mission Studies • Ongoing</p>
+                            <p>Collaborative project with Luiseño and Kumeyaay youth to recover the Indigenous place-names of the North San Diego County "Mission Trail", part of the Critical Mission Studies Initiative.</p>
+                            <a href="https://storymaps.arcgis.com/stories/de868339c9a84afb920ead88bf65ccc3" target="_blank" class="item-link">→ VIEW STORYMAP</a>
                         </div>
                         <div class="project-card">
-                            <h3>Dolor Sit Initiative</h3>
-                            <p class="item-meta">Research • 2024-2025</p>
-                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                            <a href="#" class="item-link">→ LEARN MORE</a>
+                            <h3>Indigenous Borderlands UCHRI Multi-Campus Faculty Working Group</h3>
+                            <p class="item-meta">Research Collective • Active</p>
+                            <p>Multi-campus faculty working group exploring Indigenous perspectives on borders, refusal, and fugitivity across the Americas.</p>
+                            <a href="https://uchri.org/awards/indigenous-borderlands-refusal-and-fugitivity/" target="_blank" class="item-link">→ LEARN MORE</a>
+                        </div>
+                        <div class="project-card">
+                            <div class="item-badge">NEW</div>
+                            <h3>Indigenous Border Studies - American Quarterly Special Issue</h3>
+                            <p class="item-meta">Publication • Call for Papers</p>
+                            <p>Special issue of American Quarterly focusing on Indigenous Borderlands, bringing together interdisciplinary scholarship on Indigenous border perspectives.</p>
+                            <a href="#" class="item-link">→ SUBMIT</a>
+                        </div>
+                        <div class="project-card">
+                            <h3>Indigenous Border Studies Syllabus</h3>
+                            <p class="item-meta">Educational Resource • Ongoing</p>
+                            <p>A comprehensive syllabus centering Indigenous perspectives on borders, sovereignty, and movement across the Americas.</p>
+                            <a href="#" class="item-link">→ ACCESS</a>
                         </div>
                     </div>
                 </section>
 
                 <section class="section">
-                    <h2 class="section-header">Archived Projects</h2>
+                    <h2 class="section-header">Past Projects & Events</h2>
                     <div class="projects-grid">
                         <div class="project-card">
-                            <h3>Consectetur Archive</h3>
-                            <p class="item-meta">Archive • Ongoing</p>
-                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                            <a href="#" class="item-link">→ ACCESS</a>
-                        </div>
-                        <div class="project-card">
-                            <div class="item-badge">NEW</div>
-                            <h3>Adipiscing Workshop</h3>
-                            <p class="item-meta">Network • 2025</p>
-                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                            <a href="#" class="item-link">→ JOIN</a>
+                            <h3>The Indigenous Border/ands Symposium</h3>
+                            <p class="item-meta">Symposium • Past Event</p>
+                            <p>An exploration of the borderlands from Indigenous perspectives across the Americas, bringing together scholars, artists, and activists.</p>
+                            <a href="https://crjucsc.com/calendar/the-indigenous-borderlands-an-exploration-of-the-borderlands-from-indigenous-perspectives-across-the-americas" target="_blank" class="item-link">→ VIEW ARCHIVE</a>
                         </div>
                     </div>
                 </section>
@@ -378,30 +375,39 @@ class RegeneracionApp {
     async loadStudentsContent() {
         return `
             <div class="fade-in">
-                <div class="article-header">
-                    <h1 class="article-title">Students</h1>
-                    <p style="font-size: 1.1em; margin-top: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <div class="article-header" style="border-bottom: none; padding-bottom: 0;">
+                    <h1 class="article-title">For Students</h1>
                 </div>
 
-                <article class="article-content">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-
-                    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-                    <h3>Opportunities</h3>
-
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-
-                    <div class="quote-block">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                <section class="section">
+                    <h2 class="section-header">Critical Temporalities Reading Group</h2>
+                    <div class="projects-grid">
+                        <div class="project-card">
+                            <div class="item-badge">ACTIVE</div>
+                            <h3>2025-2026 Reading Group: Critical Temporalities</h3>
+                            <p class="item-meta">Reading Group • 2025-2026</p>
+                            <p>Join the Regeneración Lab and the UCSB English Department Lit & Environment cluster for an interdisciplinary reading group on time, space, and environment. This collaborative space brings together students, faculty, and community members to engage with critical scholarship on temporality and environmental justice.</p>
+                            <a href="#" class="item-link">→ JOIN THE GROUP</a>
+                        </div>
                     </div>
+                </section>
 
-                    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <section class="section">
+                    <h2 class="section-header">Study & Research Opportunities</h2>
+                    <article class="article-content">
+                        <p>The Regeneración Lab offers opportunities for students to engage in community-based research, decolonial praxis, and collaborative scholarship. We work with undergraduate and graduate students across disciplines who are committed to research justice and anti-colonial frameworks.</p>
 
-                    <h3>Resources</h3>
+                        <h3>Ways to Engage</h3>
 
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </article>
+                        <p>Students can participate through directed research projects, reading groups, workshops, and collaborative initiatives with our resident scholars. We prioritize hands-on learning that centers community needs and Indigenous epistemologies.</p>
+
+                        <h3>Resources</h3>
+
+                        <p>Access our Indigenous Border Studies Syllabus, research frameworks, and educational materials developed through our community-based projects. These resources are designed to support critical engagement with decolonial scholarship and praxis.</p>
+                        
+                        <a href="#" class="item-link" style="display: inline-block; margin-top: 20px;">→ CONTACT US ABOUT OPPORTUNITIES</a>
+                    </article>
+                </section>
             </div>
         `;
     }
