@@ -245,7 +245,8 @@ body {
     opacity: 0.6;
 }
 
-.project-meta {
+.project-meta,
+.item-meta {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.85em;
     color: var(--color-earth-brown);
