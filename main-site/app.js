@@ -65,12 +65,28 @@ class RegeneracionApp {
                 throw new Error(`Failed to load page: ${page}`);
             }
             const content = await response.text();
-
+            
             // Cache the content
             this.contentCache.set(page, content);
             return content;
         } catch (error) {
             throw new Error(`Error loading ${page}: ${error.message}`);
+        }
+    }
+
+    // Load detail pages (for project/resident details)
+    async loadDetailPage(detailPage) {
+        this.showLoading();
+        try {
+            const content = await this.loadPageContent(`detail-${detailPage}`);
+            this.renderContent(content);
+            this.currentPage = `detail-${detailPage}`;
+            history.pushState({ page: `detail-${detailPage}` }, '', `#${detailPage}`);
+        } catch (error) {
+            console.error('Error loading detail page:', error);
+            this.showError();
+        } finally {
+            this.hideLoading();
         }
     }
 
@@ -117,6 +133,25 @@ class RegeneracionApp {
     renderContent(content) {
         const mainContent = document.getElementById('mainContent');
         mainContent.innerHTML = content;
+        // Load any partials after content is rendered
+        this.loadPartials();
+    }
+
+    async loadPartials() {
+        // Find all partial placeholders and load their content
+        const partials = document.querySelectorAll('[data-partial]');
+        for (const placeholder of partials) {
+            const partialName = placeholder.dataset.partial;
+            try {
+                const response = await fetch(`partials/${partialName}.html`);
+                if (response.ok) {
+                    const content = await response.text();
+                    placeholder.innerHTML = content;
+                }
+            } catch (error) {
+                console.error(`Error loading partial ${partialName}:`, error);
+            }
+        }
     }
 
     updateActiveNav(page) {

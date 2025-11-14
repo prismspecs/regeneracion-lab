@@ -36,9 +36,17 @@
                     <!-- Content will be dynamically loaded here -->
                 </div>
             </div>
+
+            <footer class="site-footer">
+                <p>&copy; <span id="currentYear"></span> Regeneración Lab. All rights reserved.</p>
+            </footer>
         </div>
     </div>
 
+    <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
     <script src="app.js"></script>
 </body>
 

@@ -163,19 +163,36 @@ Three-project contract for Amrah focusing on digital humanities and Indigenous s
 
 ### File Structure
 ```
-version6/
-├── index.html          # Shell page with header/nav
-├── app.js             # Navigation and SPA logic only
+main-site/              # ACTIVE DIRECTORY
+├── index.html          # Shell page with header/nav/footer
+├── app.js             # Navigation and SPA logic + partial loader
 ├── styles.css         # Global styles
-├── spa.css            # SPA-specific styles  
+├── spa.css            # SPA-specific styles
+├── partials/          # Reusable content sections (no duplication!)
+│   └── collaborations.html    # Used on both home + projects pages
 └── pages/             # All page content (HTML fragments)
     ├── home.html
     ├── about.html
     ├── projects.html
     ├── residents.html
     ├── students.html
-    └── support.html
+    ├── support.html
+    ├── detail-reclaiming-homelands.html        # Intermediary page
+    ├── detail-resident-bt-werner.html          # Resident detail page
+    └── detail-resident-omar-zahzah.html        # Resident detail page
 ```
+
+### Partials System
+- **Purpose:** Avoid duplicating content that appears on multiple pages
+- **Usage:** Add `<div data-partial="filename"></div>` in any page
+- **How it works:** After page loads, app.js finds all `[data-partial]` elements and loads content from `partials/` directory
+- **Example:** Collaborations section appears on both Home and Projects pages but defined once in `partials/collaborations.html`
+
+### Content Strategy
+- **Main pages:** Brief, scannable content (~amount shown in reference images)
+- **Detail pages:** Click-through for full information
+- **Residents:** Brief bio + photo placeholder → Click for full bio
+- **Projects:** Major projects on main page → Click for details before external links
 
 ---
 

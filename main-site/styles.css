@@ -427,6 +427,22 @@ body {
     display: block;
 }
 
+.site-footer {
+    border-top: 3px solid var(--color-primary-text);
+    padding: 30px 60px;
+    background: var(--color-bg-light);
+    margin-top: 60px;
+    text-align: center;
+}
+
+.site-footer p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
 @media (max-width: 768px) {
     .projects-grid {
         grid-template-columns: 1fr;
@@ -452,5 +468,14 @@ body {
         flex-direction: column;
         gap: 15px;
         align-items: center;
+    }
+
+    .site-footer {
+        padding: 20px 30px;
+        margin-top: 40px;
+    }
+
+    .site-footer p {
+        font-size: 0.75em;
     }
 }
