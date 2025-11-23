@@ -108,6 +108,15 @@ Three-project contract for Amrah focusing on digital humanities and Indigenous s
 
 - https://library.saintheron.com/ (more relevant for syllabus design)
 
+### Syllabus v2 (`syllabus2`)
+
+A new version of the syllabus has been created in the `syllabus2/` directory, combining the thematic organization with the original column-based, filterable layout.
+
+- **Thematic Columnar Layout:** The main page now lists themes in a columnar format, similar to the original syllabus layout. Each row displays the theme's title, description, and the number of items it contains.
+- **Filtering:** The filter navigation (`All`, `Articles`, `Books`, etc.) has been re-implemented. When a theme is selected and the detail panel is open, these filters can be used to show or hide items within that theme based on their type.
+- **Detail Panel:** Clicking on a theme opens a side panel with detailed information. This panel includes the theme's title and description, a placeholder for a visual element, and a filterable list of related items (readings, projects, etc.).
+- **Visual Placeholders:** The detail panel includes a designated area for visuals, which are currently represented by a simple border outline.
+
 ---
 
 ## Project 3: Tribal Community Historical Site
