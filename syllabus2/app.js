@@ -98,12 +98,24 @@ class SyllabusApp {
         this.themes = syllabusData.themes;
         this.activeTheme = null;
         this.currentFilter = 'all';
+        this.images = [
+            'AmericanCanal.jpg', 'AnimalTracks2.jpg', 'AsequiasSanLucy.jpg', 'BarrelCactus.jpg',
+            'desertsunset.jpg', 'GatheringHanam1.jpg', 'HanamHarvest1.jpg', 'ImperialDam.jpg',
+            'JumpinCholla.jpg', 'JumpingCholla1.jpg', 'JumpingCholla2.jpg', 'JumpingCholla3.jpg',
+            'OcotilloLeaves.jpg', 'PaintedRock.jpg', 'SanLucyWash.jpg', 'SLakeYuma.jpg',
+            'VikamDoag3.jpg', 'YuccaBlossoms.jpg'
+        ];
         this.init();
     }
 
     init() {
         this.renderThemes();
         this.setupEventListeners();
+    }
+
+    getRandomImage() {
+        const randomIndex = Math.floor(Math.random() * this.images.length);
+        return `images/${this.images[randomIndex]}`;
     }
 
     setupEventListeners() {
@@ -180,6 +192,7 @@ class SyllabusApp {
         }
 
         const filteredItems = getFilteredItems();
+        const randomImage = this.getRandomImage();
 
         const detailContent = document.getElementById('detailContent');
         detailContent.innerHTML = `
@@ -188,8 +201,8 @@ class SyllabusApp {
                 <p class="detail-description">${theme.description}</p>
             </div>
             
-            <div class="detail-visual-placeholder">
-                Visual Placeholder
+            <div class="detail-visual">
+                <img src="${randomImage}" alt="A random image related to the theme">
             </div>
 
             <div class="detail-section">

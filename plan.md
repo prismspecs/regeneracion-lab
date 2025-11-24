@@ -11,6 +11,9 @@ Three-project contract for Amrah focusing on digital humanities and Indigenous s
 
 ## Project 1: Main Research Lab Website (Primary Focus)
 
+### Temporary Landing Page
+A `temporary-landing/` directory has been created to house a simple placeholder website. This landing page consists of a full-screen, responsive background image and the quote "THEY TRIED TO BURY US BUT THEY DIDN'T KNOW WE WERE SEEDS" —Mexican revolutionary dicho circa. 1910. This is intended to be a placeholder for the main site.
+
 **Budget:** $3,000–$5,000 (30–50 hours)  
 **Timeline:** Landing page by mid-October (extended from mid-September)  
 **Platform:** WordPress  
@@ -213,6 +216,12 @@ main-site/              # ACTIVE DIRECTORY
 - Accessibility is a priority across all platforms
 
 ## Content Updates
+
+### November 24, 2025
+**Project-Wide Image Replacement** - Images from the `ingest/` folder have been distributed throughout the `main-site` and `syllabus2` applications to replace placeholders.
+- **`main-site`**: The hero image on the homepage has been updated to `desertsunset.jpg`, and a placeholder for a resident has been replaced with `BarrelCactus.jpg`.
+- **`syllabus2`**: The detail panel now displays a random image from the `ingest/` folder when a theme is selected.
+- **Image Asset Management**: Images have been copied from the `ingest/` folder to `main-site/images/` and `syllabus2/images/` to be accessible to the applications.
 
 ### October 4, 2025
 **Resident Profiles Updated** - All 4 prototype versions now feature real Indigenous Action members:
