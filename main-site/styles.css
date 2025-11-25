@@ -1,30 +1,30 @@
 :root {
-    /* Earth & Ink Color Palette */
-    --color-primary-bg: #f5f5f0;
-    /* newsprint/cream */
+    /* Earth & Ink Color Palette - Refreshed */
+    --color-primary-bg: #ffffff;
+    /* clean white */
     --color-primary-text: #1a1a1a;
     /* ink black */
-    --color-accent-green: #2d5016;
-    /* forest - borders, emphasis */
-    --color-secondary-green: #4a7c59;
-    /* sage - lighter accents */
-    --color-earth-brown: #8b4513;
-    /* earth brown */
-    --color-clay-red: #c05746;
-    /* clay/muted red */
+    --color-accent-green: #1e4a26;
+    /* deep forest - borders, emphasis */
+    --color-secondary-green: #2a9d8f;
+    /* teal - vibrant accent */
+    --color-earth-brown: #9c5424;
+    /* rich earth brown */
+    --color-clay-red: #e76f51;
+    /* bright terracotta */
 
     /* Derived colors */
-    --color-bg-light: #fafaf5;
-    /* lighter background */
-    --color-bg-page: #e8e8e0;
-    /* page background */
-    --color-text-muted: #666;
+    --color-bg-light: #f8f9fa;
+    /* very light grey/white */
+    --color-bg-page: #e9ecef;
+    /* cool light grey background */
+    --color-text-muted: #555;
     /* muted text */
-    --color-border-light: #ddd;
+    --color-border-light: #e0e0e0;
     /* light borders */
-    --color-shadow: rgba(0, 0, 0, 0.1);
+    --color-shadow: rgba(0, 0, 0, 0.08);
     /* subtle shadows */
-    --color-shadow-hover: rgba(0, 0, 0, 0.2);
+    --color-shadow-hover: rgba(0, 0, 0, 0.15);
     /* hover shadows */
 }
 
@@ -112,7 +112,8 @@ body {
 
 .site-nav a:hover,
 .site-nav a.active {
-    border-bottom-color: var(--color-accent-green);
+    border-bottom-color: var(--color-secondary-green);
+    color: var(--color-secondary-green);
 }
 
 .content-area {
@@ -122,7 +123,7 @@ body {
 .hero-image {
     position: relative;
     margin-bottom: 50px;
-    background-image: url('images/desertsunset.jpg');
+    background-image: url('metates.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -235,14 +236,16 @@ body {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.9em;
     letter-spacing: 1px;
-    color: var(--color-primary-text);
+    color: var(--color-secondary-green);
     text-decoration: none;
     margin-top: 15px;
-    transition: opacity 0.2s;
+    transition: color 0.2s, transform 0.2s;
+    font-weight: 600;
 }
 
 .item-link:hover {
-    opacity: 0.6;
+    color: var(--color-clay-red);
+    transform: translateX(5px);
 }
 
 .project-meta,
@@ -327,20 +330,20 @@ body {
 .btn {
     display: inline-block;
     padding: 12px 30px;
-    background: var(--color-primary-text);
-    color: var(--color-primary-bg);
+    background: var(--color-clay-red);
+    color: white;
     text-decoration: none;
     font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 0.9em;
-    border: 2px solid var(--color-primary-text);
+    border: 2px solid var(--color-clay-red);
     transition: all 0.2s;
 }
 
 .btn:hover {
     background: var(--color-earth-brown);
-    color: var(--color-primary-bg);
+    color: white;
     border-color: var(--color-earth-brown);
     transform: translateY(-1px);
 }
