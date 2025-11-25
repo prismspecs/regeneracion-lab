@@ -50,6 +50,13 @@
     }
 }
 
+@media (max-width: 768px) {
+    .app-container {
+        margin: 10px auto;
+        padding: 0 10px;
+    }
+}
+
 .nav-link {
     cursor: pointer;
     transition: all 0.2s ease;
@@ -57,17 +64,6 @@
 
 .nav-link:hover {
     transform: translateY(-1px);
-}
-
-/* Hide mockup container styling for SPA */
-.mockup-container {
-    max-width: none;
-    margin: 0;
-    padding: 0;
-}
-
-.mockup-label {
-    display: none;
 }
 
 .mockup {

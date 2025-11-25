@@ -217,6 +217,15 @@ main-site/              # ACTIVE DIRECTORY
 
 ## Content Updates
 
+### November 25, 2025
+**New Resident Profile Added** - Added a profile for Dr. Lyra D. Monteiro.
+- Created a new detail page `detail-resident-lyra-monteiro.html` with her bio and work blurb.
+- Updated the `residents.html` page to include her profile and link to the detail page.
+- Added her headshot as `images/lyra.jpg`.
+
+**CSS Cleanup** - Removed unused CSS classes from `styles.css` and `spa.css` to reduce file size and improve maintainability.
+- **Removed classes:** `hero-statement`, `mockup-container`, `mockup-label`, `project-meta`, `quote-block`, `resident-card`, `resident-list`, `section-label`
+
 ### November 24, 2025
 **Project-Wide Image Replacement** - Images from the `ingest/` folder have been distributed throughout the `main-site` and `syllabus2` applications to replace placeholders.
 - **`main-site`**: The hero image on the homepage has been updated to `desertsunset.jpg`, and a placeholder for a resident has been replaced with `BarrelCactus.jpg`.
