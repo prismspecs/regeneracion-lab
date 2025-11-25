@@ -218,6 +218,11 @@ main-site/              # ACTIVE DIRECTORY
 ## Content Updates
 
 ### November 25, 2025
+**Experimental "Melt" Effect Added to Homepage** - An experimental "melt" effect has been added to the hero image on the homepage.
+- The effect is implemented using the `glfx.js` library and is triggered by mouse movement over the hero image.
+- A new file, `melt-effect.js`, has been created to house the code for this effect.
+- A fallback is in place for browsers that do not support WebGL, displaying the static image instead.
+
 **New Resident Profile Added** - Added a profile for Dr. Lyra D. Monteiro.
 - Created a new detail page `detail-resident-lyra-monteiro.html` with her bio and work blurb.
 - Updated the `residents.html` page to include her profile and link to the detail page.

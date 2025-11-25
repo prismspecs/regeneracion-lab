@@ -436,4 +436,18 @@ body {
     .site-footer p {
         font-size: 0.75em;
     }
+
+    .project-card,
+    .support-box {
+        padding: 20px;
+    }
+
+    .hero-image {
+        padding: 40px 20px;
+        min-height: 300px;
+    }
+
+    .quote-overlay {
+        padding: 20px;
+    }
 }
