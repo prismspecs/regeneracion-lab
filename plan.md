@@ -218,6 +218,10 @@ main-site/              # ACTIVE DIRECTORY
 ## Content Updates
 
 ### November 25, 2025
+**Fixed "Melt" Effect on Homepage** - Fixed an issue where the "melt" effect was not being applied to the hero image on the homepage.
+- The `melt-effect.js` script has been updated to correctly initialize the WebGL canvas and ensure the effect is applied.
+- The fallback for browsers that do not support WebGL has been improved.
+
 **Experimental "Melt" Effect Added to Homepage** - An experimental "melt" effect has been added to the hero image on the homepage.
 - The effect is implemented using the `glfx.js` library and is triggered by mouse movement over the hero image.
 - A new file, `melt-effect.js`, has been created to house the code for this effect.

@@ -107,6 +107,7 @@ body {
 
 .hero-image {
     position: relative;
+    z-index: 2;
     margin-bottom: 50px;
     background-image: url('metates.jpg');
     background-size: cover;
