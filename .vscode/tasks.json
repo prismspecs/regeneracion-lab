@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "append_css",
+			"type": "shell",
+			"command": "cat >>",
+			"args": [
+				"main-site/styles.css",
+				"\n/* Refactored Inline Styles */\n\n/* Utilities */\n.no-border {\n    border-bottom: none !important;\n    padding-bottom: 0 !important;\n}\n\n.mt-0 { margin-top: 0 !important; }\n.mt-15 { margin-top: 15px; }\n.mt-30 { margin-top: 30px; }\n.mb-10 { margin-bottom: 10px; }\n.mb-15 { margin-bottom: 15px; }\n.mb-20 { margin-bottom: 20px; }\n.mb-25 { margin-bottom: 25px; }\n.mb-40 { margin-bottom: 40px; }\n\n/* Project Cards */\n.project-card.full-width {\n    max-width: 100%;\n    margin-bottom: 40px;\n}\n\n.card-title {\n    font-family: 'Libre Baskerville', Georgia, serif;\n    font-size: 2em;\n    margin-bottom: 15px;\n}\n\n.card-text {\n    margin-bottom: 25px;\n}\n\n/* Resident Cards */\n.resident-avatar {\n    width: 150px;\n    height: 150px;\n    object-fit: cover;\n    border: 2px solid var(--color-border-light);\n    margin-bottom: 20px;\n}\n\n.resident-bio {\n    margin-top: 15px;\n}\n\n.resident-read-more {\n    margin-top: 15px;\n    pointer-events: none;\n}\n\n/* Application Form */\n.apply-container {\n    max-width: 720px;\n    margin: 0 auto;\n}\n\n.apply-heading {\n    font-family: 'Libre Baskerville', Georgia, serif;\n    font-size: 1.6em;\n    margin-bottom: 20px;\n}\n\n.apply-subheading {\n    font-family: 'Libre Baskerville', Georgia, serif;\n    font-size: 1.3em;\n    margin: 30px 0 15px;\n}\n\n.form-group {\n    margin-bottom: 20px;\n}\n\n.form-label {\n    display: block;\n    font-family: 'IBM Plex Mono', monospace;\n    font-size: 0.85em;\n    letter-spacing: 1px;\n    margin-bottom: 8px;\n    text-transform: uppercase;\n}\n\n.form-input,\n.form-select,\n.form-textarea {\n    width: 100%;\n    padding: 12px;\n    border: 2px solid var(--color-primary-text);\n    font-family: inherit;\n    font-size: 1em;\n}\n\n.form-textarea {\n    resize: vertical;\n}\n\n.form-note {\n    font-size: 0.9em;\n    margin-bottom: 10px;\n    color: var(--color-text-muted);\n}\n\n.form-footer-note {\n    margin-top: 15px;\n    font-size: 0.9em;\n    color: var(--color-text-muted);\n}\n\n/* Detail Pages */\n.resident-link-block {\n    display: block;\n    margin-bottom: 10px;\n}\n"
+			],
+			"group": "none"
+		}
+	]
+}

@@ -20,12 +20,39 @@ class RegeneracionApp {
                 this.navigateTo(page);
             });
         });
+
+        // Event delegation for dynamic content links
+        document.getElementById('mainContent').addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link) {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('#detail/')) {
+                    e.preventDefault();
+                    const detailPage = href.substring('#detail/'.length);
+                    this.loadDetailPage(detailPage);
+                }
+            }
+        });
     }
 
     setupHistory() {
         window.addEventListener('popstate', (e) => {
-            const page = e.state?.page || 'home';
-            this.navigateTo(page, false);
+            if (e.state?.page) {
+                this.navigateTo(e.state.page, false);
+            } else {
+                // Handle hash change or back/forward to a state without state object
+                const hash = window.location.hash.slice(1);
+                if (hash.startsWith('detail/')) {
+                    const detailPage = hash.substring('detail/'.length);
+                    this.loadDetailPage(detailPage, false);
+                    // Ensure state object is present for future navigation
+                    history.replaceState({ page: `detail-${detailPage}` }, '', `#detail/${detailPage}`);
+                } else if (hash) {
+                    this.navigateTo(hash, false);
+                } else {
+                    this.navigateTo('home', false);
+                }
+            }
         });
     }
 
@@ -75,13 +102,15 @@ class RegeneracionApp {
     }
 
     // Load detail pages (for project/resident details)
-    async loadDetailPage(detailPage) {
+    async loadDetailPage(detailPage, updateHistory = true) {
         this.showLoading();
         try {
             const content = await this.loadPageContent(`detail-${detailPage}`);
             this.renderContent(content);
             this.currentPage = `detail-${detailPage}`;
-            history.pushState({ page: `detail-${detailPage}` }, '', `#${detailPage}`);
+            if (updateHistory) {
+                history.pushState({ page: `detail-${detailPage}` }, '', `#detail/${detailPage}`);
+            }
         } catch (error) {
             console.error('Error loading detail page:', error);
             this.showError();
@@ -125,7 +154,12 @@ class RegeneracionApp {
     loadInitialContent() {
         const hash = window.location.hash.slice(1);
         if (hash) {
-            this.navigateTo(hash, false);
+            if (hash.startsWith('detail/')) {
+                const detailPage = hash.substring('detail/'.length);
+                this.loadDetailPage(detailPage, false);
+            } else {
+                this.navigateTo(hash, false);
+            }
         }
         // If no hash, don't load any content initially - user must click to navigate
     }

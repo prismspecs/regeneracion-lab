@@ -452,3 +452,205 @@ body {
         padding: 20px;
     }
 }
+
+/* Refactored Inline Styles */
+
+/* Utilities */
+.no-border {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+}
+
+.mt-0 { margin-top: 0 !important; }
+.mt-15 { margin-top: 15px; }
+.mt-30 { margin-top: 30px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-15 { margin-bottom: 15px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-25 { margin-bottom: 25px; }
+.mb-40 { margin-bottom: 40px; }
+
+/* Project Cards */
+.project-card.full-width {
+    max-width: 100%;
+    margin-bottom: 40px;
+}
+
+.card-title {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 2em;
+    margin-bottom: 15px;
+}
+
+.card-text {
+    margin-bottom: 25px;
+}
+
+/* Resident Cards */
+.resident-avatar {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 2px solid var(--color-border-light);
+    margin-bottom: 20px;
+}
+
+.resident-bio {
+    margin-top: 15px;
+}
+
+.resident-read-more {
+    margin-top: 15px;
+    pointer-events: none;
+}
+
+/* Application Form */
+.apply-container {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.apply-heading {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.6em;
+    margin-bottom: 20px;
+}
+
+.apply-subheading {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.3em;
+    margin: 30px 0 15px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--color-primary-text);
+    font-family: inherit;
+    font-size: 1em;
+}
+
+.form-textarea {
+    resize: vertical;
+}
+
+.form-note {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    color: var(--color-text-muted);
+}
+
+.form-footer-note {
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: var(--color-text-muted);
+}
+
+/* Detail Pages */
+.resident-link-block {
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Home Page */
+.home-intro-text {
+    margin-bottom: 20px;
+    font-size: 0.95em;
+    line-height: 1.7;
+}
+
+.home-intro-text-last {
+    font-size: 0.95em;
+    line-height: 1.7;
+}
+
+.home-section-box {
+    background: white;
+    border-left: 4px solid var(--color-secondary-green);
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.home-section-box-last {
+    background: white;
+    border-left: 4px solid var(--color-secondary-green);
+    padding: 25px;
+}
+
+.home-section-title {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+}
+
+.home-link-button {
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.home-link-button-secondary {
+    display: inline-block;
+    margin-top: 15px;
+    margin-left: 15px;
+}
+
+/* About Page */
+.about-section-title {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.6em;
+    margin: 40px 0 20px;
+}
+
+.about-profile-container {
+    display: flex;
+    gap: 30px;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+.about-profile-image {
+    width: 200px;
+    height: auto;
+    object-fit: cover;
+    border: 2px solid var(--color-border-light);
+    flex-shrink: 0;
+    align-self: stretch;
+}
+
+.about-profile-content {
+    flex: 1;
+    min-width: 300px;
+}
+
+.about-profile-name {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+.about-form-container {
+    max-width: 600px;
+}
+
+/* Detail Pages */
+.detail-bio-list {
+    margin-left: 30px;
+    margin-top: 15px;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}

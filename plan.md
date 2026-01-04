@@ -217,6 +217,21 @@ main-site/              # ACTIVE DIRECTORY
 
 ## Content Updates
 
+### January 4, 2026
+**Bug Fix: Project Detail Page Links & Routing** - Fixed a bug where clicking on the project links on the homepage would result in a "Error Loading Content" message, and where refreshing a detail page would fail to load the content.
+- The `onclick` handlers for the project links in `main-site/pages/home.html` were calling `app.loadDetailPage` with an incorrect argument (e.g., `detail-project-name` instead of `project-name`).
+- The routing logic in `main-site/app.js` was updated to use a `detail/` prefix for detail page URLs (e.g. `#detail/project-name`). This ensures that refreshing a detail page loads the correct content.
+- The links in `main-site/pages/home.html` and `main-site/pages/residents.html` were updated to use this new URL structure.
+
+**Projects Section Updated** - The projects section on the homepage has been updated with new project cards.
+- The following new detail pages have been created for the projects:
+  - `detail-indigenous-border-studies.html`
+  - `detail-safiya-henderson-holmes-archive.html`
+  - `detail-oodham-and-yoeme.html`
+  - `detail-research-justice.html`
+- The links on the homepage have been updated to point to these new detail pages.
+- The `projects.html` file has been updated to include the new projects.
+
 ### November 25, 2025
 **Fixed "Melt" Effect on Homepage** - Fixed an issue where the "melt" effect was not being applied to the hero image on the homepage.
 - The `melt-effect.js` script has been updated to correctly initialize the WebGL canvas and ensure the effect is applied.
