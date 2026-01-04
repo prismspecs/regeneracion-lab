@@ -42,6 +42,13 @@ class RegeneracionApp {
             } else {
                 // Handle hash change or back/forward to a state without state object
                 const hash = window.location.hash.slice(1);
+
+                // If the hash corresponds to an element ID on the current page, it's an anchor link.
+                // Don't try to load it as a new page.
+                if (hash && document.getElementById(hash)) {
+                    return;
+                }
+
                 if (hash.startsWith('detail/')) {
                     const detailPage = hash.substring('detail/'.length);
                     this.loadDetailPage(detailPage, false);

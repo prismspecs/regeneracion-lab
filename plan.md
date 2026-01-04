@@ -147,6 +147,14 @@ A new version of the syllabus has been created in the `syllabus2/` directory, co
 - [x] Collect resident bios and photos for profiles (Updated with Indigenous Action members)
 - [ ] Set up WordPress on Pantheon dev environment
 - [ ] Begin landing page design (target: mid-October)
+- [x] Create GEMINI.md for project context and LLM onboarding
+- [x] Rename `syllabus` to `syllabus-old` and `syllabus2` to `syllabus` (Active version is now v2)
+- [x] Update GEMINI.md references to reflect `syllabus` renaming
+- [x] Update `students.html` with new Reading Groups, Python Lab, and shared application form
+- [x] Update styling of subheaders in `students.html` to be distinct (Instrument Serif, Italic, Accent Color)
+- [x] Revert `students.html` subheaders to Sans-Serif and reduce spacing
+- [x] Fix "Error Loading Content" bug when clicking internal anchor links (e.g., `#join-form`)
+- [x] Verify "Apply for Residency" content and form in `residents.html` matches requirements
 
 ---
 
