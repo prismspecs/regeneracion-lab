@@ -1,4 +1,9 @@
 :root {
+    /* Typography */
+    --font-serif: 'Libre Baskerville', Georgia, serif;
+    --font-sans: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+
     /* Earth & Ink Color Palette - Refreshed */
     --color-primary-bg: #ffffff;
     /* clean white */
@@ -16,8 +21,8 @@
     /* Derived colors */
     --color-bg-light: #f8f9fa;
     /* very light grey/white */
-    --color-bg-page: #e9ecef;
-    /* cool light grey background */
+    --color-bg-page: #f5f7f9;
+    /* lighter, cooler grey background */
     --color-text-muted: #555;
     /* muted text */
     --color-border-light: #e0e0e0;
@@ -26,6 +31,8 @@
     /* subtle shadows */
     --color-shadow-hover: rgba(0, 0, 0, 0.15);
     /* hover shadows */
+    --color-shadow-soft: 0 8px 30px rgba(0,0,0,0.06);
+    /* modern soft shadow */
 }
 
 * {
@@ -35,7 +42,7 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
     background: var(--color-bg-page);
     color: var(--color-primary-text);
     line-height: 1.7;
@@ -43,24 +50,26 @@ body {
 
 .mockup {
     background: var(--color-primary-bg);
-    border: 3px solid var(--color-primary-text);
+    border: none;
     margin-bottom: 60px;
-    box-shadow: 12px 12px 0 var(--color-shadow);
+    box-shadow: var(--color-shadow-soft);
+    border-radius: 16px;
+    overflow: hidden;
 }
 
 .site-header {
-    border-bottom: 3px solid var(--color-primary-text);
-    padding: 40px 60px 30px;
+    border-bottom: none;
+    padding: 50px 60px 40px;
     background: var(--color-bg-light);
 }
 
 .site-title {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: clamp(2.5em, 7vw, 6em);
     font-weight: 700;
     line-height: 1.1;
     text-align: center;
-    letter-spacing: 2px;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
     margin-bottom: 40px;
     margin-left: auto;
@@ -68,7 +77,7 @@ body {
 }
 
 .site-tagline {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-style: italic;
     text-align: center;
     font-size: 1.1em;
@@ -80,8 +89,9 @@ body {
     display: flex;
     justify-content: center;
     gap: 45px;
-    margin-top: 25px;
-    font-family: 'IBM Plex Mono', monospace;
+    margin-top: 35px;
+    font-family: var(--font-sans);
+    font-weight: 500;
     font-size: 0.95em;
 }
 
@@ -90,9 +100,9 @@ body {
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 1px;
-    padding-bottom: 2px;
+    padding-bottom: 4px;
     border-bottom: 2px solid transparent;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
 }
 
 .site-nav a:hover,
@@ -102,7 +112,7 @@ body {
 }
 
 .content-area {
-    padding: 60px;
+    padding: 80px 60px;
 }
 
 .hero-image {
@@ -128,7 +138,7 @@ body {
 }
 
 .quote-label {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.75em;
     letter-spacing: 2px;
     color: var(--color-earth-brown);
@@ -147,74 +157,72 @@ body {
 }
 
 .section {
-    margin-bottom: 50px;
+    margin-bottom: 100px;
 }
 
 .section-header {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 2em;
-    margin-bottom: 25px;
-    padding-bottom: 10px;
-    border-bottom: 3px solid var(--color-primary-text);
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--color-border-light);
 }
 
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+    gap: 40px;
 }
 
 .project-card {
-    border: 2px solid var(--color-primary-text);
-    padding: 30px;
+    border: none;
+    border-radius: 12px;
+    padding: 40px;
     background: white;
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    box-shadow: var(--color-shadow-soft);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
 }
 
 .project-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 4px 4px 0 var(--color-earth-brown);
-    border-color: var(--color-clay-red);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
 }
 
 .project-card h3 {
-    font-family: 'Libre Baskerville', Georgia, serif;
-    font-size: 1.5em;
-    margin-bottom: 12px;
+    font-family: var(--font-serif);
+    font-size: 1.6em;
+    margin-bottom: 15px;
 }
 
 .item-badge {
     display: inline-block;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.7em;
-    letter-spacing: 2px;
-    background: var(--color-clay-red);
-    color: white;
-    padding: 6px 12px;
-    margin-bottom: 20px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.75em;
+    letter-spacing: 1px;
+    background: rgba(231, 111, 81, 0.15); /* Semi-transparent orange */
+    color: var(--color-clay-red);
+    padding: 8px 16px;
+    margin-bottom: 25px;
     text-transform: uppercase;
+    border-radius: 20px;
 }
 
 .item-link {
     display: inline-block;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--font-sans);
+    font-weight: 600;
     font-size: 0.9em;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     color: var(--color-secondary-green);
     text-decoration: none;
-    margin-top: 15px;
+    margin-top: 20px;
     transition: color 0.2s, transform 0.2s;
-    font-weight: 600;
-}
-
-.item-link:hover {
-    color: var(--color-clay-red);
-    transform: translateX(5px);
 }
 
 .item-meta {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.85em;
     color: var(--color-earth-brown);
     margin-bottom: 15px;
@@ -231,14 +239,14 @@ body {
 }
 
 .grid-index {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 1.8em;
     font-weight: 600;
     color: var(--color-earth-brown);
 }
 
 .grid-type {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.7em;
     letter-spacing: 1px;
     color: var(--color-clay-red);
@@ -246,14 +254,16 @@ body {
 }
 
 .support-box {
-    border: 3px solid var(--color-accent-green);
+    border: none;
+    border-radius: 12px;
     padding: 40px;
-    background: var(--color-bg-light);
+    background: white;
+    box-shadow: var(--color-shadow-soft);
     margin-top: 30px;
 }
 
 .support-box h3 {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 1.6em;
     color: var(--color-accent-green);
     margin-bottom: 20px;
@@ -261,23 +271,26 @@ body {
 
 .btn {
     display: inline-block;
-    padding: 12px 30px;
+    padding: 14px 32px;
     background: var(--color-clay-red);
     color: white;
     text-decoration: none;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--font-sans);
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 0.9em;
-    border: 2px solid var(--color-clay-red);
-    transition: all 0.2s;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(231, 111, 81, 0.3);
+    transition: all 0.2s ease;
 }
 
 .btn:hover {
     background: var(--color-earth-brown);
     color: white;
-    border-color: var(--color-earth-brown);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(156, 84, 36, 0.3);
 }
 
 .article-header {
@@ -653,4 +666,89 @@ body {
     margin-top: 15px;
     line-height: 1.8;
     margin-bottom: 30px;
+}
+/* Floating Labels Form Styles */
+.form-floating {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 16px; /* Increased padding for floating label space */
+    padding-top: 24px;
+    padding-bottom: 8px;
+    border: 2px solid var(--color-border-light);
+    border-radius: 8px; /* Rounded corners */
+    font-family: var(--font-sans);
+    font-size: 1em;
+    background: white;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: var(--color-clay-red);
+    box-shadow: 0 0 0 4px rgba(231, 111, 81, 0.15); /* Brand glow */
+}
+
+.form-label {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    font-family: var(--font-sans);
+    font-size: 1em;
+    color: var(--color-text-muted);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    transform-origin: 0 0;
+}
+
+/* Floating State */
+.form-input:focus ~ .form-label,
+.form-input:not(:placeholder-shown) ~ .form-label,
+.form-select:focus ~ .form-label,
+.form-select:valid ~ .form-label,
+.form-textarea:focus ~ .form-label,
+.form-textarea:not(:placeholder-shown) ~ .form-label {
+    transform: translateY(-10px) scale(0.85);
+    color: var(--color-clay-red);
+}
+
+/* Select specific adjustments since it doesn't support placeholder-shown reliably */
+.form-select {
+    padding-top: 24px;
+    padding-bottom: 8px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+.form-textarea {
+    min-height: 120px;
+}
+
+/* Helper for file inputs which don't support floating labels well */
+.form-file-group {
+    margin-bottom: 25px;
+}
+.form-file-group .form-label {
+    position: static;
+    display: block;
+    margin-bottom: 8px;
+    transform: none;
+    color: var(--color-primary-text);
+    font-size: 0.9em;
+    font-weight: 500;
+}
+.form-note {
+    font-size: 0.85em;
+    color: var(--color-text-muted);
+    margin-top: 6px;
 }

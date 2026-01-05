@@ -154,6 +154,7 @@ A new version of the syllabus has been created in the `syllabus2/` directory, co
 - [x] Update styling of subheaders in `students.html` to be distinct (Instrument Serif, Italic, Accent Color)
 - [x] Revert `students.html` subheaders to Sans-Serif and reduce spacing
 - [x] Fix "Error Loading Content" bug when clicking internal anchor links (e.g., `#join-form`)
+- [x] Visual Redesign: Modernized typography (Inter/Roboto), Apple-style cards with soft shadows, increased whitespace/layout width, and floating label forms.
 - [x] Verify "Apply for Residency" content and form in `residents.html` matches requirements
 
 ---
