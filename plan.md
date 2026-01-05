@@ -155,6 +155,7 @@ A new version of the syllabus has been created in the `syllabus2/` directory, co
 - [x] Revert `students.html` subheaders to Sans-Serif and reduce spacing
 - [x] Fix "Error Loading Content" bug when clicking internal anchor links (e.g., `#join-form`)
 - [x] Visual Redesign: Modernized typography (Inter/Roboto), Apple-style cards with soft shadows, increased whitespace/layout width, and floating label forms.
+- [x] Visual Update: Removed rounded corners from all UI elements (cards, buttons, forms) for a sharper, more serious aesthetic.
 - [x] Verify "Apply for Residency" content and form in `residents.html` matches requirements
 
 ---
@@ -226,6 +227,10 @@ main-site/              # ACTIVE DIRECTORY
 
 ## Content Updates
 
+### January 5, 2026
+**Visual Refinement** - Removed rounded corners from all UI components (buttons, cards, inputs) to align with a sharper, more brutalist/modernist aesthetic while maintaining the soft shadows and modern typography.
+**Students Page Fix** - Removed the invisible "NEW" badge and corrected spacing for the "Python Learning Lab" card on the Students page to eliminate unwanted whitespace.
+
 ### January 4, 2026
 **Bug Fix: Project Detail Page Links & Routing** - Fixed a bug where clicking on the project links on the homepage would result in a "Error Loading Content" message, and where refreshing a detail page would fail to load the content.
 - The `onclick` handlers for the project links in `main-site/pages/home.html` were calling `app.loadDetailPage` with an incorrect argument (e.g., `detail-project-name` instead of `project-name`).
@@ -289,4 +294,3 @@ Version 5 provides a complete, production-ready foundation with:
 - Accessible navigation with keyboard support (ESC key closes overlays)
 - Combined color palette from all versions
 - Multiple typography options (Libre Baskerville, Cormorant Garamond, Inter, IBM Plex Mono)
-
