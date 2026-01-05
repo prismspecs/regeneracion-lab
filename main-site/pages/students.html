@@ -1,29 +1,29 @@
 <div class="fade-in">
-    <div class="article-header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 10px;">
+    <div class="article-header article-header-compact">
         <h1 class="article-title">For Students</h1>
     </div>
 
     <section class="section">
-        <h2 class="section-header" style="font-family: 'Inter', sans-serif; font-weight: 500; color: var(--color-primary-text); border-bottom: none; font-size: 2em; letter-spacing: -0.5px;">Reading Groups & Study Circles</h2>
+        <h2 class="section-header section-header-sans">Reading Groups & Study Circles</h2>
         
         <!-- Active Group -->
-        <div class="project-card" style="max-width: 100%; margin-bottom: 30px;">
+        <div class="project-card full-width mb-30">
             <div class="item-badge">ACTIVE</div>
-            <h3 style="margin-top: 10px;">2025-2026; Critical Temporalities Reading Group</h3>
-            <p style="margin-top: 15px;">Join the Regeneración Lab and the UCSB English Department Literature & Environment research center for an interdisciplinary reading group on time, space, and environment. This collaborative space brings together students, faculty, and community members to engage with critical scholarship on temporality and environmental justice.</p>
-            <a href="#join-form" class="btn" style="margin-top: 20px; display: inline-block; text-decoration: none;">→ JOIN THE GROUP</a>
+            <h3 class="mt-10">2025-2026; Critical Temporalities Reading Group</h3>
+            <p class="mt-15">Join the Regeneración Lab and the UCSB English Department Literature & Environment research center for an interdisciplinary reading group on time, space, and environment. This collaborative space brings together students, faculty, and community members to engage with critical scholarship on temporality and environmental justice.</p>
+            <a href="#join-form" class="btn mt-20">→ JOIN THE GROUP</a>
         </div>
 
         <!-- New Group -->
-        <div class="project-card" style="max-width: 100%;">
-            <h3 style="margin-top: 0;">Winter 2026; Python Learning Lab / Coding for Justice Collaboration Space</h3>
-            <p style="margin-top: 15px;">Join the Regeneración Lab and the Transcriptions Center for Digital Humanities in a collaborative space for learning and developing projects in Python. Open to students, faculty, and community members interested in learning how to code in Python or who want to workshop coding Digital Humanities and Research Justice frameworks projects. Facilitated by B.T. Werner.</p>
-            <a href="#join-form" class="btn" style="margin-top: 20px; display: inline-block; text-decoration: none;">→ JOIN THE LAB</a>
+        <div class="project-card full-width">
+            <h3 class="mt-0">Winter 2026; Python Learning Lab / Coding for Justice Collaboration Space</h3>
+            <p class="mt-15">Join the Regeneración Lab and the Transcriptions Center for Digital Humanities in a collaborative space for learning and developing projects in Python. Open to students, faculty, and community members interested in learning how to code in Python or who want to workshop coding Digital Humanities and Research Justice frameworks projects. Facilitated by B.T. Werner.</p>
+            <a href="#join-form" class="btn mt-20">→ JOIN THE LAB</a>
         </div>
     </section>
 
     <section class="section">
-        <h2 class="section-header" style="font-family: 'Inter', sans-serif; font-weight: 500; color: var(--color-primary-text); border-bottom: none; font-size: 2em; letter-spacing: -0.5px;">Study & Research Opportunities</h2>
+        <h2 class="section-header section-header-sans">Study & Research Opportunities</h2>
         <article class="article-content">
             <p>The Regeneración Lab offers opportunities for students to engage in community-based research, decolonial praxis, and collaborative scholarship. We work with undergraduate and graduate students and postdoctoral fellows across disciplines who are committed to research justice and critical-creative methodologies.</p>
 
@@ -33,13 +33,13 @@
             <h3 class="subsection-header">Resources</h3>
             <p>Access our Indigenous Border Studies Syllabus, research justice frameworks, and educational materials developed through our community-based projects. These resources are designed to support critical engagement with decolonial scholarship and praxis.</p>
 
-            <a href="mailto:asalomon@ucsb.edu" class="btn" style="margin-top: 20px; display: inline-block; text-decoration: none;">→ CONTACT US ABOUT OPPORTUNITIES</a>
+            <a href="mailto:asalomon@ucsb.edu" class="btn mt-20">→ CONTACT US ABOUT OPPORTUNITIES</a>
         </article>
     </section>
 
     <!-- Shared Form -->
-    <section class="section" id="join-form" style="border-top: 1px solid var(--color-border); padding-top: 40px; margin-top: 40px;">
-        <h2 class="section-header" style="font-family: 'Inter', sans-serif; font-weight: 500; color: var(--color-primary-text); border-bottom: none; font-size: 2em; letter-spacing: -0.5px;">Join a Reading Group / Study Circle</h2>
+    <section class="section form-section" id="join-form">
+        <h2 class="section-header section-header-sans">Join a Reading Group / Study Circle</h2>
         <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" style="max-width: 800px;">
             <div class="form-floating">
                 <input type="text" id="join-name" name="name" class="form-input" placeholder=" " required>
@@ -58,12 +58,12 @@
                 <label for="join-department" class="form-label">Major or Department</label>
             </div>
             <div class="form-group">
-                <label class="form-label" style="position: static; margin-bottom: 10px; color: var(--color-primary-text); font-size: 0.9em; font-weight: 500;">Which group(s) are you interested in?</label>
-                <div style="margin-top: 10px;">
-                    <label style="display: block; margin-bottom: 8px; font-family: var(--font-body);">
+                <label class="form-label form-label-static">Which group(s) are you interested in?</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
                         <input type="checkbox" name="group_interest" value="Critical Temporalities"> Critical Temporalities Reading Group
                     </label>
-                    <label style="display: block; margin-bottom: 8px; font-family: var(--font-body);">
+                    <label class="checkbox-label">
                         <input type="checkbox" name="group_interest" value="Python Learning Lab"> Python Learning Lab / Coding for Justice
                     </label>
                 </div>
