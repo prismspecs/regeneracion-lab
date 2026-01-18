@@ -251,6 +251,7 @@ body {
 /* Cards */
 .project-card {
     border: none;
+    border-left: 4px solid var(--color-secondary-green);
     border-radius: 0;
     padding: 40px;
     background: white;
@@ -779,6 +780,7 @@ body {
 .mt-15 { margin-top: 15px; }
 .mt-20 { margin-top: 20px; }
 .mt-30 { margin-top: 30px; }
+.mb-0 { margin-bottom: 0 !important; }
 .mb-10 { margin-bottom: 10px; }
 .mb-15 { margin-bottom: 15px; }
 .mb-20 { margin-bottom: 20px; }
@@ -875,4 +877,116 @@ body {
     .site-footer p {
         font-size: 0.75em;
     }
+}
+
+/* =========================================
+   Special Project Styles
+   ========================================= */
+
+/* Safiya Archive Pop-out */
+#safiya-archive-card {
+    border-left: 6px solid var(--color-earth-brown);
+    background: linear-gradient(135deg, #fff 0%, #fcfcfc 100%);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+#safiya-archive-card .card-title {
+    color: var(--color-earth-brown);
+}
+
+/* Apple-style Timeline */
+.timeline {
+    position: relative;
+    padding-left: 40px;
+    margin: 40px 0 40px 10px;
+    border-left: 2px solid var(--color-border-light);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -47px; /* 40px padding + 2px border (approx center) + radius adjustment */
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--color-earth-brown);
+    z-index: 1;
+}
+
+.timeline-year {
+    font-family: var(--font-serif);
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--color-primary-text);
+    margin-bottom: 12px;
+    line-height: 1;
+}
+
+.timeline-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.timeline-list li {
+    position: relative;
+    margin-bottom: 12px;
+    font-family: var(--font-sans);
+    font-size: 1em;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+
+.timeline-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* Resource Lists (Bibliography etc) */
+.resource-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 40px;
+    border-top: 1px solid var(--color-border-light);
+}
+
+.resource-list li {
+    padding: 15px 0;
+    border-bottom: 1px solid var(--color-border-light);
+    font-family: var(--font-sans);
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+}
+
+.resource-list li a {
+    color: var(--color-secondary-green);
+    text-decoration: none;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.resource-list li a:hover {
+    text-decoration: underline;
+    color: var(--color-earth-brown);
+}
+
+/* Subtitles */
+.card-subtitle,
+.article-subtitle {
+    font-family: var(--font-serif);
+    color: var(--color-earth-brown);
+    font-size: 1.3em;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    line-height: 1.3;
 }

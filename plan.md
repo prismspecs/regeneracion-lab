@@ -227,6 +227,16 @@ main-site/              # ACTIVE DIRECTORY
 
 ## Content Updates
 
+### January 18, 2026
+**Archive & Timeline Visual Update**
+- **Scroll Behavior**: Updated navigation logic in `app.js` to scroll the `#mainContent` area into view instead of scrolling to the top of the page (`window.scrollTo(0,0)`), ensuring users are taken directly to the content they requested without being forced to view the site header repeatedly.
+- **Safiya Henderson Holmes Archive**:
+  - **Pop-out Effect**: Added specific styling (`#safiya-archive-card`) to the project card to make it stand out with a left border, gradient background, and enhanced shadow.
+  - **Modern Timeline**: Refactored the project timeline in the detail page to use a clean, "Apple-style" vertical layout with markers and san-serif typography, removing standard list discs.
+- **Design Consistency**: Added a default left border (`--color-secondary-green`) to all project cards to unify the design language with the homepage and ensure the specific styling for the Safiya Archive card is a purposeful variation rather than an inconsistency.
+- **Resource List Styling**: Updated the bibliography and resource lists in the Safiya Archive detail page with a clean, modern style (`.resource-list`), removing bullets and adding subtle separators for better readability.
+- **Typography**: Refactored the Safiya Henderson Holmes Archive title (on both the project card and detail page) to use a separate **subtitle element** for "Black Arts & Radicalism Archive". This creates a clearer visual hierarchy and prevents the text from being orphaned.
+
 ### January 5, 2026
 **Visual Refinement** - Removed rounded corners from all UI components (buttons, cards, inputs) to align with a sharper, more brutalist/modernist aesthetic while maintaining the soft shadows and modern typography.
 **Students Page Fix** - Removed the invisible "NEW" badge and corrected spacing for the "Python Learning Lab" card on the Students page to eliminate unwanted whitespace.

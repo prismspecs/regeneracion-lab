@@ -72,6 +72,12 @@ class RegeneracionApp {
         try {
             const content = await this.loadPageContent(page);
             this.renderContent(content);
+            setTimeout(() => {
+                const mainContent = document.getElementById('mainContent');
+                if (mainContent) {
+                    mainContent.scrollIntoView();
+                }
+            }, 0);
             this.setupTabNavigation(); // Setup tabs after content is loaded
             this.currentPage = page;
 
@@ -111,9 +117,17 @@ class RegeneracionApp {
     // Load detail pages (for project/resident details)
     async loadDetailPage(detailPage, updateHistory = true) {
         this.showLoading();
+        this.updateActiveNav(null); // Clear active nav state as we are in a detail view
         try {
             const content = await this.loadPageContent(`detail-${detailPage}`);
             this.renderContent(content);
+            setTimeout(() => {
+                const mainContent = document.getElementById('mainContent');
+                if (mainContent) {
+                    mainContent.scrollIntoView();
+                }
+            }, 0);
+            this.setupTabNavigation(); // Setup tabs after content is loaded
             this.currentPage = `detail-${detailPage}`;
             if (updateHistory) {
                 history.pushState({ page: `detail-${detailPage}` }, '', `#detail/${detailPage}`);
