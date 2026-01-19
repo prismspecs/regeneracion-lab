@@ -73,10 +73,7 @@ class RegeneracionApp {
             const content = await this.loadPageContent(page);
             this.renderContent(content);
             setTimeout(() => {
-                const mainContent = document.getElementById('mainContent');
-                if (mainContent) {
-                    mainContent.scrollIntoView();
-                }
+                this.scrollToContent();
             }, 0);
             this.setupTabNavigation(); // Setup tabs after content is loaded
             this.currentPage = page;
@@ -122,10 +119,7 @@ class RegeneracionApp {
             const content = await this.loadPageContent(`detail-${detailPage}`);
             this.renderContent(content);
             setTimeout(() => {
-                const mainContent = document.getElementById('mainContent');
-                if (mainContent) {
-                    mainContent.scrollIntoView();
-                }
+                this.scrollToContent();
             }, 0);
             this.setupTabNavigation(); // Setup tabs after content is loaded
             this.currentPage = `detail-${detailPage}`;
@@ -217,6 +211,36 @@ class RegeneracionApp {
                 link.classList.add('active');
             }
         });
+    }
+
+    scrollToContent() {
+        const mainContent = document.getElementById('mainContent');
+        if (!mainContent) return;
+
+        // Custom smooth scroll with 100ms duration and ~1em buffer
+        const buffer = 20; // approx 1em
+        const elementTop = mainContent.getBoundingClientRect().top;
+        const startPosition = window.pageYOffset;
+        const targetPosition = startPosition + elementTop - buffer;
+        const distance = targetPosition - startPosition;
+        const duration = 200; // ms
+        let start = null;
+
+        const step = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            // Simple ease-out for natural feel even at high speed
+            const percentage = progress / duration;
+            const easedProgress = Math.min(percentage * (2 - percentage), 1);
+            
+            window.scrollTo(0, startPosition + distance * easedProgress);
+
+            if (progress < duration) {
+               window.requestAnimationFrame(step);
+            }
+        };
+        
+        window.requestAnimationFrame(step);
     }
 
     showLoading() {
