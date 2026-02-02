@@ -179,6 +179,13 @@ function regen_wp_register_project_meta() {
         'sanitize_callback' => 'sanitize_text_field',
     ) );
 
+    register_post_meta( 'project', 'project_link_url', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'esc_url_raw',
+    ) );
+
     register_post_meta( 'project', 'project_style', array(
         'type'         => 'string',
         'single'       => true,
@@ -220,6 +227,7 @@ function regen_wp_project_metabox_render( $post ) {
     $badge        = get_post_meta( $post->ID, 'project_badge', true );
     $meta         = get_post_meta( $post->ID, 'project_meta', true );
     $link_label   = get_post_meta( $post->ID, 'project_link_label', true );
+    $link_url     = get_post_meta( $post->ID, 'project_link_url', true );
     $style_value  = get_post_meta( $post->ID, 'project_style', true );
     $title_line1  = get_post_meta( $post->ID, 'project_title_line1', true );
     $title_line2  = get_post_meta( $post->ID, 'project_title_line2', true );
@@ -243,6 +251,9 @@ function regen_wp_project_metabox_render( $post ) {
 
     <p style="margin-top:12px;"><strong><?php esc_html_e( 'Link label (default: Explore)', 'regen-wp' ); ?></strong></p>
     <input type="text" name="project_link_label" value="<?php echo esc_attr( $link_label ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Link URL (leave blank to use the project page; use full URL for external destinations)', 'regen-wp' ); ?></strong></p>
+    <input type="url" name="project_link_url" value="<?php echo esc_attr( $link_url ); ?>" style="width:100%" />
 
     <p style="margin-top:12px;"><strong><?php esc_html_e( 'Card style', 'regen-wp' ); ?></strong></p>
     <select name="project_style" style="width:100%">
@@ -272,10 +283,11 @@ function regen_wp_save_project_meta( $post_id ) {
         return;
     }
 
-    $fields = array( 'project_badge', 'project_meta', 'project_link_label', 'project_style', 'project_title_line1', 'project_title_line2' );
+    $fields = array( 'project_badge', 'project_meta', 'project_link_label', 'project_link_url', 'project_style', 'project_title_line1', 'project_title_line2' );
     foreach ( $fields as $field ) {
         if ( isset( $_POST[ $field ] ) ) {
-            $value = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
+            $raw   = wp_unslash( $_POST[ $field ] );
+            $value = ( 'project_link_url' === $field ) ? esc_url_raw( $raw ) : sanitize_text_field( $raw );
             update_post_meta( $post_id, $field, $value );
         } else {
             delete_post_meta( $post_id, $field );

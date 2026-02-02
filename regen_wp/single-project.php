@@ -10,15 +10,13 @@ if ( have_posts() ) :
         $badge        = get_post_meta( get_the_ID(), 'project_badge', true );
         $meta         = get_post_meta( get_the_ID(), 'project_meta', true );
         $link_label   = get_post_meta( get_the_ID(), 'project_link_label', true );
-        $style        = get_post_meta( get_the_ID(), 'project_style', true );
-        $style_class  = $style ? ' article-style--' . sanitize_html_class( $style ) : ' article-style--turquoise';
         $cta_label    = $link_label ? $link_label : 'Explore';
         $thumb_url    = get_the_post_thumbnail_url( get_the_ID(), 'large' );
         $title_line1  = get_post_meta( get_the_ID(), 'project_title_line1', true );
         $title_line2  = get_post_meta( get_the_ID(), 'project_title_line2', true );
         ?>
         <article <?php post_class( 'content-article project-single' ); ?>>
-            <header class="article-header<?php echo esc_attr( $style_class ); ?>">
+            <header class="article-header">
                 <?php if ( $badge && 0 === strcasecmp( trim( $badge ), 'ongoing' ) ) : ?><div class="item-badge"><?php echo esc_html( $badge ); ?></div><?php endif; ?>
                 <h1 class="article-title">
                     <?php

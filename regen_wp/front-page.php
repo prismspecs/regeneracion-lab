@@ -45,19 +45,23 @@ $support_url      = get_theme_mod( 'regen_support_url', 'https://give.ucsb.edu/c
         <div class="projects-grid">
             <?php while ( $projects_query->have_posts() ) : $projects_query->the_post(); ?>
                 <?php
-                    $badge       = get_post_meta( get_the_ID(), 'project_badge', true );
-                    $meta        = get_post_meta( get_the_ID(), 'project_meta', true );
-                    $link_label  = get_post_meta( get_the_ID(), 'project_link_label', true );
-                    $style       = get_post_meta( get_the_ID(), 'project_style', true );
-                    $style_class = $style ? ' project-card--' . sanitize_html_class( $style ) : ' project-card--turquoise';
-                    $cta_label   = $link_label ? $link_label : 'Explore';
+                    $badge        = get_post_meta( get_the_ID(), 'project_badge', true );
+                    $meta         = get_post_meta( get_the_ID(), 'project_meta', true );
+                    $link_label   = get_post_meta( get_the_ID(), 'project_link_label', true );
+                    $link_url     = get_post_meta( get_the_ID(), 'project_link_url', true );
+                    $style        = get_post_meta( get_the_ID(), 'project_style', true );
+                    $style_class  = $style ? ' project-card--' . sanitize_html_class( $style ) : ' project-card--turquoise';
+                    $cta_label    = $link_label ? $link_label : 'Explore';
+                    $link_href    = $link_url ? esc_url( $link_url ) : get_permalink();
+                    $is_external  = $link_url && preg_match( '/^https?:\/\//i', $link_url );
+                    $link_target  = $is_external ? ' target="_blank" rel="noopener"' : '';
                 ?>
                 <div class="project-card<?php echo esc_attr( $style_class ); ?>">
                     <?php if ( $badge && 0 === strcasecmp( trim( $badge ), 'ongoing' ) ) : ?><div class="item-badge"><?php echo esc_html( $badge ); ?></div><?php endif; ?>
                     <h3><?php the_title(); ?></h3>
                     <?php if ( $meta ) : ?><p class="item-meta"><?php echo esc_html( $meta ); ?></p><?php endif; ?>
                     <p><?php echo esc_html( get_the_excerpt() ); ?></p>
-                    <a href="<?php the_permalink(); ?>" class="item-link">→ <?php echo esc_html( $cta_label ); ?></a>
+                    <a href="<?php echo esc_url( $link_href ); ?>" class="item-link"<?php echo $link_target; ?>>→ <?php echo esc_html( $cta_label ); ?></a>
                 </div>
             <?php endwhile; ?>
         </div>

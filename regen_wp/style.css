@@ -1115,7 +1115,7 @@ body {
     border: 0;
 }
 
-.resource-header + .resource-list {
+.resource-header+.resource-list {
     margin-top: 8px;
 }
 
