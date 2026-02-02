@@ -1,71 +1,76 @@
-# Regeneración Lab - Project Context for Gemini
+# Regeneración Lab - Project Context
 
-## Design Principles
-- Always follow Google Material Design 3 for typography: https://m3.material.io/styles/typography/applying-type
-- Use Apple's layout best practices for web views: https://developer.apple.com/design/human-interface-guidelines/layout
-- Ensure contrast ratios follow WCAG standards (e.g., 4.5:1 for small text).
-
-## Project Overview
-**Regeneración Lab** is a digital humanities and Indigenous studies initiative involving three interconnected web projects.
+## Overview
+**Regeneración Lab** is a digital humanities and Indigenous studies initiative involving three interconnected web projects:
 1.  **Main Research Lab Website (`main-site/`)**: The primary public face of the lab.
 2.  **Indigenous Border Studies Syllabus (`syllabus/`)**: An educational platform with thematic modules.
 3.  **Tribal Community Historical Site**: (Planned/In-progress).
 
 **Core Theme:** Water justice, Indigenous studies, and "Regeneración" (referencing the Mexican anarchist newspaper).
-**Aesthetic:** Turn-of-the-century anarchist newspaper, nature-evoking colors (river imagery), clean/minimal but with experimental navigation.
+
+## Design Principles & Aesthetic
+*   **Typography:** Google Material Design 3 guidelines.
+*   **Layout:** Apple's layout best practices for web views.
+*   **Accessibility:** WCAG standards (e.g., 4.5:1 contrast).
+*   **Aesthetic:** Turn-of-the-century anarchist newspaper, nature-evoking colors (river imagery), clean/minimal but with experimental navigation.
+*   **Visual Inspiration:** "Motates" (cooking holes) photo, Mexican anarchist newspaper *Regeneración* (1900-1918).
+*   **UI Style:** Sharp, brutalist/modernist aesthetic (no rounded corners), soft shadows, modern typography (Inter/Roboto).
 
 ## Architecture & Tech Stack (Critical)
-
-**Stack:** Vanilla HTML, CSS, and JavaScript. **NO frameworks** (React, Vue, etc.) are used or desired.
+**Stack:** Vanilla HTML, CSS, and JavaScript. **NO frameworks** (React, Vue, etc.).
 
 ### Main Site Architecture (`main-site/`)
-The main site uses a custom "HTML-first" SPA architecture designed for future WordPress migration.
-
-*   **Shell:** `index.html` contains the header, nav, and an empty `#mainContent` container.
-*   **Routing:** Hash-based routing (e.g., `#about`, `#residents`) handled by `app.js`.
-*   **Content Strategy (CRITICAL RULE):**
+*   **HTML-First SPA:** `index.html` is the shell. `app.js` handles hash-based routing and injects content into `#mainContent`.
+*   **Content Strategy:**
+    *   **All content lives in `pages/*.html`.**
     *   **NEVER** put content in JavaScript strings.
-    *   All page content lives in individual HTML fragments in `pages/` (e.g., `pages/home.html`).
-    *   `app.js` fetches these fragments and injects them into `#mainContent`.
-    *   **Reasoning:** This ensures SEO, easy editing for non-coders, and a direct migration path to WordPress templates.
-*   **Partials:** Reusable sections (like `collaborations.html`) live in `partials/` and are injected via `data-partial` attributes.
+    *   This ensures SEO, easy editing, and future WordPress migration.
+*   **Partials:** Reusable sections (e.g., `partials/collaborations.html`) are injected via `data-partial` attributes.
+*   **Styling:** `styles.css` (global) and `spa.css` (layout/components) using CSS variables.
 
-### Styling
-*   **`styles.css`**: Global variables, typography, and base styles.
-*   **`spa.css`**: Layouts, component styles, and SPA-specific rules.
-*   **Design System:** CSS variables are used for colors and fonts.
+### Syllabus Platform (`syllabus/`)
+*   **Layout:** Thematic columnar layout with filtering.
+*   **Detail Panel:** Side panel for theme details, visual placeholders, and related items.
+*   **Features:** Filtering (Articles, Books, etc.), definition flashcards, timelines.
 
 ## Directory Structure
-
-*   **`main-site/`**: **active development**. The main website.
-    *   `pages/`: Content fragments (Edit these for text changes).
+*   `main-site/`: **Active Development**. Main website.
+    *   `pages/`: Content fragments (HTML).
     *   `partials/`: Reusable content blocks.
     *   `images/`: Local assets.
-*   **`syllabus/`**: The syllabus platform (formerly v2).
-*   **`syllabus-old/`**: Archived syllabus platform (formerly v1).
-*   **`ingest/`**: Raw image assets for use across projects.
-*   **`temporary-landing/`**: A placeholder landing page.
-*   **`archive/`**: Old versions (v1-v5). Do not edit.
+*   `syllabus/`: Active Syllabus platform (v2).
+*   `syllabus-old/`: Archived syllabus platform (v1).
+*   `ingest/`: Raw image assets.
+*   `temporary-landing/`: Placeholder landing page.
+*   `archive/`: Old versions (v1-v5).
 
 ## Development Workflow
-
-1.  **Local Server:** Due to `fetch()` usage, you **MUST** run a local server to test:
+1.  **Local Server:** Required due to `fetch()` usage.
     ```bash
     cd main-site
     python3 -m http.server 8000
     ```
-2.  **Editing Content:** Modify files in `pages/`. Refresh browser.
+2.  **Editing Content:** Modify files in `pages/`.
 3.  **Editing Logic:** Modify `app.js`.
-4.  **Adding Pages:**
-    *   Create `pages/new-page.html`.
-    *   Add link to navigation in `index.html`.
-    *   (Optional) Update `app.js` if custom routing logic is needed (usually not required for simple pages).
+4.  **Adding Pages:** Create `pages/new-page.html` -> Add link in `index.html` -> Update `app.js` if custom routing needed.
 
-## Future Goals
-*   **WordPress Migration:** The strict separation of HTML content from JS logic is to facilitate moving to WordPress later. Keep markup semantic and clean.
-*   **Accessibility:** A high priority for all platforms.
+## Future Goals & Notes
+*   **WordPress Migration:** Strict separation of HTML/JS facilitates this.
+*   **Experimental Features:** "Melt" WebGL effect on homepage (`melt-effect.js`).
+*   **Images:** Use assets from `ingest/` or `main-site/images/`.
 
-## Important Notes
-*   **Images:** Use images from `ingest/` or `main-site/images/`.
-*   **Forms:** Use Formspree (placeholder `YOUR_FORM_ID` in code).
-*   **"Melt" Effect:** An experimental WebGL effect exists on the homepage (`melt-effect.js`).
+## WordPress Migration (active)
+*   **Goal:** Replace SPA routing with native WP templates and content types while preserving the existing aesthetic.
+*   **Theme setup:** Register nav menu(s), enqueue only needed assets, use `front-page.php` for the landing page, and avoid hash-based navigation (`data-page` links go away).
+*   **Landing page content sources:**
+    1. **Site identity:** `bloginfo()` (already used) + optional custom logo.
+    2. **Navigation:** `wp_nav_menu()` pulling a "Primary" menu configured in the Dashboard.
+    3. **Hero:** Featured image (or custom field) on the Home page.
+    4. **Intro copy:** Home page content (the_content()).
+    5. **Projects grid:** Custom Post Type `project` (or a Page with child items) with fields: status badge, title, date/meta, excerpt, link/slug.
+    6. **Collaborations block:** Convert `partials/collaborations.html` into a CPT `collaboration` or a reusable block (ACF/Block Editor) and render via a template part.
+    7. **Recent updates:** Standard Posts in an "Updates" category (loop limited on the front page).
+    8. **Support CTA:** Button URL from a theme option or Home page custom field.
+*   **SPA note:** Hash-based SPA routing (app.js) is disabled; template-driven rendering is now the default. Keep app.js only if future hash navigation is required.
+*   **Next templates:** Build `front-page.php`, `archive-project.php`, `single-project.php`, and a fallback `page.php` that mirrors existing typography/layout.
+*   **Data migration:** Move HTML snippets from `regen_wp/pages/*.html` into WP content (Pages, CPTs, Posts) and re-map image URLs to the media library where possible.
