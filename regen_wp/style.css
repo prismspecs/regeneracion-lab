@@ -291,6 +291,23 @@ body {
     margin-bottom: 40px;
 }
 
+.project-card--turquoise {
+    border-left-color: var(--color-secondary-green);
+    box-shadow: var(--color-shadow-soft);
+}
+
+.project-card--brown {
+    border-left-color: var(--color-earth-brown);
+    background: #f9f6f3;
+    box-shadow: 0 12px 30px rgba(156, 84, 36, 0.12);
+}
+
+.project-card--amber {
+    border-left-color: var(--color-clay-red);
+    background: #fff7ec;
+    box-shadow: 0 12px 30px rgba(231, 111, 81, 0.12);
+}
+
 .project-card h3,
 .card-title {
     font-family: var(--font-serif);
@@ -762,6 +779,18 @@ body {
     border-bottom: 3px solid var(--color-earth-brown);
 }
 
+.article-header.article-style--turquoise {
+    border-bottom-color: var(--color-secondary-green);
+}
+
+.article-header.article-style--brown {
+    border-bottom-color: var(--color-earth-brown);
+}
+
+.article-header.article-style--amber {
+    border-bottom-color: var(--color-clay-red);
+}
+
 .article-title {
     font-family: var(--font-serif);
     font-size: 2.5em;
@@ -787,6 +816,12 @@ body {
 }
 
 .article-content h3 {
+    font-family: var(--font-serif);
+    font-size: 1.6em;
+    margin: 40px 0 20px;
+}
+
+.article-content .wp-block-heading {
     font-family: var(--font-serif);
     font-size: 1.6em;
     margin: 40px 0 20px;
@@ -1064,6 +1099,24 @@ body {
 .resource-list li a:hover {
     text-decoration: underline;
     color: var(--color-earth-brown);
+}
+
+.resource-header,
+.article-content .resource-header,
+.article-content .wp-block-heading.resource-header,
+.wp-block-heading.resource-header {
+    font-family: var(--font-sans);
+    font-size: 1.17em;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--color-primary-text);
+    margin: 24px 0 12px;
+    padding: 0;
+    border: 0;
+}
+
+.resource-header + .resource-list {
+    margin-top: 8px;
 }
 
 /* Subtitles */

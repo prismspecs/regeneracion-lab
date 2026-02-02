@@ -178,6 +178,27 @@ function regen_wp_register_project_meta() {
         'show_in_rest' => true,
         'sanitize_callback' => 'sanitize_text_field',
     ) );
+
+    register_post_meta( 'project', 'project_style', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+
+    register_post_meta( 'project', 'project_title_line1', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+
+    register_post_meta( 'project', 'project_title_line2', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
 }
 add_action( 'init', 'regen_wp_register_project_meta' );
 
@@ -196,11 +217,19 @@ add_action( 'add_meta_boxes', 'regen_wp_project_metabox' );
 function regen_wp_project_metabox_render( $post ) {
     wp_nonce_field( 'regen_wp_save_project_meta', 'regen_wp_project_nonce' );
 
-    $badge      = get_post_meta( $post->ID, 'project_badge', true );
-    $meta       = get_post_meta( $post->ID, 'project_meta', true );
-    $link_label = get_post_meta( $post->ID, 'project_link_label', true );
+    $badge        = get_post_meta( $post->ID, 'project_badge', true );
+    $meta         = get_post_meta( $post->ID, 'project_meta', true );
+    $link_label   = get_post_meta( $post->ID, 'project_link_label', true );
+    $style_value  = get_post_meta( $post->ID, 'project_style', true );
+    $title_line1  = get_post_meta( $post->ID, 'project_title_line1', true );
+    $title_line2  = get_post_meta( $post->ID, 'project_title_line2', true );
 
     $badge_options = array( '', 'NEW', 'ACTIVE', 'ONGOING', 'PAUSED', 'ARCHIVE' );
+    $style_options = array(
+        'turquoise' => __( 'Turquoise (default)', 'regen-wp' ),
+        'brown'     => __( 'Brown', 'regen-wp' ),
+        'amber'     => __( 'Amber', 'regen-wp' ),
+    );
     ?>
     <p><strong><?php esc_html_e( 'Badge', 'regen-wp' ); ?></strong></p>
     <select name="project_badge" style="width:100%">
@@ -214,6 +243,19 @@ function regen_wp_project_metabox_render( $post ) {
 
     <p style="margin-top:12px;"><strong><?php esc_html_e( 'Link label (default: Explore)', 'regen-wp' ); ?></strong></p>
     <input type="text" name="project_link_label" value="<?php echo esc_attr( $link_label ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Card style', 'regen-wp' ); ?></strong></p>
+    <select name="project_style" style="width:100%">
+        <?php foreach ( $style_options as $key => $label ) : ?>
+            <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $style_value ? $style_value : 'turquoise', $key ); ?>><?php echo esc_html( $label ); ?></option>
+        <?php endforeach; ?>
+    </select>
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Title Line 1 (optional override)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="project_title_line1" value="<?php echo esc_attr( $title_line1 ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Title Line 2 (optional)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="project_title_line2" value="<?php echo esc_attr( $title_line2 ); ?>" style="width:100%" />
     <?php
 }
 
@@ -230,7 +272,7 @@ function regen_wp_save_project_meta( $post_id ) {
         return;
     }
 
-    $fields = array( 'project_badge', 'project_meta', 'project_link_label' );
+    $fields = array( 'project_badge', 'project_meta', 'project_link_label', 'project_style', 'project_title_line1', 'project_title_line2' );
     foreach ( $fields as $field ) {
         if ( isset( $_POST[ $field ] ) ) {
             $value = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
@@ -241,3 +283,92 @@ function regen_wp_save_project_meta( $post_id ) {
     }
 }
 add_action( 'save_post_project', 'regen_wp_save_project_meta' );
+
+// Block pattern for timeline
+function regen_wp_register_block_patterns() {
+    if ( ! function_exists( 'register_block_pattern' ) ) {
+        return;
+    }
+
+    register_block_pattern_category( 'regen', array( 'label' => __( 'Regeneracion', 'regen-wp' ) ) );
+
+    register_block_pattern(
+        'regen/timeline-default',
+        array(
+            'title'       => __( 'Project Timeline', 'regen-wp' ),
+            'description' => __( 'Three-step timeline with markers and years.', 'regen-wp' ),
+            'categories'  => array( 'regen' ),
+            'content'     => '<div class="timeline">
+    <div class="timeline-item">
+        <div class="timeline-marker"></div>
+        <div class="timeline-content">
+            <div class="timeline-year">2025</div>
+            <ul class="timeline-list">
+                <li>Save the archive!</li>
+            </ul>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-marker"></div>
+        <div class="timeline-content">
+            <div class="timeline-year">2026</div>
+            <ul class="timeline-list">
+                <li>Indexing, preservation, and repair of archival material</li>
+                <li>Creating an annotated finding guide for the archive</li>
+                <li>Research publication possibilities for the family, including developing new scholarly introductions to Holmes’ previously published and unpublished works</li>
+            </ul>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-marker"></div>
+        <div class="timeline-content">
+            <div class="timeline-year">2027</div>
+            <ul class="timeline-list">
+                <li>Finding a long-term home for the archive where the family, scholars, and artists can visit the materials</li>
+                <li>Supporting the family in developing a research symposium on Holmes’ work and significance</li>
+            </ul>
+        </div>
+    </div>
+</div>',
+        )
+    );
+
+    // Resource header (standalone heading block)
+    register_block_pattern(
+        'regen/resource-header',
+        array(
+            'title'       => __( 'Resource Header', 'regen-wp' ),
+            'description' => __( 'Standalone section heading for resource lists.', 'regen-wp' ),
+            'categories'  => array( 'regen' ),
+            'content'     => '<!-- wp:heading {"level":4,"className":"resource-header"} -->
+<h4 class="resource-header">Resource Title</h4>
+<!-- /wp:heading -->',
+        )
+    );
+
+    // Resource list (list block with resource-list class)
+    register_block_pattern(
+        'regen/resource-list',
+        array(
+            'title'       => __( 'Resource List', 'regen-wp' ),
+            'description' => __( 'Lined resource list styled like the HTML site.', 'regen-wp' ),
+            'categories'  => array( 'regen' ),
+            'content'     => '<!-- wp:list {"className":"resource-list"} -->
+<ul class="resource-list">
+    <li>Example resource entry with optional <a href="https://example.com" target="_blank" rel="noopener">link</a>.</li>
+    <li>Another resource entry with citation details.</li>
+    <li>A third resource entry.</li>
+</ul>
+<!-- /wp:list -->',
+        )
+    );
+}
+add_action( 'init', 'regen_wp_register_block_patterns' );
+
+// Add fallback favicon if Site Icon is not set
+function regen_wp_favicon() {
+    if ( ! has_site_icon() ) {
+        echo '<link rel="shortcut icon" href="' . esc_url( get_stylesheet_directory_uri() . '/images/favicon.png' ) . '" />' . "\n";
+    }
+}
+add_action( 'wp_head', 'regen_wp_favicon' );

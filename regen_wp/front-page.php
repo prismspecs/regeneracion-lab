@@ -48,10 +48,12 @@ $support_url      = get_theme_mod( 'regen_support_url', 'https://give.ucsb.edu/c
                     $badge       = get_post_meta( get_the_ID(), 'project_badge', true );
                     $meta        = get_post_meta( get_the_ID(), 'project_meta', true );
                     $link_label  = get_post_meta( get_the_ID(), 'project_link_label', true );
+                    $style       = get_post_meta( get_the_ID(), 'project_style', true );
+                    $style_class = $style ? ' project-card--' . sanitize_html_class( $style ) : ' project-card--turquoise';
                     $cta_label   = $link_label ? $link_label : 'Explore';
                 ?>
-                <div class="project-card">
-                    <?php if ( $badge ) : ?><div class="item-badge"><?php echo esc_html( $badge ); ?></div><?php endif; ?>
+                <div class="project-card<?php echo esc_attr( $style_class ); ?>">
+                    <?php if ( $badge && 0 === strcasecmp( trim( $badge ), 'ongoing' ) ) : ?><div class="item-badge"><?php echo esc_html( $badge ); ?></div><?php endif; ?>
                     <h3><?php the_title(); ?></h3>
                     <?php if ( $meta ) : ?><p class="item-meta"><?php echo esc_html( $meta ); ?></p><?php endif; ?>
                     <p><?php echo esc_html( get_the_excerpt() ); ?></p>
