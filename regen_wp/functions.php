@@ -124,7 +124,7 @@ function regen_wp_register_cpts() {
         'has_archive' => true,
         'menu_position' => 5,
         'show_in_rest' => true,
-        'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields' ),
+        'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
         'rewrite' => array( 'slug' => 'projects' ),
     ) );
 
@@ -137,7 +137,7 @@ function regen_wp_register_cpts() {
         'has_archive' => true,
         'menu_position' => 6,
         'show_in_rest' => true,
-        'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields' ),
+        'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
         'rewrite' => array( 'slug' => 'residents' ),
     ) );
 
@@ -150,8 +150,94 @@ function regen_wp_register_cpts() {
         'has_archive' => true,
         'menu_position' => 7,
         'show_in_rest' => true,
-        'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields' ),
+        'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
         'rewrite' => array( 'slug' => 'collaborations' ),
     ) );
 }
 add_action( 'init', 'regen_wp_register_cpts' );
+
+// Project meta (badge/meta/link label) with editor-friendly UI
+function regen_wp_register_project_meta() {
+    register_post_meta( 'project', 'project_badge', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+
+    register_post_meta( 'project', 'project_meta', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+
+    register_post_meta( 'project', 'project_link_label', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+}
+add_action( 'init', 'regen_wp_register_project_meta' );
+
+function regen_wp_project_metabox() {
+    add_meta_box(
+        'regen_project_meta',
+        __( 'Project Display', 'regen-wp' ),
+        'regen_wp_project_metabox_render',
+        'project',
+        'side',
+        'default'
+    );
+}
+add_action( 'add_meta_boxes', 'regen_wp_project_metabox' );
+
+function regen_wp_project_metabox_render( $post ) {
+    wp_nonce_field( 'regen_wp_save_project_meta', 'regen_wp_project_nonce' );
+
+    $badge      = get_post_meta( $post->ID, 'project_badge', true );
+    $meta       = get_post_meta( $post->ID, 'project_meta', true );
+    $link_label = get_post_meta( $post->ID, 'project_link_label', true );
+
+    $badge_options = array( '', 'NEW', 'ACTIVE', 'ONGOING', 'PAUSED', 'ARCHIVE' );
+    ?>
+    <p><strong><?php esc_html_e( 'Badge', 'regen-wp' ); ?></strong></p>
+    <select name="project_badge" style="width:100%">
+        <?php foreach ( $badge_options as $option ) : ?>
+            <option value="<?php echo esc_attr( $option ); ?>" <?php selected( $badge, $option ); ?>><?php echo $option ? esc_html( ucfirst( strtolower( $option ) ) ) : '—'; ?></option>
+        <?php endforeach; ?>
+    </select>
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Meta line (e.g., Ongoing, 2025-2026)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="project_meta" value="<?php echo esc_attr( $meta ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Link label (default: Explore)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="project_link_label" value="<?php echo esc_attr( $link_label ); ?>" style="width:100%" />
+    <?php
+}
+
+function regen_wp_save_project_meta( $post_id ) {
+    if ( ! isset( $_POST['regen_wp_project_nonce'] ) || ! wp_verify_nonce( $_POST['regen_wp_project_nonce'], 'regen_wp_save_project_meta' ) ) {
+        return;
+    }
+
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    if ( isset( $_POST['post_type'] ) && 'project' === $_POST['post_type'] && ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    $fields = array( 'project_badge', 'project_meta', 'project_link_label' );
+    foreach ( $fields as $field ) {
+        if ( isset( $_POST[ $field ] ) ) {
+            $value = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
+            update_post_meta( $post_id, $field, $value );
+        } else {
+            delete_post_meta( $post_id, $field );
+        }
+    }
+}
+add_action( 'save_post_project', 'regen_wp_save_project_meta' );

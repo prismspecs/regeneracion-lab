@@ -1,6 +1,6 @@
 <?php
 /**
- * Main template fallback
+ * Generic single template (posts and other CPTs)
  */
 
 get_header();
@@ -19,5 +19,3 @@ else :
 endif;
 
 get_footer();
-
-?>
