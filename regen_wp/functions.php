@@ -108,6 +108,39 @@ function regen_wp_customize_register( $wp_customize ) {
         'section' => $section_id,
         'type'    => 'url',
     ) );
+
+    // Support button label
+    $wp_customize->add_setting( 'regen_support_button_label', array(
+        'default'           => 'CONTRIBUTE',
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+    $wp_customize->add_control( 'regen_support_button_label', array(
+        'label'   => __( 'Support Button Label', 'regen-wp' ),
+        'section' => $section_id,
+        'type'    => 'text',
+    ) );
+
+    // Support popover message
+    $wp_customize->add_setting( 'regen_support_popover_message', array(
+        'default'           => 'When you check out, specify the donation is for Regeneracion Lab.',
+        'sanitize_callback' => 'wp_kses_post',
+    ) );
+    $wp_customize->add_control( 'regen_support_popover_message', array(
+        'label'   => __( 'Support Popover Message', 'regen-wp' ),
+        'section' => $section_id,
+        'type'    => 'textarea',
+    ) );
+
+    // Support popover continue button
+    $wp_customize->add_setting( 'regen_support_popover_button', array(
+        'default'           => 'Continue',
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+    $wp_customize->add_control( 'regen_support_popover_button', array(
+        'label'   => __( 'Support Popover Button Label', 'regen-wp' ),
+        'section' => $section_id,
+        'type'    => 'text',
+    ) );
 }
 add_action( 'customize_register', 'regen_wp_customize_register' );
 
@@ -206,6 +239,21 @@ function regen_wp_register_project_meta() {
         'show_in_rest' => true,
         'sanitize_callback' => 'sanitize_text_field',
     ) );
+
+    // Collaboration link meta
+    register_post_meta( 'collaboration', 'collaboration_link_label', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+
+    register_post_meta( 'collaboration', 'collaboration_link_url', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'esc_url_raw',
+    ) );
 }
 add_action( 'init', 'regen_wp_register_project_meta' );
 
@@ -215,8 +263,8 @@ function regen_wp_project_metabox() {
         __( 'Project Display', 'regen-wp' ),
         'regen_wp_project_metabox_render',
         'project',
-        'side',
-        'default'
+        'normal',
+        'high'
     );
 }
 add_action( 'add_meta_boxes', 'regen_wp_project_metabox' );
@@ -239,33 +287,33 @@ function regen_wp_project_metabox_render( $post ) {
         'amber'     => __( 'Amber', 'regen-wp' ),
     );
     ?>
-    <p><strong><?php esc_html_e( 'Badge', 'regen-wp' ); ?></strong></p>
+    <p><strong><?php esc_html_e( 'Badge (NEW, ACTIVE, etc.)', 'regen-wp' ); ?></strong></p>
     <select name="project_badge" style="width:100%">
         <?php foreach ( $badge_options as $option ) : ?>
             <option value="<?php echo esc_attr( $option ); ?>" <?php selected( $badge, $option ); ?>><?php echo $option ? esc_html( ucfirst( strtolower( $option ) ) ) : '—'; ?></option>
         <?php endforeach; ?>
     </select>
 
-    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Meta line (e.g., Ongoing, 2025-2026)', 'regen-wp' ); ?></strong></p>
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Year(s) or status (e.g., Ongoing, 2025-2026)', 'regen-wp' ); ?></strong></p>
     <input type="text" name="project_meta" value="<?php echo esc_attr( $meta ); ?>" style="width:100%" />
 
-    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Link label (default: Explore)', 'regen-wp' ); ?></strong></p>
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Button label (default: Explore)', 'regen-wp' ); ?></strong></p>
     <input type="text" name="project_link_label" value="<?php echo esc_attr( $link_label ); ?>" style="width:100%" />
 
-    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Link URL (leave blank to use the project page; use full URL for external destinations)', 'regen-wp' ); ?></strong></p>
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Link URL (leave blank to use this project page; add full URL for external destinations)', 'regen-wp' ); ?></strong></p>
     <input type="url" name="project_link_url" value="<?php echo esc_attr( $link_url ); ?>" style="width:100%" />
 
-    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Card style', 'regen-wp' ); ?></strong></p>
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Card style (accent color)', 'regen-wp' ); ?></strong></p>
     <select name="project_style" style="width:100%">
         <?php foreach ( $style_options as $key => $label ) : ?>
             <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $style_value ? $style_value : 'turquoise', $key ); ?>><?php echo esc_html( $label ); ?></option>
         <?php endforeach; ?>
     </select>
 
-    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Title Line 1 (optional override)', 'regen-wp' ); ?></strong></p>
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Title Line 1 (use to split long titles manually)', 'regen-wp' ); ?></strong></p>
     <input type="text" name="project_title_line1" value="<?php echo esc_attr( $title_line1 ); ?>" style="width:100%" />
 
-    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Title Line 2 (optional)', 'regen-wp' ); ?></strong></p>
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Title Line 2 (optional second line)', 'regen-wp' ); ?></strong></p>
     <input type="text" name="project_title_line2" value="<?php echo esc_attr( $title_line2 ); ?>" style="width:100%" />
     <?php
 }
@@ -295,6 +343,59 @@ function regen_wp_save_project_meta( $post_id ) {
     }
 }
 add_action( 'save_post_project', 'regen_wp_save_project_meta' );
+
+// Collaboration meta box
+function regen_wp_collaboration_metabox() {
+    add_meta_box(
+        'regen_collaboration_meta',
+        __( 'Collaboration Link', 'regen-wp' ),
+        'regen_wp_collaboration_metabox_render',
+        'collaboration',
+        'normal',
+        'high'
+    );
+}
+add_action( 'add_meta_boxes', 'regen_wp_collaboration_metabox' );
+
+function regen_wp_collaboration_metabox_render( $post ) {
+    wp_nonce_field( 'regen_wp_save_collaboration_meta', 'regen_wp_collaboration_nonce' );
+
+    $link_label = get_post_meta( $post->ID, 'collaboration_link_label', true );
+    $link_url   = get_post_meta( $post->ID, 'collaboration_link_url', true );
+    ?>
+    <p><strong><?php esc_html_e( 'Button label (default: Learn More)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="collaboration_link_label" value="<?php echo esc_attr( $link_label ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Link URL (leave blank to use this collaboration page; add full URL for external destinations)', 'regen-wp' ); ?></strong></p>
+    <input type="url" name="collaboration_link_url" value="<?php echo esc_attr( $link_url ); ?>" style="width:100%" />
+    <?php
+}
+
+function regen_wp_save_collaboration_meta( $post_id ) {
+    if ( ! isset( $_POST['regen_wp_collaboration_nonce'] ) || ! wp_verify_nonce( $_POST['regen_wp_collaboration_nonce'], 'regen_wp_save_collaboration_meta' ) ) {
+        return;
+    }
+
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    if ( isset( $_POST['post_type'] ) && 'collaboration' === $_POST['post_type'] && ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    $fields = array( 'collaboration_link_label', 'collaboration_link_url' );
+    foreach ( $fields as $field ) {
+        if ( isset( $_POST[ $field ] ) ) {
+            $raw   = wp_unslash( $_POST[ $field ] );
+            $value = ( 'collaboration_link_url' === $field ) ? esc_url_raw( $raw ) : sanitize_text_field( $raw );
+            update_post_meta( $post_id, $field, $value );
+        } else {
+            delete_post_meta( $post_id, $field );
+        }
+    }
+}
+add_action( 'save_post_collaboration', 'regen_wp_save_collaboration_meta' );
 
 // Block pattern for timeline
 function regen_wp_register_block_patterns() {

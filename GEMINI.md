@@ -67,15 +67,17 @@
     2. **Navigation:** `wp_nav_menu()` pulling a "Primary" menu configured in the Dashboard.
     3. **Hero:** Featured image (or customizer image) on the Home page.
     4. **Intro copy:** Home page content (the_content()).
-    5. **Projects grid:** Custom Post Type `project` with meta: `project_badge` (shows only when "Ongoing"), `project_meta` (e.g., Ongoing/2025-2026), `project_link_label` (CTA label), `project_style` (turquoise/brown/amber), and optional title overrides (`project_title_line1`/`project_title_line2` for manual breaks). Excerpt populates the card body.
-    6. **Collaborations block:** Convert `partials/collaborations.html` into a CPT `collaboration` or a reusable block (ACF/Block Editor) and render via a template part.
+    5. **Projects grid:** Custom Post Type `project` with meta: `project_badge` (shows only when "Ongoing"), `project_meta` (e.g., Ongoing/2025-2026), `project_link_label` (CTA label), `project_link_url` (optional external; opens in new tab), `project_style` (turquoise/brown/amber), and optional title overrides (`project_title_line1`/`project_title_line2` for manual breaks). Excerpt populates the card body.
+    6. **Collaborations block:** CPT `collaboration` rendered via template part; supports `collaboration_link_label`/`collaboration_link_url` (external opens in new tab).
     7. **Recent updates:** Standard Posts in an "Updates" category (loop limited on the front page).
     8. **Support CTA:** Button URL/text from theme options (Customizer); hero quote/attribution/image also via Customizer.
 *   **SPA note:** Hash-based SPA routing (app.js) is disabled; template-driven rendering is now the default. Keep app.js only if future hash navigation is required.
-*   **Templates in theme:** `front-page.php`, `single-project.php`, generic `single.php`, fallback `index.php`. Project badges are Ongoing-only; project card styles are chosen via `project_style` meta.
-*   **Editor UX:** Project sidebar metabox “Project Display” surfaces badge, meta line, CTA label, card style, title line 1/2 overrides.
+*   **Templates in theme:** `front-page.php`, `archive-project.php` (Projects grid), `single-project.php` (neutral header color), generic `single.php`, fallback `index.php`. Project badges are Ongoing-only; project card styles are chosen via `project_style` meta.
+*   **Editor UX:**
+    - Project metabox “Project Display” sits in main column: badge, year/status, button label, optional link URL (external allowed), card style, title line 1/2 overrides.
+    - Collaboration metabox “Collaboration Link” in main column: button label + link URL (external allowed).
 *   **Block patterns:**
     - **Timeline** pattern (`timeline` classes) for project timelines.
     - **Resource Header** (H4 with `resource-header` class) and **Resource List** (list with `resource-list` class) to recreate bibliography/resource sections without manual classes.
-*   **Next templates:** Add `archive-project.php` to mirror the HTML Projects page grid, and optionally a `page.php` to mirror general typography/layout.
+*   **Next templates:** Optionally add `page.php` to mirror general typography/layout.
 *   **Data migration:** Move HTML snippets from `regen_wp/pages/*.html` into WP content (Pages, CPTs, Posts) and re-map image URLs to the media library where possible.
