@@ -254,6 +254,14 @@ function regen_wp_register_project_meta() {
         'show_in_rest' => true,
         'sanitize_callback' => 'esc_url_raw',
     ) );
+
+    // Post update links (multiple CTA links per update/post)
+    register_post_meta( 'post', 'update_links', array(
+        'type'              => 'array',
+        'single'            => true,
+        'show_in_rest'      => true,
+        'sanitize_callback' => 'regen_wp_sanitize_update_links',
+    ) );
 }
 add_action( 'init', 'regen_wp_register_project_meta' );
 
@@ -396,6 +404,111 @@ function regen_wp_save_collaboration_meta( $post_id ) {
     }
 }
 add_action( 'save_post_collaboration', 'regen_wp_save_collaboration_meta' );
+
+// Update links meta box for posts
+function regen_wp_update_links_metabox() {
+    add_meta_box(
+        'regen_update_links',
+        __( 'Update Links', 'regen-wp' ),
+        'regen_wp_update_links_metabox_render',
+        'post',
+        'normal',
+        'high'
+    );
+}
+add_action( 'add_meta_boxes', 'regen_wp_update_links_metabox' );
+
+function regen_wp_update_links_metabox_render( $post ) {
+    wp_nonce_field( 'regen_wp_save_update_links', 'regen_wp_update_links_nonce' );
+    $links = get_post_meta( $post->ID, 'update_links', true );
+    if ( ! is_array( $links ) ) {
+        $links = array();
+    }
+    $max = 3;
+    ?>
+    <p><?php esc_html_e( 'Add one or more links for this update (label + URL). Leave blank to skip a row.', 'regen-wp' ); ?></p>
+    <?php for ( $i = 0; $i < $max; $i++ ) :
+        $label = isset( $links[ $i ]['label'] ) ? $links[ $i ]['label'] : '';
+        $url   = isset( $links[ $i ]['url'] ) ? $links[ $i ]['url'] : '';
+        ?>
+        <div style="margin-bottom:12px;">
+            <label style="display:block; font-weight:600; margin-bottom:4px;">Link <?php echo ( $i + 1 ); ?></label>
+            <input type="text" name="update_links[label][]" value="<?php echo esc_attr( $label ); ?>" placeholder="Label (e.g., Read more)" style="width:100%; margin-bottom:6px;" />
+            <input type="url" name="update_links[url][]" value="<?php echo esc_attr( $url ); ?>" placeholder="https://example.com" style="width:100%;" />
+        </div>
+    <?php endfor; ?>
+    <?php
+}
+
+function regen_wp_sanitize_update_links( $value ) {
+    if ( ! is_array( $value ) ) {
+        return array();
+    }
+    $clean = array();
+
+    // Handle shape: [ 'label' => [...], 'url' => [...] ] from the metabox inputs
+    if ( isset( $value['label'] ) || isset( $value['url'] ) ) {
+        $labels = isset( $value['label'] ) ? (array) $value['label'] : array();
+        $urls   = isset( $value['url'] ) ? (array) $value['url'] : array();
+        $max    = max( count( $labels ), count( $urls ) );
+        for ( $i = 0; $i < $max; $i++ ) {
+            $label = isset( $labels[ $i ] ) ? sanitize_text_field( $labels[ $i ] ) : '';
+            $url   = isset( $urls[ $i ] ) ? esc_url_raw( $urls[ $i ] ) : '';
+            if ( '' === $label && '' === $url ) {
+                continue;
+            }
+            $clean[] = array(
+                'label' => $label,
+                'url'   => $url,
+            );
+        }
+        return $clean;
+    }
+
+    // Fallback: array of rows
+    foreach ( $value as $row ) {
+        if ( ! is_array( $row ) ) {
+            continue;
+        }
+        $label = isset( $row['label'] ) ? sanitize_text_field( $row['label'] ) : '';
+        $url   = isset( $row['url'] ) ? esc_url_raw( $row['url'] ) : '';
+        if ( '' === $label && '' === $url ) {
+            continue;
+        }
+        $clean[] = array(
+            'label' => $label,
+            'url'   => $url,
+        );
+    }
+    return $clean;
+}
+
+function regen_wp_save_update_links( $post_id ) {
+    if ( ! isset( $_POST['regen_wp_update_links_nonce'] ) || ! wp_verify_nonce( $_POST['regen_wp_update_links_nonce'], 'regen_wp_save_update_links' ) ) {
+        return;
+    }
+
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    if ( isset( $_POST['post_type'] ) && 'post' === $_POST['post_type'] && ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    if ( isset( $_POST['update_links'] ) ) {
+        $raw   = wp_unslash( $_POST['update_links'] );
+        $clean = regen_wp_sanitize_update_links( $raw );
+        if ( ! empty( $clean ) ) {
+            update_post_meta( $post_id, 'update_links', $clean );
+        } else {
+            delete_post_meta( $post_id, 'update_links' );
+        }
+    } else {
+        delete_post_meta( $post_id, 'update_links' );
+    }
+}
+add_action( 'save_post', 'regen_wp_save_update_links' );
 
 // Block pattern for timeline
 function regen_wp_register_block_patterns() {

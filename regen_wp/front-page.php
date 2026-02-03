@@ -81,7 +81,6 @@ $support_pop_cta  = get_theme_mod( 'regen_support_popover_button', 'Continue' );
     <?php
     $updates_query = new WP_Query( array(
         'post_type'      => 'post',
-        'category_name'  => 'updates',
         'posts_per_page' => 3,
     ) );
     ?>
@@ -90,7 +89,26 @@ $support_pop_cta  = get_theme_mod( 'regen_support_popover_button', 'Continue' );
             <div class="home-section-box">
                 <h3 class="home-section-title"><?php the_title(); ?></h3>
                 <p><?php echo esc_html( get_the_excerpt() ); ?></p>
-                <a href="<?php the_permalink(); ?>" class="item-link home-link-button">→ Read More</a>
+                <?php
+                    $update_links = get_post_meta( get_the_ID(), 'update_links', true );
+                ?>
+                <div class="update-links">
+                    <?php if ( is_array( $update_links ) && ! empty( $update_links ) ) : ?>
+                        <?php foreach ( $update_links as $link ) :
+                            $label = isset( $link['label'] ) ? $link['label'] : '';
+                            $url   = isset( $link['url'] ) ? $link['url'] : '';
+                            if ( ! $url ) {
+                                continue;
+                            }
+                            $is_external = preg_match( '/^https?:\/\//i', $url );
+                            $target_attr = $is_external ? ' target="_blank" rel="noopener"' : '';
+                        ?>
+                            <a href="<?php echo esc_url( $url ); ?>" class="item-link"<?php echo $target_attr; ?>>→ <?php echo esc_html( $label ? $label : 'Read More' ); ?></a>
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                        <a href="<?php the_permalink(); ?>" class="item-link home-link-button">→ Read More</a>
+                    <?php endif; ?>
+                </div>
             </div>
         <?php endwhile; ?>
         <?php wp_reset_postdata(); ?>
