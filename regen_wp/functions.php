@@ -9,6 +9,9 @@ function regen_wp_enqueue_scripts() {
     
     // Enqueue Google Fonts (from index.html)
     wp_enqueue_style( 'regen-google-fonts', 'https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Roboto:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap', array(), null );
+
+    // PJAX-style nav swaps (keeps clean URLs)
+    wp_enqueue_script( 'regen-pjax', get_template_directory_uri() . '/pjax.js', array(), null, true );
 }
 add_action( 'wp_enqueue_scripts', 'regen_wp_enqueue_scripts' );
 
@@ -586,6 +589,19 @@ function regen_wp_register_block_patterns() {
     <li>A third resource entry.</li>
 </ul>
 <!-- /wp:list -->',
+        )
+    );
+
+    // Profile card for About/Team sections
+    register_block_pattern(
+        'regen/profile-card',
+        array(
+            'title'       => __( 'Profile Card', 'regen-wp' ),
+            'description' => __( 'Director / Principal Investigator profile card with image and bio.', 'regen-wp' ),
+            'categories'  => array( 'regen' ),
+            'content'     => '<!-- wp:group {"className":"about-profile-card"} -->
+<div class="about-profile-card"><img class="about-profile-image" src="https://via.placeholder.com/180x240" alt="Profile"/><div class="about-profile-content"><h3 class="about-profile-name">Amrah Salomon</h3><p>Amrah Salomon is a scholar, creative writer, and practitioner of research justice working at the intersections of Ethnic Studies, Indigenous studies, Women of Color feminisms and Queer theory, environmental justice, and decolonial methodologies.</p><p>At the Regeneracion Lab, Dr. Salomon develops collaborative projects with communities, supports resident scholars and artists, and builds educational resources for students and activists.</p></div></div>
+<!-- /wp:group -->',
         )
     );
 }
