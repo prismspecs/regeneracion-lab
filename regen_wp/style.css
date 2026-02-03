@@ -705,9 +705,111 @@ body {
     margin: 30px 0 15px;
 }
 
+/* Contact Form 7 Styling */
+.wpcf7 {
+    max-width: 600px;
+}
+
+.wpcf7-form p {
+    margin-bottom: 20px;
+}
+
+/* Hide labels when using placeholder approach */
+.wpcf7-form p>label {
+    display: none;
+}
+
+.wpcf7-form-control-wrap {
+    display: block;
+}
+
+.wpcf7-form input[type="text"],
+.wpcf7-form input[type="email"],
+.wpcf7-form .wpcf7-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--color-primary-text);
+    font-family: inherit;
+    font-size: 1em;
+    background: white;
+    border-radius: 0;
+    box-sizing: border-box;
+}
+
+.wpcf7-form input[type="text"]::placeholder,
+.wpcf7-form input[type="email"]::placeholder,
+.wpcf7-form .wpcf7-textarea::placeholder {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.wpcf7-form .wpcf7-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.wpcf7-form input[type="submit"],
+.wpcf7-form .wpcf7-submit {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--color-clay-red);
+    color: white;
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 4px 15px rgba(231, 111, 81, 0.3);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.wpcf7-form input[type="submit"]:hover,
+.wpcf7-form .wpcf7-submit:hover {
+    background: var(--color-earth-brown);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(156, 84, 36, 0.3);
+}
+
+.wpcf7-form .wpcf7-spinner {
+    display: none;
+}
+
+.wpcf7-form .wpcf7-response-output {
+    margin: 20px 0 0;
+    padding: 15px;
+    border: none;
+    background: var(--color-bg-light);
+}
+
+.wpcf7-form.sent .wpcf7-response-output {
+    background: #d4edda;
+    color: #155724;
+}
+
+.wpcf7-form.failed .wpcf7-response-output,
+.wpcf7-form.invalid .wpcf7-response-output {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Hide CF7 screen reader elements visually */
+.wpcf7 .screen-reader-response {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+}
+
 /* =========================================
    Page Specific Styles
-   ========================================= */
+   =========================================*/
+*/
 
 /* Home Page */
 .hero-image-container {
