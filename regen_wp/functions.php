@@ -189,6 +189,19 @@ function regen_wp_register_cpts() {
         'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
         'rewrite' => array( 'slug' => 'collaborations' ),
     ) );
+
+    register_post_type( 'person', array(
+        'labels' => array(
+            'name' => __( 'People', 'regen-wp' ),
+            'singular_name' => __( 'Person', 'regen-wp' ),
+        ),
+        'public' => true,
+        'has_archive' => true,
+        'menu_position' => 8,
+        'show_in_rest' => true,
+        'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
+        'rewrite' => array( 'slug' => 'people' ),
+    ) );
 }
 add_action( 'init', 'regen_wp_register_cpts' );
 
@@ -264,6 +277,42 @@ function regen_wp_register_project_meta() {
         'single'            => true,
         'show_in_rest'      => true,
         'sanitize_callback' => 'regen_wp_sanitize_update_links',
+    ) );
+
+    // People meta
+    register_post_meta( 'person', 'person_role', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+
+    register_post_meta( 'person', 'person_years', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+
+    register_post_meta( 'person', 'person_link_label', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'sanitize_text_field',
+    ) );
+
+    register_post_meta( 'person', 'person_link_url', array(
+        'type'         => 'string',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'esc_url_raw',
+    ) );
+
+    register_post_meta( 'person', 'person_order', array(
+        'type'         => 'number',
+        'single'       => true,
+        'show_in_rest' => true,
+        'sanitize_callback' => 'absint',
     ) );
 }
 add_action( 'init', 'regen_wp_register_project_meta' );
@@ -513,6 +562,225 @@ function regen_wp_save_update_links( $post_id ) {
 }
 add_action( 'save_post', 'regen_wp_save_update_links' );
 
+// People metabox
+function regen_wp_person_metabox() {
+    add_meta_box(
+        'regen_person_meta',
+        __( 'Person Details', 'regen-wp' ),
+        'regen_wp_person_metabox_render',
+        'person',
+        'normal',
+        'high'
+    );
+}
+add_action( 'add_meta_boxes', 'regen_wp_person_metabox' );
+
+function regen_wp_person_metabox_render( $post ) {
+    wp_nonce_field( 'regen_wp_save_person_meta', 'regen_wp_person_nonce' );
+
+    $role       = get_post_meta( $post->ID, 'person_role', true );
+    $years      = get_post_meta( $post->ID, 'person_years', true );
+    $link_label = get_post_meta( $post->ID, 'person_link_label', true );
+    $link_url   = get_post_meta( $post->ID, 'person_link_url', true );
+    $order      = get_post_meta( $post->ID, 'person_order', true );
+    ?>
+    <p><strong><?php esc_html_e( 'Role (e.g., Director, Resident, Scholar)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="person_role" value="<?php echo esc_attr( $role ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Year(s) (e.g., 2025-2026)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="person_years" value="<?php echo esc_attr( $years ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Button label (optional)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="person_link_label" value="<?php echo esc_attr( $link_label ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Link URL (optional; external allowed)', 'regen-wp' ); ?></strong></p>
+    <input type="url" name="person_link_url" value="<?php echo esc_attr( $link_url ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Order (lower shows first)', 'regen-wp' ); ?></strong></p>
+    <input type="number" name="person_order" value="<?php echo esc_attr( $order ); ?>" style="width:100%" />
+    <?php
+}
+
+function regen_wp_save_person_meta( $post_id ) {
+    if ( ! isset( $_POST['regen_wp_person_nonce'] ) || ! wp_verify_nonce( $_POST['regen_wp_person_nonce'], 'regen_wp_save_person_meta' ) ) {
+        return;
+    }
+
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    if ( isset( $_POST['post_type'] ) && 'person' === $_POST['post_type'] && ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    $map = array(
+        'person_role'       => 'text',
+        'person_years'      => 'text',
+        'person_link_label' => 'text',
+        'person_link_url'   => 'url',
+        'person_order'      => 'int',
+    );
+
+    foreach ( $map as $field => $type ) {
+        if ( isset( $_POST[ $field ] ) ) {
+            $raw = wp_unslash( $_POST[ $field ] );
+            if ( 'url' === $type ) {
+                $val = esc_url_raw( $raw );
+            } elseif ( 'int' === $type ) {
+                $val = ( '' === $raw ) ? '' : absint( $raw );
+            } else {
+                $val = sanitize_text_field( $raw );
+            }
+            if ( '' === $val ) {
+                delete_post_meta( $post_id, $field );
+            } else {
+                update_post_meta( $post_id, $field, $val );
+            }
+        } else {
+            delete_post_meta( $post_id, $field );
+        }
+    }
+}
+add_action( 'save_post_person', 'regen_wp_save_person_meta' );
+
+// Shortcode to output person meta in blocks: [person_meta key="person_role"]
+function regen_wp_person_meta_shortcode( $atts ) {
+    $atts = shortcode_atts( array( 'key' => '' ), $atts, 'person_meta' );
+    $key  = $atts['key'];
+    if ( ! $key ) {
+        return '';
+    }
+    $value = get_post_meta( get_the_ID(), $key, true );
+    return esc_html( $value );
+}
+add_shortcode( 'person_meta', 'regen_wp_person_meta_shortcode' );
+
+// Renders the person link as a button using meta fields for label/url.
+function regen_person_link_button_shortcode() {
+    $post_id = get_the_ID();
+    if ( ! $post_id ) {
+        return '';
+    }
+
+    $label = get_post_meta( $post_id, 'person_link_label', true );
+    $url   = get_post_meta( $post_id, 'person_link_url', true );
+
+    if ( empty( $label ) || empty( $url ) ) {
+        return '';
+    }
+
+    $label = esc_html( $label );
+    $url   = esc_url( $url );
+
+    return '<div class="wp-block-buttons"><div class="wp-block-button is-style-outline"><a class="wp-block-button__link" href="' . $url . '" target="_blank" rel="noopener">' . $label . '</a></div></div>';
+}
+add_shortcode( 'person_link_button', 'regen_person_link_button_shortcode' );
+
+// Returns current person title.
+function regen_person_title_shortcode() {
+    return esc_html( get_the_title() );
+}
+add_shortcode( 'person_title', 'regen_person_title_shortcode' );
+
+// Returns current person featured image HTML.
+function regen_person_featured_image_shortcode() {
+    if ( ! has_post_thumbnail() ) {
+        return '';
+    }
+    return get_the_post_thumbnail( get_the_ID(), 'large', array( 'class' => 'resident-avatar' ) );
+}
+add_shortcode( 'person_featured_image', 'regen_person_featured_image_shortcode' );
+
+// Safely fetches person content with recursion guard to avoid person_card loops.
+function regen_person_get_content( $post_id ) {
+    static $in_person_content = false;
+
+    if ( $in_person_content ) {
+        return '';
+    }
+
+    $content = get_post_field( 'post_content', $post_id );
+    if ( ! $content ) {
+        return '';
+    }
+
+    // Strip nested person_card shortcodes to avoid infinite loops during render.
+    $content = preg_replace( '/\[person_card[^\]]*\]/', '', $content );
+
+    $in_person_content = true;
+    $rendered         = apply_filters( 'the_content', $content );
+    $in_person_content = false;
+
+    return $rendered;
+}
+
+// Returns current person content.
+function regen_person_content_shortcode() {
+    $post_id = get_the_ID();
+    if ( ! $post_id ) {
+        return '';
+    }
+    return regen_person_get_content( $post_id );
+}
+add_shortcode( 'person_content', 'regen_person_content_shortcode' );
+
+// Renders a full person card via shortcode: [person_card id="123"] (id optional; falls back to current post).
+function regen_person_card_shortcode( $atts ) {
+    $atts = shortcode_atts( array( 'id' => 0 ), $atts, 'person_card' );
+    $post_id = absint( $atts['id'] );
+
+    if ( ! $post_id ) {
+        $post_id = get_the_ID();
+    }
+
+    if ( ! $post_id ) {
+        error_log( 'person_card: missing post id' );
+        return '';
+    }
+
+    $post = get_post( $post_id );
+    if ( ! $post || 'person' !== $post->post_type ) {
+        error_log( 'person_card: invalid post id ' . $post_id );
+        return '';
+    }
+
+    $title   = esc_html( get_the_title( $post ) );
+    $role    = esc_html( get_post_meta( $post_id, 'person_role', true ) );
+    $years   = esc_html( get_post_meta( $post_id, 'person_years', true ) );
+    $label   = esc_html( get_post_meta( $post_id, 'person_link_label', true ) );
+    $url     = esc_url( get_post_meta( $post_id, 'person_link_url', true ) );
+    $content = regen_person_get_content( $post_id );
+
+    $img_html = '';
+    if ( has_post_thumbnail( $post_id ) ) {
+        $img_html = get_the_post_thumbnail( $post_id, 'large', array( 'class' => 'resident-avatar' ) );
+    }
+
+    $button_html = '';
+    if ( $label && $url ) {
+        $button_html = '<div class="wp-block-buttons"><div class="wp-block-button is-style-outline"><a class="wp-block-button__link" href="' . $url . '" target="_blank" rel="noopener">' . $label . '</a></div></div>';
+    }
+
+    $meta_line = '';
+    if ( $role || $years ) {
+        $meta_line = '<p><strong>' . $role . '</strong>' . ( $years ? ' <span style="margin-left:12px;">' . $years . '</span>' : '' ) . '</p>';
+    }
+
+    $html  = '<div class="project-card full-width">';
+    $html .= '<div class="wp-block-columns are-vertically-aligned-top">';
+    $html .= '<div class="wp-block-column" style="flex-basis:28%">' . $img_html . '</div>';
+    $html .= '<div class="wp-block-column" style="flex-basis:72%">';
+    $html .= '<h3 class="card-title">' . $title . '</h3>';
+    $html .= $meta_line;
+    $html .= $content ? '<div class="card-text">' . $content . '</div>' : '';
+    $html .= $button_html;
+    $html .= '</div></div></div>';
+
+    return $html;
+}
+add_shortcode( 'person_card', 'regen_person_card_shortcode' );
+
 // Block pattern for timeline
 function regen_wp_register_block_patterns() {
     if ( ! function_exists( 'register_block_pattern' ) ) {
@@ -602,6 +870,19 @@ function regen_wp_register_block_patterns() {
             'content'     => '<!-- wp:group {"className":"about-profile-card"} -->
 <div class="about-profile-card"><img class="about-profile-image" src="https://via.placeholder.com/180x240" alt="Profile"/><div class="about-profile-content"><h3 class="about-profile-name">Amrah Salomon</h3><p>Amrah Salomon is a scholar, creative writer, and practitioner of research justice working at the intersections of Ethnic Studies, Indigenous studies, Women of Color feminisms and Queer theory, environmental justice, and decolonial methodologies.</p><p>At the Regeneracion Lab, Dr. Salomon develops collaborative projects with communities, supports resident scholars and artists, and builds educational resources for students and activists.</p></div></div>
 <!-- /wp:group -->',
+        )
+    );
+
+    // People card pattern (uses one shortcode to avoid block parse issues)
+    register_block_pattern(
+        'regen/person-card',
+        array(
+            'title'       => __( 'Person Card (People CPT)', 'regen-wp' ),
+            'description' => __( 'Profile card for Director/PI or Residents, pulling People CPT data.', 'regen-wp' ),
+            'categories'  => array( 'regen' ),
+            'content'     => '<!-- wp:shortcode -->
+[person_card id="REPLACE_WITH_PERSON_ID"]
+<!-- /wp:shortcode -->',
         )
     );
 }
