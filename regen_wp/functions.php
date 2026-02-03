@@ -641,6 +641,15 @@ function regen_wp_save_person_meta( $post_id ) {
             delete_post_meta( $post_id, $field );
         }
     }
+
+    // Keep menu_order in sync with person_order for easier ordering in Query Loop blocks.
+    $person_order = get_post_meta( $post_id, 'person_order', true );
+    $menu_order   = ( '' === $person_order ) ? 0 : absint( $person_order );
+    // Avoid infinite save loops by checking current value first.
+    $current_menu_order = get_post_field( 'menu_order', $post_id );
+    if ( (int) $current_menu_order !== (int) $menu_order ) {
+        wp_update_post( array( 'ID' => $post_id, 'menu_order' => $menu_order ) );
+    }
 }
 add_action( 'save_post_person', 'regen_wp_save_person_meta' );
 
@@ -676,6 +685,155 @@ function regen_person_link_button_shortcode() {
     return '<div class="wp-block-buttons"><div class="wp-block-button is-style-outline"><a class="wp-block-button__link" href="' . $url . '" target="_blank" rel="noopener">' . $label . '</a></div></div>';
 }
 add_shortcode( 'person_link_button', 'regen_person_link_button_shortcode' );
+
+// Outputs the person order as a badge (01, 02, ...).
+function regen_person_order_badge_shortcode() {
+    $post_id = get_the_ID();
+    if ( ! $post_id ) {
+        return '';
+    }
+    $order = get_post_meta( $post_id, 'person_order', true );
+    if ( '' === $order ) {
+        return '';
+    }
+    $num = str_pad( (string) absint( $order ), 2, '0', STR_PAD_LEFT );
+    return '<span class="person-order-badge">' . esc_html( $num ) . '</span>';
+}
+add_shortcode( 'person_order_badge', 'regen_person_order_badge_shortcode' );
+
+// Add a custom block category for theme blocks.
+function regen_wp_block_category( $categories ) {
+    $categories[] = array(
+        'slug'  => 'regen',
+        'title' => __( 'Regeneracion', 'regen-wp' ),
+        'icon'  => null,
+    );
+    return $categories;
+}
+add_filter( 'block_categories_all', 'regen_wp_block_category' );
+
+// Render callback for the Person Card dynamic block.
+function regen_render_person_card_block( $attributes ) {
+    $person_id = isset( $attributes['personId'] ) ? absint( $attributes['personId'] ) : 0;
+    $variant   = isset( $attributes['variant'] ) ? sanitize_key( $attributes['variant'] ) : 'about';
+
+    if ( ! $person_id ) {
+        return '<div class="person-card-placeholder">Select a person in the block settings.</div>';
+    }
+
+    $post = get_post( $person_id );
+    if ( ! $post || 'person' !== $post->post_type ) {
+        return '<div class="person-card-placeholder">Select a valid person.</div>';
+    }
+
+    $title   = esc_html( get_the_title( $post ) );
+    $role    = esc_html( get_post_meta( $person_id, 'person_role', true ) );
+    $years   = esc_html( get_post_meta( $person_id, 'person_years', true ) );
+    $label   = esc_html( get_post_meta( $person_id, 'person_link_label', true ) );
+    $url     = esc_url( get_post_meta( $person_id, 'person_link_url', true ) );
+    $content = regen_person_get_content( $person_id );
+
+    $image_html = '';
+    if ( has_post_thumbnail( $person_id ) ) {
+        $img_class = ( 'resident' === $variant ) ? 'resident-avatar' : 'about-profile-image';
+        $image_html = get_the_post_thumbnail( $person_id, 'large', array( 'class' => $img_class ) );
+    }
+
+    $button_html = '';
+    if ( $label && $url ) {
+        $button_html = '<div class="wp-block-buttons"><div class="wp-block-button is-style-outline"><a class="wp-block-button__link" href="' . $url . '" target="_blank" rel="noopener">' . $label . '</a></div></div>';
+    }
+
+    $meta_line = '';
+    if ( $role || $years ) {
+        $meta_line = '<p><strong>' . $role . '</strong>' . ( $years ? ' <span style="margin-left:12px;">' . $years . '</span>' : '' ) . '</p>';
+    }
+
+    // Order badge for resident variant
+    $order_badge = '';
+    if ( 'resident' === $variant ) {
+        $order_meta = get_post_meta( $person_id, 'person_order', true );
+        $order_val  = ( '' !== $order_meta ) ? absint( $order_meta ) : (int) get_post_field( 'menu_order', $person_id );
+        if ( $order_val ) {
+            $order_badge = '<span class="person-order-badge">' . str_pad( (string) $order_val, 2, '0', STR_PAD_LEFT ) . '</span>';
+        }
+    }
+
+    if ( 'resident' === $variant ) {
+        $html  = '<div class="project-card resident-card person-card person-card--resident" data-variant="resident">';
+        $html .= '<div class="wp-block-columns are-vertically-aligned-top">';
+        $html .= '<div class="wp-block-column" style="flex-basis:30%">' . $image_html . '</div>';
+        $html .= '<div class="wp-block-column" style="flex-basis:70%">';
+        if ( $order_badge ) {
+            $html .= '<p class="person-order">' . $order_badge . '</p>';
+        }
+        if ( $meta_line ) {
+            $html .= '<p class="person-meta-line"><span class="person-role">' . $role . '</span>' . ( $years ? ' <span class="person-years" style="margin-left:12px;">' . $years . '</span>' : '' ) . '</p>';
+        }
+        $html .= '<h3 class="card-title">' . $title . '</h3>';
+        if ( $content ) {
+            $html .= '<div class="card-text">' . $content . '</div>';
+        }
+        $html .= $button_html;
+        $html .= '</div></div></div>';
+        return $html;
+    }
+
+    // About/default variant
+    $html  = '<div class="project-card full-width">';
+    $html .= '<div class="about-profile-container">';
+    $html .= $image_html ? $image_html : '';
+    $html .= '<div class="about-profile-content">';
+    $html .= '<h3 class="about-profile-name">' . $title . '</h3>';
+    if ( $content ) {
+        $html .= $content;
+    }
+    if ( $button_html ) {
+        $html .= $button_html;
+    }
+    $html .= '</div></div></div>';
+
+    return $html;
+}
+
+// Register the Person Card dynamic block and its editor script.
+function regen_register_person_card_block() {
+    $dir        = get_template_directory();
+    $script_rel = '/blocks/person-card/index.js';
+    $script_abs = $dir . $script_rel;
+
+    if ( file_exists( $script_abs ) ) {
+        wp_register_script(
+            'regen-person-card-block',
+            get_template_directory_uri() . $script_rel,
+            array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n', 'wp-block-editor' ),
+            filemtime( $script_abs ),
+            true
+        );
+    }
+
+    register_block_type( 'regen/person-card', array(
+        'api_version'     => 2,
+        'editor_script'   => 'regen-person-card-block',
+        'render_callback' => 'regen_render_person_card_block',
+        'attributes'      => array(
+            'personId' => array(
+                'type' => 'integer',
+            ),
+            'variant'  => array(
+                'type'    => 'string',
+                'default' => 'about',
+            ),
+        ),
+        'supports'       => array(
+            'html' => false,
+        ),
+        'category'      => 'regen',
+        'title'         => __( 'Person Card', 'regen-wp' ),
+        'description'   => __( 'Render a Person CPT card (About or Resident style).', 'regen-wp' ),
+    ) );
+}
+add_action( 'init', 'regen_register_person_card_block' );
 
 // Returns current person title.
 function regen_person_title_shortcode() {
@@ -873,18 +1031,6 @@ function regen_wp_register_block_patterns() {
         )
     );
 
-    // People card pattern (uses one shortcode to avoid block parse issues)
-    register_block_pattern(
-        'regen/person-card',
-        array(
-            'title'       => __( 'Person Card (People CPT)', 'regen-wp' ),
-            'description' => __( 'Profile card for Director/PI or Residents, pulling People CPT data.', 'regen-wp' ),
-            'categories'  => array( 'regen' ),
-            'content'     => '<!-- wp:shortcode -->
-[person_card id="REPLACE_WITH_PERSON_ID"]
-<!-- /wp:shortcode -->',
-        )
-    );
 }
 add_action( 'init', 'regen_wp_register_block_patterns' );
 
