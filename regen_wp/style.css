@@ -50,6 +50,8 @@ body {
     line-height: 1.7;
 }
 
+
+
 /* =========================================
    Layout
    ========================================= */
@@ -668,13 +670,17 @@ body {
     letter-spacing: normal;
 }
 
-/* Floating State */
+/* Floating State - supports both direct siblings and CF7 wrappers */
 .form-floating .form-input:focus~.form-label,
 .form-floating .form-input:not(:placeholder-shown)~.form-label,
 .form-floating .form-select:focus~.form-label,
-.form-floating .form-select:valid~.form-label,
+.form-floating .form-select:not([value=""]):not(:focus)~.form-label,
 .form-floating .form-textarea:focus~.form-label,
-.form-floating .form-textarea:not(:placeholder-shown)~.form-label {
+.form-floating .form-textarea:not(:placeholder-shown)~.form-label,
+.form-floating:focus-within .form-label,
+.form-floating:has(.form-input:not(:placeholder-shown)) .form-label,
+.form-floating:has(.form-textarea:not(:placeholder-shown)) .form-label,
+.form-floating:has(.form-select:not([value=""])) .form-label {
     transform: translateY(-10px) scale(0.85);
     color: var(--color-clay-red);
 }
@@ -721,27 +727,26 @@ body {
     margin: 30px 0 15px;
 }
 
-/* Contact Form 7 Styling */
+/* Contact Form 7 Styling - Simple Placeholder Version */
 .wpcf7 {
-    max-width: 600px;
+    max-width: 100%;
 }
 
 .wpcf7-form p {
     margin-bottom: 20px;
 }
 
-/* Hide labels when using placeholder approach */
-.wpcf7-form p>label {
-    display: none;
-}
-
 .wpcf7-form-control-wrap {
     display: block;
+    margin-bottom: 20px;
 }
 
 .wpcf7-form input[type="text"],
 .wpcf7-form input[type="email"],
-.wpcf7-form .wpcf7-textarea {
+.wpcf7-form input[type="tel"],
+.wpcf7-form input[type="url"],
+.wpcf7-form .wpcf7-textarea,
+.wpcf7-form .wpcf7-select {
     width: 100%;
     padding: 12px;
     border: 2px solid var(--color-primary-text);
@@ -750,16 +755,7 @@ body {
     background: white;
     border-radius: 0;
     box-sizing: border-box;
-}
-
-.wpcf7-form input[type="text"]::placeholder,
-.wpcf7-form input[type="email"]::placeholder,
-.wpcf7-form .wpcf7-textarea::placeholder {
-    font-family: var(--font-mono);
-    font-size: 0.85em;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .wpcf7-form .wpcf7-textarea {
@@ -767,8 +763,43 @@ body {
     min-height: 120px;
 }
 
-.wpcf7-form input[type="submit"],
-.wpcf7-form .wpcf7-submit {
+.wpcf7-form input:focus,
+.wpcf7-form textarea:focus,
+.wpcf7-form select:focus {
+    border-color: var(--color-clay-red);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(231, 111, 81, 0.15);
+}
+
+/* Placeholder Styling */
+.wpcf7-form input::placeholder,
+.wpcf7-form textarea::placeholder {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    opacity: 0.7;
+}
+
+/* Select specific overrides to match placeholder aesthetic */
+.wpcf7-select {
+    font-family: var(--font-mono) !important;
+    font-size: 0.85em !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    color: var(--color-text-muted) !important;
+    opacity: 0.7 !important;
+}
+
+.wpcf7-select option {
+    font-family: var(--font-sans);
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--color-primary-text);
+}
+
+.wpcf7-submit {
     display: inline-block;
     padding: 14px 32px;
     background: var(--color-clay-red);
@@ -784,10 +815,10 @@ body {
     box-shadow: 0 4px 15px rgba(231, 111, 81, 0.3);
     transition: all 0.2s ease;
     cursor: pointer;
+    margin-top: 20px;
 }
 
-.wpcf7-form input[type="submit"]:hover,
-.wpcf7-form .wpcf7-submit:hover {
+.wpcf7-submit:hover {
     background: var(--color-earth-brown);
     color: white;
     transform: translateY(-2px);
@@ -821,11 +852,6 @@ body {
     position: absolute;
     clip: rect(0, 0, 0, 0);
 }
-
-/* =========================================
-   Page Specific Styles
-   =========================================*/
-*/
 
 /* Home Page */
 .hero-image-container {
@@ -1030,14 +1056,28 @@ body {
 }
 
 .resident-bio-text ul {
-    margin-left: 0;
-    padding-left: 1.2em;
+    list-style: none;
+    padding-left: 0;
     margin-bottom: 20px;
-    list-style-position: outside;
 }
 
 .resident-bio-text li {
+    position: relative;
+    padding-left: 20px;
     margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.resident-bio-text li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: calc(0.6em - 1px);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.5px solid var(--color-earth-brown);
 }
 
 /* Article/Detail Pages */

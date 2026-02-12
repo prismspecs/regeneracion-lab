@@ -6,8 +6,9 @@
 
 get_header();
 
-if ( have_posts() ) :
-    while ( have_posts() ) : the_post(); ?>
+if (have_posts()):
+    while (have_posts()):
+        the_post(); ?>
         <div class="fade-in">
             <div class="article-header article-header-compact">
                 <h1 class="article-title"><?php the_title(); ?></h1>
@@ -39,7 +40,7 @@ if ( have_posts() ) :
                 </div>
             </section>
 
-            <!-- Shared Form -->
+            <!-- TODO: Replace with Contact Form 7 shortcode if preferred -->
             <section class="section form-section" id="join-form">
                 <h2 class="section-header section-header-sans">Join a Reading Group / Study Circle</h2>
                 <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" style="max-width: 800px;">
@@ -79,7 +80,8 @@ if ( have_posts() ) :
                 <p class="form-footer-note">Note: To enable form submission, configure Formspree to send to asalomon@ucsb.edu</p>
             </section>
         </div>
-    <?php endwhile;
+    <?php
+    endwhile;
 endif;
 
 get_footer();

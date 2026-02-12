@@ -56,6 +56,14 @@
     const replaceContent = (nextDoc) => {
         const nextMain = nextDoc.querySelector('#mainContent');
         if (!nextMain) return false;
+
+        // Update nav active states by swapping the nav container children if found
+        const nextNav = nextDoc.querySelector('.site-nav');
+        const currentNav = document.querySelector('.site-nav');
+        if (nextNav && currentNav) {
+            currentNav.replaceChildren(...nextNav.childNodes);
+        }
+
         const scripts = Array.from(nextMain.querySelectorAll('script'));
         const clone = nextMain.cloneNode(true);
         clone.querySelectorAll('script').forEach((s) => s.remove());

@@ -144,8 +144,15 @@ add_action( 'after_setup_theme', 'regen_wp_register_menus' );
 // Add nav-link class to primary menu anchors for styling parity
 function regen_wp_nav_link_class( $atts, $item, $args ) {
     if ( isset( $args->theme_location ) && 'primary' === $args->theme_location ) {
+        $classes = array( 'nav-link' );
+        
+        // Add active class if this is the current item or an ancestor
+        if ( $item->current || $item->current_item_ancestor || $item->current_item_parent ) {
+            $classes[] = 'active';
+        }
+
         $existing_class = isset( $atts['class'] ) ? $atts['class'] . ' ' : '';
-        $atts['class'] = trim( $existing_class . 'nav-link' );
+        $atts['class'] = trim( $existing_class . implode( ' ', $classes ) );
     }
     return $atts;
 }
