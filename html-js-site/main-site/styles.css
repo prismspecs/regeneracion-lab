@@ -112,6 +112,7 @@ body {
     font-weight: 500;
     font-size: 0.95em;
 }
+
 /* Students Page Specifics */
 .article-header-compact {
     border-bottom: none;
@@ -177,6 +178,7 @@ body {
 .site-credits-link:hover {
     opacity: 0.6;
 }
+
 .nav-link {
     color: var(--color-primary-text);
     text-decoration: none;
@@ -216,6 +218,22 @@ body {
     letter-spacing: 0.5px;
     color: var(--color-text-muted);
     margin: 0;
+}
+
+.site-designer-credit {
+    font-size: 0.75em;
+    margin-top: 8px;
+    opacity: 0.7;
+}
+
+.site-designer-credit a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-text-muted);
+}
+
+.site-designer-credit a:hover {
+    opacity: 0.8;
 }
 
 /* =========================================
@@ -392,8 +410,13 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
 }
 
 /* =========================================
@@ -481,12 +504,12 @@ body {
 }
 
 /* Floating State */
-.form-floating .form-input:focus ~ .form-label,
-.form-floating .form-input:not(:placeholder-shown) ~ .form-label,
-.form-floating .form-select:focus ~ .form-label,
-.form-floating .form-select:valid ~ .form-label,
-.form-floating .form-textarea:focus ~ .form-label,
-.form-floating .form-textarea:not(:placeholder-shown) ~ .form-label {
+.form-floating .form-input:focus~.form-label,
+.form-floating .form-input:not(:placeholder-shown)~.form-label,
+.form-floating .form-select:focus~.form-label,
+.form-floating .form-select:valid~.form-label,
+.form-floating .form-textarea:focus~.form-label,
+.form-floating .form-textarea:not(:placeholder-shown)~.form-label {
     transform: translateY(-10px) scale(0.85);
     color: var(--color-clay-red);
 }
@@ -775,17 +798,49 @@ body {
     cursor: pointer;
 }
 
-.mt-0 { margin-top: 0 !important; }
-.mt-10 { margin-top: 10px; }
-.mt-15 { margin-top: 15px; }
-.mt-20 { margin-top: 20px; }
-.mt-30 { margin-top: 30px; }
-.mb-0 { margin-bottom: 0 !important; }
-.mb-10 { margin-bottom: 10px; }
-.mb-15 { margin-bottom: 15px; }
-.mb-20 { margin-bottom: 20px; }
-.mb-25 { margin-bottom: 25px; }
-.mb-40 { margin-bottom: 40px; }
+.mt-0 {
+    margin-top: 0 !important;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-15 {
+    margin-top: 15px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mt-30 {
+    margin-top: 30px;
+}
+
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-15 {
+    margin-bottom: 15px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.mb-25 {
+    margin-bottom: 25px;
+}
+
+.mb-40 {
+    margin-bottom: 40px;
+}
 
 .fade-in {
     animation: fadeIn 0.3s ease-in;
@@ -796,6 +851,7 @@ body {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -887,7 +943,7 @@ body {
 #safiya-archive-card {
     border-left: 6px solid var(--color-earth-brown);
     background: linear-gradient(135deg, #fff 0%, #fcfcfc 100%);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
 #safiya-archive-card .card-title {
@@ -913,7 +969,8 @@ body {
 
 .timeline-marker {
     position: absolute;
-    left: -47px; /* 40px padding + 2px border (approx center) + radius adjustment */
+    left: -47px;
+    /* 40px padding + 2px border (approx center) + radius adjustment */
     top: 6px;
     width: 12px;
     height: 12px;

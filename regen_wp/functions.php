@@ -1,4 +1,118 @@
 <?php
+// --- Residents Custom Fields ---
+function regen_wp_resident_metabox() {
+    add_meta_box(
+        'regen_resident_meta',
+        __( 'Resident Details', 'regen-wp' ),
+        'regen_wp_resident_metabox_render',
+        'resident',
+        'normal',
+        'high'
+    );
+}
+add_action( 'add_meta_boxes', 'regen_wp_resident_metabox' );
+
+function regen_wp_resident_metabox_render( $post ) {
+    wp_nonce_field( 'regen_wp_save_resident_meta', 'regen_wp_resident_nonce' );
+
+    $resident_title = get_post_meta( $post->ID, 'resident_title', true );
+    $resident_dates = get_post_meta( $post->ID, 'resident_dates', true );
+    $resident_bio = get_post_meta( $post->ID, 'resident_bio', true );
+    $resident_links = get_post_meta( $post->ID, 'resident_links', true );
+    $resident_is_past = get_post_meta( $post->ID, 'resident_is_past', true );
+    $resident_order = get_post_meta( $post->ID, 'resident_order', true );
+    if ( ! is_array( $resident_links ) ) {
+        $resident_links = array();
+    }
+    $max_links = 5;
+
+    ?>
+    <p><strong><?php esc_html_e( 'Title (e.g., Scholar in Residence)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="resident_title" value="<?php echo esc_attr( $resident_title ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Dates (e.g., 2025-2026)', 'regen-wp' ); ?></strong></p>
+    <input type="text" name="resident_dates" value="<?php echo esc_attr( $resident_dates ); ?>" style="width:100%" />
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Biography (Brief intro)', 'regen-wp' ); ?></strong></p>
+    <textarea name="resident_bio" rows="6" style="width:100%" ><?php echo esc_textarea( $resident_bio ); ?></textarea>
+
+    <div style="margin-top:12px; padding: 10px; background: #eee; border-radius: 4px;">
+        <label>
+            <input type="checkbox" name="resident_is_past" value="1" <?php checked( $resident_is_past, '1' ); ?> />
+            <strong><?php esc_html_e( 'Past Resident?', 'regen-wp' ); ?></strong> (Moves to "Past" tab on archive)
+        </label>
+    </div>
+
+    <p style="margin-top:12px;"><strong><?php esc_html_e( 'Display Order', 'regen-wp' ); ?></strong> (Lower numbers show first)</p>
+    <input type="number" name="resident_order" value="<?php echo esc_attr( $resident_order ); ?>" style="width:100px" />
+
+    <hr style="margin: 20px 0;">
+    <p><strong><?php esc_html_e( 'Resident Links', 'regen-wp' ); ?></strong> (Label + URL)</p>
+    <?php for ( $i = 0; $i < $max_links; $i++ ) : 
+        $label = isset( $resident_links[ $i ]['label'] ) ? $resident_links[ $i ]['label'] : '';
+        $url   = isset( $resident_links[ $i ]['url'] ) ? $resident_links[ $i ]['url'] : '';
+    ?>
+        <div style="margin-bottom:12px; padding: 10px; background: #f6f6f6; border: 1px solid #ddd;">
+            <label style="display:block; margin-bottom:4px; font-weight:600;">Link <?php echo ($i + 1); ?></label>
+            <input type="text" name="resident_links[label][]" value="<?php echo esc_attr( $label ); ?>" placeholder="Label (e.g., Website)" style="width:100%; margin-bottom:6px;" />
+            <input type="url" name="resident_links[url][]" value="<?php echo esc_attr( $url ); ?>" placeholder="https://..." style="width:100%;" />
+        </div>
+    <?php endfor; ?>
+    <?php
+    // Featured image is handled by WordPress core (post-thumbnails support)
+    // Note: Use the main post editor for "Residency Projects" content.
+}
+
+function regen_wp_save_resident_meta( $post_id ) {
+    if ( ! isset( $_POST['regen_wp_resident_nonce'] ) || ! wp_verify_nonce( $_POST['regen_wp_resident_nonce'], 'regen_wp_save_resident_meta' ) ) {
+        return;
+    }
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+    if ( isset( $_POST['post_type'] ) && 'resident' === $_POST['post_type'] && ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    // Standard text/textarea fields
+    $fields = array( 'resident_title', 'resident_dates', 'resident_bio', 'resident_order' );
+    foreach ( $fields as $field ) {
+        if ( isset( $_POST[ $field ] ) ) {
+            $val = ( 'resident_bio' === $field ) ? wp_kses_post( $_POST[ $field ] ) : sanitize_text_field( $_POST[ $field ] );
+            update_post_meta( $post_id, $field, $val );
+        }
+    }
+
+    // Checkbox
+    update_post_meta( $post_id, 'resident_is_past', isset( $_POST['resident_is_past'] ) ? '1' : '0' );
+
+    // Links array (using the same sanitizer as update_links)
+    if ( isset( $_POST['resident_links'] ) ) {
+        $raw   = wp_unslash( $_POST['resident_links'] );
+        $clean = regen_wp_sanitize_update_links( $raw );
+        if ( ! empty( $clean ) ) {
+            update_post_meta( $post_id, 'resident_links', $clean );
+        } else {
+            delete_post_meta( $post_id, 'resident_links' );
+        }
+    } else {
+        delete_post_meta( $post_id, 'resident_links' );
+    }
+
+    // Explicitly remove old residency projects meta if it exists
+    delete_post_meta( $post_id, 'resident_projects' );
+
+    // Sync menu_order
+    if ( isset( $_POST['resident_order'] ) ) {
+        $order = absint( $_POST['resident_order'] );
+        $current_order = get_post_field( 'menu_order', $post_id );
+        if ( (int) $current_order !== $order ) {
+            wp_update_post( array( 'ID' => $post_id, 'menu_order' => $order ) );
+        }
+    }
+}
+add_action( 'save_post_resident', 'regen_wp_save_resident_meta' );
+
 /**
  * Regeneración Lab Theme Functions
  */

@@ -239,6 +239,22 @@ body {
     margin: 0;
 }
 
+.site-designer-credit {
+    font-size: 0.75em;
+    margin-top: 8px;
+    opacity: 0.7;
+}
+
+.site-designer-credit a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-text-muted);
+}
+
+.site-designer-credit a:hover {
+    opacity: 0.8;
+}
+
 /* =========================================
    Components
    ========================================= */
@@ -986,9 +1002,10 @@ body {
 }
 
 .resident-avatar {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
+    width: 150px !important;
+    height: 150px !important;
+    object-fit: cover !important;
+    object-position: top !important;
     border: 2px solid var(--color-border-light);
     margin-bottom: 20px;
 }
@@ -1005,6 +1022,22 @@ body {
 .resident-link-block {
     display: block;
     margin-bottom: 10px;
+}
+
+.resident-bio-text {
+    font-family: var(--font-sans);
+    line-height: 1.8;
+}
+
+.resident-bio-text ul {
+    margin-left: 0;
+    padding-left: 1.2em;
+    margin-bottom: 20px;
+    list-style-position: outside;
+}
+
+.resident-bio-text li {
+    margin-bottom: 8px;
 }
 
 /* Article/Detail Pages */
@@ -1116,6 +1149,19 @@ body.page .content-article,
     max-width: 960px;
     margin: 0 auto;
     gap: 20px;
+}
+
+/* Project Single Template - Constrain Content Area */
+.content-article.project-single .article-header {
+    max-width: 720px !important;
+    margin: 0 auto 40px auto !important;
+    width: auto !important;
+}
+
+.content-article.project-single .article-content {
+    max-width: 720px !important;
+    margin: 0 auto !important;
+    width: auto !important;
 }
 
 .detail-bio-list {
