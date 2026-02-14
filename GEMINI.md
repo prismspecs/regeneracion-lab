@@ -81,3 +81,4 @@
     - **Resource Header** (H4 with `resource-header` class) and **Resource List** (list with `resource-list` class) to recreate bibliography/resource sections without manual classes.
 *   **Next templates:** Optionally add `page.php` to mirror general typography/layout.
 *   **Data migration:** Move HTML snippets from `regen_wp/pages/*.html` into WP content (Pages, CPTs, Posts) and re-map image URLs to the media library where possible.
+*   **Email Delivery:** Configure an SMTP plugin (e.g., WP Mail SMTP) to ensure reliable email delivery for Contact Form 7 (prevents spam flags).

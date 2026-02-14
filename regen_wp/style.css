@@ -168,10 +168,14 @@ body {
 
 .form-label-static {
     position: static;
-    margin-bottom: 10px;
+    display: block;
+    margin-bottom: 15px;
     color: var(--color-primary-text);
-    font-size: 0.9em;
+    font-size: 0.85em;
     font-weight: 500;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* Site Credits */
@@ -285,6 +289,36 @@ body {
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(156, 84, 36, 0.3);
+}
+
+/* WordPress Buttons Block → match .btn styling */
+.wp-block-button__link {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--color-clay-red);
+    color: white;
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 0 !important;
+    box-shadow: 0 4px 15px rgba(231, 111, 81, 0.3);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.wp-block-button__link:hover {
+    background: var(--color-earth-brown);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(156, 84, 36, 0.3);
+}
+
+.wp-block-buttons {
+    margin-top: 20px;
 }
 
 /* Cards */
@@ -607,16 +641,36 @@ body {
 .form-textarea {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--color-primary-text);
+    border: 2px solid var(--color-border-light);
     font-family: inherit;
     font-size: 1em;
     background: white;
     border-radius: 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: var(--color-clay-red);
+    box-shadow: 0 0 0 4px rgba(231, 111, 81, 0.15);
 }
 
 .form-textarea {
     resize: vertical;
     min-height: 120px;
+}
+
+/* Base placeholder styling for all forms */
+.form-input::placeholder,
+.form-textarea::placeholder {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    opacity: 0.7;
 }
 
 .form-note {
@@ -639,13 +693,16 @@ body {
 
 .form-floating .form-input,
 .form-floating .form-select,
-.form-floating .form-textarea {
+.form-floating .form-textarea,
+.form-floating .wpcf7-form-control {
     padding: 16px;
     padding-top: 24px;
     padding-bottom: 8px;
-    border: 2px solid var(--color-border-light);
+    border: 2px solid var(--color-border-light) !important;
     transition: all 0.2s ease;
     outline: none;
+    width: 100%;
+    background: white;
 }
 
 .form-floating .form-input:focus,
@@ -671,16 +728,15 @@ body {
 }
 
 /* Floating State - supports both direct siblings and CF7 wrappers */
-.form-floating .form-input:focus~.form-label,
-.form-floating .form-input:not(:placeholder-shown)~.form-label,
+.form-floating :is(.form-input, .wpcf7-form-control):focus~.form-label,
+.form-floating :is(.form-input, .wpcf7-form-control):not(:placeholder-shown)~.form-label,
 .form-floating .form-select:focus~.form-label,
 .form-floating .form-select:not([value=""]):not(:focus)~.form-label,
 .form-floating .form-textarea:focus~.form-label,
 .form-floating .form-textarea:not(:placeholder-shown)~.form-label,
 .form-floating:focus-within .form-label,
-.form-floating:has(.form-input:not(:placeholder-shown)) .form-label,
-.form-floating:has(.form-textarea:not(:placeholder-shown)) .form-label,
-.form-floating:has(.form-select:not([value=""])) .form-label {
+.form-floating:has(:is(input, textarea):not(:placeholder-shown)) .form-label,
+.form-floating:has(select:not([value=""])) .form-label {
     transform: translateY(-10px) scale(0.85);
     color: var(--color-clay-red);
 }
@@ -741,6 +797,25 @@ body {
     margin-bottom: 20px;
 }
 
+/* Zero out spacing inside floating-label containers (Students form) */
+.form-floating .wpcf7-form-control-wrap,
+.form-floating p {
+    margin-bottom: 0;
+}
+
+/* Fix checkbox stacking */
+.wpcf7-checkbox .wpcf7-list-item {
+    display: block;
+    margin-bottom: 8px;
+    margin-left: 0;
+}
+
+.wpcf7-checkbox .wpcf7-list-item label {
+    font-family: var(--font-sans);
+    font-size: 1em;
+    cursor: pointer;
+}
+
 .wpcf7-form input[type="text"],
 .wpcf7-form input[type="email"],
 .wpcf7-form input[type="tel"],
@@ -749,7 +824,7 @@ body {
 .wpcf7-form .wpcf7-select {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--color-primary-text);
+    border: 2px solid var(--color-border-light);
     font-family: inherit;
     font-size: 1em;
     background: white;
@@ -1011,6 +1086,14 @@ body {
     max-width: 600px;
 }
 
+.about-form-container .wpcf7 {
+    max-width: 600px;
+}
+
+.page-article .article-content .wpcf7 {
+    max-width: 600px;
+}
+
 /* Residents Page */
 .resident-profile {
     display: flex;
@@ -1126,6 +1209,17 @@ body.page .article-content {
     margin: 0;
 }
 
+/* Students page: restore article-content indentation */
+body.page-template-page-students .article-content {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+/* Students page: constrain form width */
+body.page-template-page-students .form-section .wpcf7 {
+    max-width: 800px;
+}
+
 .page .content-article,
 body.page .content-article,
 .page-article {
@@ -1147,6 +1241,12 @@ body.page .content-article,
     border-bottom: 2px solid var(--color-border-light);
     padding-bottom: 15px;
     margin-bottom: 30px;
+}
+
+.page-template-page-students .article-header {
+    border-bottom: 3px solid var(--color-earth-brown);
+    padding-bottom: 30px;
+    margin-bottom: 40px;
 }
 
 .page .article-title {

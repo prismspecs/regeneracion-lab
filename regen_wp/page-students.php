@@ -10,7 +10,7 @@ if (have_posts()):
     while (have_posts()):
         the_post(); ?>
         <div class="fade-in">
-            <div class="article-header article-header-compact">
+            <div class="article-header">
                 <h1 class="article-title"><?php the_title(); ?></h1>
             </div>
 
@@ -43,41 +43,7 @@ if (have_posts()):
             <!-- TODO: Replace with Contact Form 7 shortcode if preferred -->
             <section class="section form-section" id="join-form">
                 <h2 class="section-header section-header-sans">Join a Reading Group / Study Circle</h2>
-                <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" style="max-width: 800px;">
-                    <div class="form-floating">
-                        <input type="text" id="join-name" name="name" class="form-input" placeholder=" " required>
-                        <label for="join-name" class="form-label">Name</label>
-                    </div>
-                    <div class="form-floating">
-                        <input type="email" id="join-email" name="email" class="form-input" placeholder=" " required>
-                        <label for="join-email" class="form-label">Email</label>
-                    </div>
-                    <div class="form-floating">
-                        <input type="text" id="join-affiliation" name="affiliation" class="form-input" placeholder=" ">
-                        <label for="join-affiliation" class="form-label">UCSB Affiliation</label>
-                    </div>
-                    <div class="form-floating">
-                        <input type="text" id="join-department" name="department" class="form-input" placeholder=" ">
-                        <label for="join-department" class="form-label">Major or Department</label>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label form-label-static">Which group(s) are you interested in?</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="group_interest" value="Critical Temporalities"> Critical Temporalities Reading Group
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="group_interest" value="Python Learning Lab"> Python Learning Lab / Coding for Justice
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-floating">
-                        <textarea id="join-interest" name="interest" class="form-textarea" placeholder=" " required rows="4"></textarea>
-                        <label for="join-interest" class="form-label">Briefly describe your interest in the reading group / study circle</label>
-                    </div>
-                    <button type="submit" class="btn">→ SUBMIT INTEREST</button>
-                </form>
-                <p class="form-footer-note">Note: To enable form submission, configure Formspree to send to asalomon@ucsb.edu</p>
+                <?php echo do_shortcode('[contact-form-7 id="83" title="Students Join Form"]'); ?>
             </section>
         </div>
     <?php

@@ -129,6 +129,9 @@ function regen_wp_enqueue_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'regen_wp_enqueue_scripts' );
 
+// Disable CF7 auto-paragraph so our custom form-floating markup isn't broken by extra <p> tags.
+add_filter( 'wpcf7_autop_or_not', '__return_false' );
+
 // Theme supports
 add_theme_support( 'title-tag' );
 add_theme_support( 'post-thumbnails' );

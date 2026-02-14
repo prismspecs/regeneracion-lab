@@ -142,7 +142,6 @@ $past_query = new WP_Query( array(
             <p class="mb-25">Regeneración Lab currently offers non-paid residencies to artists, activists, and scholars engaged in research justice projects. Residencies can be in person in Santa Barbara, CA or remote. The residency also provides academic library access and office space with desktop computers at the beautiful University of California, Santa Barbara campus within walking distance to the beach. We also support grant writing and project development for projects that align with the lab and are in need of an academic host.</p>
 
         <?php echo do_shortcode( '[contact-form-7 id="77" title="Residents Apply Form"]' ); ?>
-        <p class="form-footer-note">Note: Please configure the Contact Form 7 mail settings to send to asalomon@ucsb.edu</p>
     </div>
 </div>
 </div>
