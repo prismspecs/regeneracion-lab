@@ -12,10 +12,17 @@
 <?php wp_body_open(); ?>
     <div class="app-container">
         <div class="mockup">
-            <header class="site-header">
-                <h1 class="site-title"><?php bloginfo( 'name' ); ?></h1>
+            <header class="site-header" id="siteHeader">
+                <div class="site-title-bar">
+                    <h1 class="site-title"><?php bloginfo( 'name' ); ?></h1>
+                    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
                 <p class="site-tagline"><?php bloginfo( 'description' ); ?></p>
-                <nav class="site-nav">
+                <nav class="site-nav" id="siteNav">
                     <?php
                         wp_nav_menu( array(
                             'theme_location' => 'primary',

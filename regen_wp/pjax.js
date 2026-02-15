@@ -45,6 +45,15 @@
     const bindNav = () => {
         document.querySelectorAll('.site-nav a').forEach((link) => {
             link.addEventListener('click', (e) => {
+                // Close mobile menu on any nav click
+                const nav = document.getElementById('siteNav');
+                const btn = document.querySelector('.nav-toggle');
+                if (nav) nav.classList.remove('is-open');
+                if (btn) {
+                    btn.classList.remove('is-open');
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+
                 if (!shouldHandle(e, link)) return;
                 e.preventDefault();
                 const url = link.href;

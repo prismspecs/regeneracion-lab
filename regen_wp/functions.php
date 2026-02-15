@@ -1165,3 +1165,124 @@ function regen_wp_favicon() {
     }
 }
 add_action( 'wp_head', 'regen_wp_favicon' );
+
+// Mobile hamburger nav toggle + scroll detection
+function regen_wp_mobile_nav_script() {
+    ?>
+    <script>
+    (function() {
+        var btn = document.querySelector('.nav-toggle');
+        var nav = document.getElementById('siteNav');
+        var header = document.getElementById('siteHeader');
+        if (!btn || !nav) return;
+
+        btn.addEventListener('click', function() {
+            var open = nav.classList.toggle('is-open');
+            btn.classList.toggle('is-open', open);
+            btn.setAttribute('aria-expanded', open);
+        });
+
+        // Close menu on link click
+        nav.querySelectorAll('a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                nav.classList.remove('is-open');
+                btn.classList.remove('is-open');
+                btn.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        // Scroll detection for sticky header color change
+        if (header) {
+            var scrollThreshold = 10;
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > scrollThreshold) {
+                    header.classList.add('is-scrolled');
+                } else {
+                    header.classList.remove('is-scrolled');
+                }
+            }, { passive: true });
+        }
+    })();
+    </script>
+    <?php
+}
+add_action( 'wp_footer', 'regen_wp_mobile_nav_script' );
+
+// Support page editable sections metabox
+function regen_wp_support_metabox() {
+    add_meta_box(
+        'regen_support_sections',
+        __( 'Support Page Sections', 'regen-wp' ),
+        'regen_wp_support_metabox_render',
+        'page',
+        'normal',
+        'high'
+    );
+}
+add_action( 'add_meta_boxes', 'regen_wp_support_metabox' );
+
+function regen_wp_support_metabox_render( $post ) {
+    // Only show on pages that use the Support Page template (or have slug "support").
+    $template  = get_page_template_slug( $post->ID );
+    $post_slug = $post->post_name;
+    if ( 'page-support.php' !== $template && 'support' !== $post_slug ) {
+        echo '<p style="color:#999;">' . esc_html__( 'This metabox applies only to pages using the "Support Page" template.', 'regen-wp' ) . '</p>';
+        return;
+    }
+
+    wp_nonce_field( 'regen_wp_save_support_meta', 'regen_wp_support_nonce' );
+
+    $fields = array(
+        'support_section1_heading' => array( 'label' => 'Section 1 Heading (default: Financial Contributions)',  'type' => 'text' ),
+        'support_section1_body'    => array( 'label' => 'Section 1 Body',    'type' => 'textarea' ),
+        'support_section2_heading' => array( 'label' => 'Section 2 Heading (default: Share Our Resources)',  'type' => 'text' ),
+        'support_section2_body'    => array( 'label' => 'Section 2 Body',    'type' => 'textarea' ),
+        'support_section3_heading' => array( 'label' => 'Section 3 Heading (default: Collaborate)',  'type' => 'text' ),
+        'support_section3_body'    => array( 'label' => 'Section 3 Body',    'type' => 'textarea' ),
+        'support_contact_heading'  => array( 'label' => 'Contact Form Heading (default: Contact Form)', 'type' => 'text' ),
+    );
+
+    foreach ( $fields as $key => $opts ) {
+        $value = get_post_meta( $post->ID, $key, true );
+        echo '<p style="margin-top:12px;"><strong>' . esc_html( $opts['label'] ) . '</strong></p>';
+        if ( 'textarea' === $opts['type'] ) {
+            echo '<textarea name="' . esc_attr( $key ) . '" rows="3" style="width:100%">' . esc_textarea( $value ) . '</textarea>';
+        } else {
+            echo '<input type="text" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '" style="width:100%" />';
+        }
+    }
+}
+
+function regen_wp_save_support_meta( $post_id ) {
+    if ( ! isset( $_POST['regen_wp_support_nonce'] ) || ! wp_verify_nonce( $_POST['regen_wp_support_nonce'], 'regen_wp_save_support_meta' ) ) {
+        return;
+    }
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+
+    $keys = array(
+        'support_section1_heading',
+        'support_section1_body',
+        'support_section2_heading',
+        'support_section2_body',
+        'support_section3_heading',
+        'support_section3_body',
+        'support_contact_heading',
+    );
+    foreach ( $keys as $key ) {
+        if ( isset( $_POST[ $key ] ) ) {
+            $raw = wp_unslash( $_POST[ $key ] );
+            $val = sanitize_textarea_field( $raw );
+            if ( '' === $val ) {
+                delete_post_meta( $post_id, $key );
+            } else {
+                update_post_meta( $post_id, $key, $val );
+            }
+        }
+    }
+}
+add_action( 'save_post_page', 'regen_wp_save_support_meta' );
