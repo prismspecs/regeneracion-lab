@@ -1,0 +1,398 @@
+:root {
+    /* OKLCH Color Palette - Refined Newspaper Style */
+    --paper: oklch(98% 0.01 90);
+    --ink: oklch(20% 0.02 260);
+    --ink-muted: oklch(45% 0.02 260);
+    
+    /* Nature Accents (River & Silt) */
+    --river: oklch(55% 0.12 240);
+    --silt: oklch(45% 0.08 135);
+    --earth: oklch(40% 0.1 45);
+    --clay: oklch(65% 0.15 35);
+    
+    /* Typography Scales */
+    --font-display: 'Instrument Serif', serif;
+    --font-editorial: 'Libre Baskerville', serif;
+    --font-interface: 'Inter', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+
+    /* Spacing & Rhythm */
+    --space-unit: clamp(1rem, 2vw, 1.5rem);
+    --container-max: 1200px;
+    --border-ink: 1.5px solid var(--ink);
+}
+
+/* =========================================
+   Reset & Base
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: 0 !important; /* Force sharp corners per principles */
+}
+
+body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-interface);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+}
+
+/* =========================================
+   Layout Structure
+   ========================================= */
+.app-container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 var(--space-unit);
+    background: var(--paper);
+    min-height: 100vh;
+}
+
+.content-wrapper {
+    position: relative;
+    padding: calc(var(--space-unit) * 2) 0;
+}
+
+/* =========================================
+   Editorial Shell
+   ========================================= */
+.site-header {
+    padding: calc(var(--space-unit) * 2) 0;
+    border-bottom: 3px solid var(--ink);
+    margin-bottom: calc(var(--space-unit) * 2);
+}
+
+.site-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-weight: 400;
+    text-align: center;
+    line-height: 1;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.site-tagline {
+    font-family: var(--font-editorial);
+    font-style: italic;
+    text-align: center;
+    max-width: 65ch;
+    margin: 0 auto 2rem;
+    font-size: 1.1rem;
+    color: var(--ink-muted);
+}
+
+.site-nav {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ink-muted);
+    flex-wrap: wrap;
+}
+
+.nav-link {
+    font-family: var(--font-interface);
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--ink);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--river);
+}
+
+/* =========================================
+   Components: Section Labels & Grids
+   ========================================= */
+.section-label {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 2px 10px;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.editorial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.editorial-card {
+    border: var(--border-ink);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.editorial-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 6px 6px 0 var(--ink);
+}
+
+.editorial-card h3 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1.1;
+}
+
+.editorial-card p {
+    font-family: var(--font-editorial);
+    font-size: 1rem;
+    color: var(--ink);
+}
+
+.editorial-btn {
+    display: inline-block;
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 2px;
+    align-self: flex-start;
+    transition: color 0.2s ease;
+}
+
+.editorial-btn:hover {
+    color: var(--river);
+    border-bottom-color: var(--river);
+}
+
+/* =========================================
+   Pretext / Dynamic Canvas Container
+   ========================================= */
+.pretext-container {
+    margin: 2rem 0 4rem;
+    min-height: 400px;
+    width: 100%;
+    position: relative;
+    border-bottom: var(--border-ink);
+}
+
+#textCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* =========================================
+   Footer
+   ========================================= */
+.site-footer {
+    border-top: 3px solid var(--ink);
+    padding: 3rem 0;
+    margin-top: 4rem;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.site-designer-credit a {
+    color: var(--ink);
+    text-underline-offset: 3px;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--river);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    z-index: 1000;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =========================================
+   Typography & Flow (Enhanced Base)
+   ========================================= */
+p {
+    font-family: var(--font-editorial);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    max-width: 75ch;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    margin-bottom: 1rem;
+}
+
+h2 { font-size: 2.5rem; }
+h3 { font-size: 1.8rem; }
+
+.section {
+    margin-bottom: 4rem;
+}
+
+/* =========================================
+   Editorial Components
+   ========================================= */
+
+/* Profile Layouts */
+.editorial-profile {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem;
+    border: var(--border-ink);
+    padding: 2.5rem;
+    background: white;
+}
+
+.profile-image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border: var(--border-ink);
+    filter: grayscale(0.2);
+}
+
+.profile-content h3 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Form Styles (Production Grade) */
+.editorial-form {
+    max-width: 600px;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+    color: var(--ink-muted);
+}
+
+.form-input, .form-textarea {
+    width: 100%;
+    padding: 1rem;
+    border: var(--border-ink);
+    background: transparent;
+    font-family: var(--font-editorial);
+    font-size: 1.1rem;
+    color: var(--ink);
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--river);
+    background: white;
+}
+
+.form-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+/* =========================================
+   Legacy / Utilities Support
+   ========================================= */
+.section-header {
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+}
+
+.mt-15 { margin-top: 1.5rem; }
+
+@media (max-width: 900px) {
+    .editorial-profile { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+/* =========================================
+   Interactive: Tabs
+   ========================================= */
+.nav-tabs {
+    display: flex;
+    gap: 3rem;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: -2px;
+}
+
+.nav-tabs button {
+    background: none;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    padding: 1rem 0;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 4px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+    margin-bottom: -2px;
+}
+
+.nav-tabs button:hover {
+    color: var(--river);
+}
+
+.nav-tabs button.active {
+    border-bottom-color: var(--river);
+    color: var(--river);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .nav-tabs { gap: 1rem; flex-wrap: wrap; }
+}
+
+/* =========================================
+   Responsive
+   ========================================= */
+@media (max-width: 768px) {
+    .site-nav { gap: 1rem; flex-direction: column; align-items: center; }
+    .site-footer { flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+    .pretext-container { min-height: 300px; }
+}

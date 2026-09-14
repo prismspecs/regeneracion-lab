@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretext Drop Cap Demo</title>
+    <style>
+        :root {
+            --bg-color: #faf9f6;
+            --text-color: #1a1a1a;
+            --accent-color: #d2691e;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: "Inter", -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 200vh; /* Force scroll */
+            padding: 40px 20px;
+        }
+        header {
+            max-width: 700px;
+            margin: 0 auto 50vh;
+            padding-top: 20vh;
+        }
+        h1 {
+            font-family: "Georgia", serif;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .intro {
+            font-size: 1.2rem;
+            color: #555;
+        }
+        .content-section {
+            max-width: 700px;
+            margin: 0 auto 50vh;
+            position: relative;
+        }
+        .canvas-container {
+            width: 100%;
+            height: 400px; 
+            position: relative;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-10px) translateX(-50%); }
+            60% { transform: translateY(-5px) translateX(-50%); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Dynamic Layout Engine</h1>
+        <p class="intro">Scroll down to see <code>@chenglou/pretext</code> in action. The text dynamically routes around a fluidly growing drop cap, recalculating line breaks at 60fps without triggering any DOM reflows.</p>
+    </header>
+
+    <div class="scroll-indicator">↓ Scroll Down ↓</div>
+
+    <section class="content-section" id="targetSection">
+        <div class="canvas-container" id="container">
+            <canvas id="textCanvas"></canvas>
+        </div>
+    </section>
+
+    <script type="module">
+        import { prepareWithSegments, layoutNextLine } from 'https://esm.sh/@chenglou/pretext@0.0.4';
+
+        const text = "A gathering place for research, stories, art, and calls to action that critically confront the ways that technology intersects with water. Water justice and indigenous studies require a regenerative approach. The Spanish term regeneración has been a rebellious political concept, philosophy, and battle cry for over a hundred years. In this context, regeneración developed as a rejection of eugenics that connected movements engaged in anti-racism, abolition of slavery and mass incarceration, and decolonial resistances rooted in Indigenous and fugitive land relations. As the Drop Cap swells, Pretext seamlessly calculates the boundaries for every frame and wraps this text perfectly around the new obstacle without a single DOM layout thrash.";
+        
+        const firstLetter = text[0];
+        const restText = text.slice(1).trimStart(); 
+
+        const fontSize = 18;
+        const lineHeight = 28;
+        const fontString = `${fontSize}px "Inter", -apple-system, sans-serif`;
+
+        const prepared = prepareWithSegments(restText, fontString);
+
+        const canvas = document.getElementById('textCanvas');
+        const container = document.getElementById('container');
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        let dpr = window.devicePixelRatio || 1;
+        let cWidth, cHeight;
+
+        function resizeCanvas() {
+            const rect = container.getBoundingClientRect();
+            cWidth = rect.width;
+            cHeight = rect.height;
+            canvas.width = cWidth * dpr;
+            canvas.height = cHeight * dpr;
+            ctx.scale(dpr, dpr);
+            render(progress); 
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        let progress = 0;
+        let animationFrameId = null;
+
+        // Custom easing curve for the springy/smooth feel
+        function easeOutQuart(t) {
+            return 1 - (--t) * t * t * t;
+        }
+
+        function render(animationVal) {
+            ctx.fillStyle = '#faf9f6';
+            ctx.fillRect(0, 0, cWidth, cHeight);
+
+            // Animate font size from 18px to 140px
+            const baseSize = fontSize;
+            const targetSize = 140;
+            const dropCapSize = baseSize + (targetSize - baseSize) * animationVal;
+            
+            ctx.font = `bold ${dropCapSize}px "Georgia", serif`;
+            ctx.textBaseline = 'top';
+
+            const dropCapWidth = ctx.measureText(firstLetter).width;
+            const dropCapHeight = dropCapSize * 0.75; // Optical height estimation
+
+            // Color animates from dark gray to amber
+            ctx.fillStyle = `color-mix(in srgb, #d2691e ${animationVal * 100}%, #1a1a1a)`;
+            ctx.fillText(firstLetter, 0, - (dropCapSize * 0.05));
+
+            ctx.font = fontString;
+            ctx.fillStyle = '#1a1a1a';
+            ctx.textBaseline = 'top';
+
+            let cursor = { segmentIndex: 0, graphemeIndex: 0 };
+            let y = 0;
+
+            const paddingBase = 0;
+            const paddingTarget = 24;
+            const currentPadding = paddingBase + (paddingTarget - paddingBase) * animationVal;
+
+            while (true) {
+                // Check if the current line overlaps with the drop cap zone
+                const isBeside = y + (lineHeight * 0.4) < dropCapHeight;
+                
+                let availableWidth = cWidth;
+                let xOffset = 0;
+
+                if (isBeside && dropCapWidth > 0 && animationVal > 0.01) {
+                    xOffset = dropCapWidth + currentPadding;
+                    availableWidth = cWidth - xOffset;
+                }
+
+                if (availableWidth < 30) availableWidth = 30; // Safety floor
+
+                const line = layoutNextLine(prepared, cursor, availableWidth);
+                if (line === null) break;
+
+                ctx.fillText(line.text, xOffset, y);
+                cursor = line.end;
+                y += lineHeight;
+
+                if (y > cHeight) break;
+            }
+        }
+
+        // Delay initial measure until fonts might be ready
+        document.fonts.ready.then(() => {
+            resizeCanvas();
+            render(0);
+        });
+
+        const targetSection = document.getElementById('targetSection');
+        
+        let startProgress = 0;
+        let targetProgress = 0;
+        let currentProgress = 0;
+        let startTime = 0;
+        const DURATION = 1000; // ms
+
+        function animate(time) {
+            if (!startTime) startTime = time;
+            const elapsed = time - startTime;
+            let t = Math.min(elapsed / DURATION, 1);
+            
+            t = easeOutQuart(t);
+
+            currentProgress = startProgress + (targetProgress - startProgress) * t;
+            progress = currentProgress;
+            
+            render(progress);
+
+            if (elapsed < DURATION) {
+                animationFrameId = requestAnimationFrame(animate);
+            } else {
+                currentProgress = targetProgress;
+                render(currentProgress);
+                animationFrameId = null;
+            }
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (targetProgress !== 1) {
+                        startProgress = currentProgress;
+                        targetProgress = 1;
+                        startTime = 0;
+                        if (!animationFrameId) animationFrameId = requestAnimationFrame(animate);
+                    }
+                } else {
+                    if (targetProgress !== 0) {
+                        startProgress = currentProgress;
+                        targetProgress = 0;
+                        startTime = 0;
+                        if (!animationFrameId) animationFrameId = requestAnimationFrame(animate);
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        observer.observe(targetSection);
+
+    </script>
+</body>
+</html>

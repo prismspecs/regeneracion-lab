@@ -1,0 +1,90 @@
+<div class="fade-in">
+    <section class="section">
+        <span class="section-label">ENGAGEMENT</span>
+        <h2 class="section-header">For Students</h2>
+        <p>The Regeneración Lab offers opportunities for students to engage in community-based research, decolonial praxis, and collaborative scholarship. We work with undergraduate and graduate students and postdoctoral fellows across disciplines who are committed to research justice and critical-creative methodologies.</p>
+    </section>
+
+    <section class="section">
+        <h3 class="section-header">Reading Groups & Study Circles</h3>
+        <div class="editorial-grid">
+            <div class="editorial-card">
+                <span class="section-label" style="background: var(--river);">ACTIVE</span>
+                <h3>Critical Temporalities</h3>
+                <p>2025-2026: An interdisciplinary reading group on time, space, and environment. Collaborative space for students, faculty, and community members to engage with scholarship on temporality and environmental justice.</p>
+                <a href="#join-form" class="editorial-btn">→ JOIN THE GROUP</a>
+            </div>
+
+            <div class="editorial-card">
+                <span class="section-label" style="background: var(--earth);">WINTER 2026</span>
+                <h3>Python Learning Lab</h3>
+                <p>Coding for Justice: Collaborative space for learning and developing projects in Python. Open to anyone interested in Digital Humanities and Research Justice frameworks. Facilitated by B.T. Werner.</p>
+                <a href="#join-form" class="editorial-btn">→ JOIN THE LAB</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h3 class="section-header">Study & Research Opportunities</h3>
+        <div class="editorial-grid" style="grid-template-columns: 1fr 1fr;">
+            <div>
+                <h4 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 1rem;">Ways to Engage</h4>
+                <p>Students can participate through directed research projects, reading groups and study circles, workshops, and collaborative initiatives with our resident scholars. We prioritize hands-on learning that centers community needs.</p>
+            </div>
+            <div>
+                <h4 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 1rem;">Resources</h4>
+                <p>Access our Indigenous Border Studies Syllabus, research justice frameworks, and educational materials. These resources support critical engagement with decolonial scholarship and praxis.</p>
+            </div>
+        </div>
+        <a href="mailto:asalomon@ucsb.edu" class="editorial-btn" style="margin-top: 2rem;">→ CONTACT US ABOUT OPPORTUNITIES</a>
+    </section>
+
+    <section class="section" id="join-form">
+        <span class="section-label">REGISTRATION</span>
+        <h2 class="section-header">Join a Reading Group / Study Circle</h2>
+        <form class="editorial-form contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <div class="editorial-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 0;">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-input" required>
+                </div>
+            </div>
+
+            <div class="editorial-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 0;">
+                <div class="form-group">
+                    <label class="form-label">UCSB Affiliation</label>
+                    <input type="text" name="affiliation" class="form-input" placeholder="e.g. Graduate Student">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Major or Department</label>
+                    <input type="text" name="department" class="form-input" placeholder="e.g. Ethnic Studies">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Which group(s) are you interested in?</label>
+                <div style="display: flex; gap: 2rem; margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.8rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" name="group_interest" value="Critical Temporalities"> CRITICAL TEMPORALITIES
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" name="group_interest" value="Python Learning Lab"> PYTHON LEARNING LAB
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Statement of Interest</label>
+                <textarea name="interest" class="form-textarea" placeholder="Briefly describe your interest in the reading group / study circle..." required></textarea>
+            </div>
+
+            <button type="submit" class="editorial-btn" style="border: var(--border-ink); padding: 1.25rem 3rem; background: var(--ink); color: var(--paper); text-transform: uppercase; width: 100%;">
+                → SUBMIT INTEREST
+            </button>
+        </form>
+    </section>
+</div>
