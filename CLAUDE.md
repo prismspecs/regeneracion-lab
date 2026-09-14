@@ -43,12 +43,27 @@
     *   `design-revamp/`, `merged-site/`, `new-main-site/`, `examples/`: Other design exploration snapshots.
 *   `reference-sites/`: Screenshots of design inspiration sites.
 *   `PRODUCT.md`, `.impeccable.md`: Product/design briefs.
+*   `.claude/skills/`: Agent skills for Claude Code (see "Agent Skills" below). `skills-lock.json` + `.cursor/skills/`, `.gemini/skills/`, `.agents/skills/` are a separate, gitignored install of the `impeccable` design skill (managed by `npx impeccable`) — unrelated to `.claude/skills/`.
 
 ## Development Workflow (current — WordPress)
 *   Local environment: **Local** (by WP Engine), site `regeneracion-lab`, https://regeneracion-lab.local, table prefix `wpjp_`. This repo is the `wp-content/themes/` folder inside that site's `app/public/`.
 *   Edit theme templates/PHP/CSS/JS directly in `regen_wp/`.
 *   Production pulls/pushes use the WP Migrate DB Pro plugin (already installed in both environments).
 *   Commit and push theme changes to `origin/main` as normal.
+*   **WP-CLI:** available as `wp` on PATH (`~/.local/bin/wp`, wrapping `~/.local/bin/wp-cli.phar`). Local (by WP Engine) doesn't expose its bundled PHP/MySQL on the system PATH, so this is a wrapper script, not a system install — it looks up the current Local site in `~/.config/Local/sites.json` from `$PWD`, then runs `wp-cli.phar` with that site's bundled PHP binary/`php.ini` (which already points at the right MySQL socket). Run `wp` from anywhere under this site's `app/public/` (e.g. from this repo). Machine-local setup, not part of the repo — re-run on a fresh machine by re-downloading `wp-cli.phar` and recreating the wrapper (see chat history for the script, or ask an agent to redo it).
+
+## Agent Skills
+`.claude/skills/` (tracked in git — these are plain files, not something a separate installer regenerates, unlike the `impeccable` skill):
+*   `wordpress-router`, `wp-project-triage` — classify/triage a WordPress repo and route to the right workflow.
+*   `wp-wpcli-and-ops` — WP-CLI usage (search-replace, db export/import, plugin/theme/content management).
+*   `wp-performance` — backend profiling/caching/DB/query optimization; useful given cPanel/LiteSpeed shared hosting in production.
+*   `wp-phpstan` — PHPStan static analysis setup for WordPress PHP (not yet wired into this repo — no `phpstan.neon` or Composer install here yet).
+*   `wp-patterns` — registering WordPress block patterns (this repo's Timeline / Resource Header / Resource List patterns).
+*   `wq-accessibility`, `wq-seo`, `wq-performance` (addyosmani/web-quality-skills) — WCAG/screen-reader, SEO/structured-data, and Core Web Vitals guidance; match the WCAG AA requirement and editorial/discoverability goals in `PRODUCT.md`.
+*   `theme-factory` (anthropics) — color/font theme presets for artifacts (slides, docs, HTML mockups); useful for quick design exploration before porting into `regen_wp/`.
+*   `frontend-skill` (openai) — composition/hierarchy/imagery guidance for visually strong front-end work. Note: OpenAI deleted this skill from their upstream repo in April 2026; this copy is a last-available snapshot and won't get updates.
+*   Not installed: `anthropics/frontend-design` — identical to the `frontend-design` skill Claude Code already ships built-in, so a project copy would just collide with it.
+*   Not installed from `WordPress/agent-skills`: `wp-block-development`, `wp-block-themes`, `wp-rest-api`, `wp-interactivity-api`, `wp-abilities-api`, `wpds`, `wp-playground`, `wp-plugin-development` — this repo is a classic (non-FSE) theme with no custom blocks, REST endpoints, or plugin code, so these don't apply yet. Revisit if that changes.
 
 ## Development Workflow (archived — static prototype in `html-js-site/main-site/`)
 Kept for reference only; not part of the live build.
