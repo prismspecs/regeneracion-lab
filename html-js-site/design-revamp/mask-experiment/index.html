@@ -4,8 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REGENERACIÓN LAB</title>
+    <title>REGENERACIÓN LAB — Mask Experiment</title>
+    <!-- Instrument Serif is --font-serif in design-revamp/new-test/styles.css
+         -- reused here rather than picking something new. One typeface for
+         both the quote and its byline (upright/uppercase/tracked instead of
+         italic, not a second family) since the title's own vector lettering
+         is already a distinct face -- three on one screen felt like one too
+         many. Only external dependency in this otherwise self-contained file. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
+        :root {
+            /* The pinned-state background: what everything becomes once
+               the title reaches the top and the wash takes over (see
+               .hero and .wash-rect below -- both read this one variable,
+               so this is the only edit needed to change it).
+               #765163 is the site's plum-purple (used elsewhere in this
+               repo, see design-revamp/new-test/styles.css) -- kept here,
+               commented out, so it's one line to switch back. */
+            /* --wash-color: #765163; */
+            --wash-color: #ffffff; /* matches the title's own white exactly */
+
+            /* Outline traced around the pinned letters (#outlineGroup) so
+               they stay visible even when --wash-color and the photo
+               showing through happen to be close in tone. */
+            --outline-color: rgba(20, 16, 12, 0.4);
+
+            /* The paragraph's ink color. No --page-bg here on purpose --
+               .hero's wash (below) already fades --wash-color in across
+               the whole viewport; a second, separately-painted page
+               background was a real bug twice over (see "Wash color" in
+               the README) before landing on "just don't paint one." */
+            --page-text: #1a1a1a;
+        }
+
         *,
         *::before,
         *::after {
@@ -17,20 +50,110 @@
         html,
         body {
             overflow-x: hidden;
-            background: #765163;
         }
 
-        body {
-            height: 600vh;
-        }
-
+        /*
+         * .hero is fixed for the life of the page: it's the pinned stage the
+         * whole interaction plays out on. Everything inside it is driven by
+         * one scroll-progress value computed in JS. Because it's fixed, it
+         * takes up no space in normal document flow -- .hero-spacer (below)
+         * is what actually reserves scroll room for it.
+         */
         .hero {
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100vh;
             overflow: hidden;
+            background: var(--wash-color);
+        }
+
+        /* Height set by JS -- just enough scroll room to trigger and
+           confirm the pin (same formula .hero used on <body> directly
+           before .page-content existed). Doesn't need to be any taller
+           than that: .page-content is a fixed overlay now (below), not
+           something scrolled into view, so nothing further down the page
+           needs reserving. */
+        .hero-spacer {
+            display: block;
+        }
+
+        /* The real page. Originally this sat in normal document flow and
+           scrolled/slid up over the fixed hero -- but that meant a long
+           stretch of extra scrolling with nothing happening between the
+           title pinning and the page actually appearing. Fixed overlay
+           instead: plain opacity fade, no motion of its own.
+
+           No background color here -- .hero's own wash (the SVG rect a
+           few blocks up, faded in by the same `activated` state on the
+           same 2s shared transition) already covers the entire viewport,
+           including the area behind this element, in --wash-color. That
+           already reaches near-full opacity by the time this fades in
+           (see CONTENT_REVEAL_DELAY_MS below). Giving .page-content its
+           OWN background as well meant two independent white fades
+           layered on top of each other, on two different timings --
+           visibly a background sweeping in twice, once from the wash and
+           again from this element's own paint. One backdrop is enough;
+           this only ever needs to paint its text.
+
+           top is always --title-height (set by JS in layout(), since the
+           title's rendered height depends on viewport width) -- that's
+           the *layout* position (and hence this box's real height: vh
+           minus the title's height), so it never covers the title once
+           it's actually pinned there.
+
+           A version of this also tried sliding the box up via
+           transform: translateY() in sync with the title's own rise
+           (to avoid covering the *still-rising* title during the first
+           couple hundred ms, when it's below this box's fixed top edge).
+           That traded one problem for a worse one -- a visibly sliding
+           white panel is a much bigger, stranger-looking thing than a
+           brief early moment of overlap. Plain fade with a short
+           TRANSITION_DELAY_MS (below) instead: short enough to feel like
+           it's arriving with the title, long enough that the title's
+           fast-then-slow ease-out curve has already carried it into its
+           safe zone (above this box's top edge) before the fade starts.
+
+           overflow-y: auto is a defensive fallback for if the real copy
+           someday doesn't fit in the remaining space -- untested, since
+           the placeholder paragraph here doesn't need it. */
+        .page-content {
+            position: fixed;
+            top: var(--title-height, 0px);
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 2;
+            overflow-y: auto;
+            opacity: 0;
+            /* off while invisible -- otherwise this full-viewport element
+               would intercept scroll/clicks (and swallow wheel scrolling
+               into its own overflow-y:auto) even at opacity 0, breaking
+               the very scroll gesture that's supposed to reveal it. JS
+               flips it to auto once activated. */
+            pointer-events: none;
+            color: var(--page-text);
+            /* top padding is much smaller than it used to be -- the title
+               now reserves its own space above via --title-height, so
+               this only needs breathing room below it, not "most of a
+               viewport" worth like when .page-content covered the title
+               too. */
+            padding: 8vh 20px 20vh;
+            transition: opacity 0.5s ease;
+        }
+
+        /* The growing-drop-cap paragraph, reused from
+           design-revamp/pretext-experiment/ -- see the script at the
+           bottom for how it works and what changed. */
+        .dropcap-container {
+            max-width: 640px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dropcap-container canvas {
+            display: block;
+            width: 100%;
         }
 
         .hero-image {
@@ -39,34 +162,132 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: contrast(1.1) saturate(1.2) brightness(0.9);
+            filter: contrast(1.05) saturate(1.1) brightness(0.95);
             transform-origin: center center;
             will-change: transform;
-            transition: transform 0.1s linear;
+            transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /*
-         * The mask SVG sits on top of the image.
-         * It's a full-viewport rectangle of the bg color (#765163)
-         * with the title text punched out (revealing the image beneath).
-         *
-         * We use a viewBox on the inner SVG to scale the path
-         * edge-to-edge, controlled via CSS width + transform for scroll.
-         */
-        .mask-layer {
+        /* Solid --wash-color fill with a title-shaped hole punched out of
+           it (via the SVG <mask> below). Fades in over the image as the
+           user scrolls; the hole is kept in registration with
+           .title-white by JS. */
+        .wash {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
+            opacity: 0;
+            transition: opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .title-overlay {
+        .wash-rect {
+            fill: var(--wash-color);
+        }
+
+        #outlineGroup use {
+            fill: none;
+            stroke: var(--outline-color);
+            stroke-width: 1.4;
+        }
+
+        /* Plain white title glyph — this is literally what "the title in
+           white" is. No mask, just a filled path. Fades out as .wash fades
+           in, so the crossfade reads as the letters "filling" with image. */
+        .title-white {
             position: absolute;
+            left: 50%;
             top: 0;
-            left: 0;
-            width: 100%;
-            /* Let the aspect ratio determine the height from the width */
-            transition: none;
+            /* width set by JS */
+            transform: translate(-50%, 0);
+            display: block;
+            filter: drop-shadow(0 2px 18px rgba(0, 0, 0, 0.35));
+            transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* SVG transform is a CSS property in modern browsers, so it
+           transitions the same way the HTML layers above do.
+           fill: black lives here (not on the <path>s themselves) so that
+           #outlineGroup's <use> clones of the same paths -- which live in
+           a different part of the document -- can inherit fill: none from
+           their own ancestor instead. A fill specified directly on a path
+           always wins over inheritance, even from a highly specific rule,
+           so it has to be absent from the source paths for both instances
+           to get their own fill correctly. */
+        #washTitleGroup {
+            fill: black;
+            transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* No transform transition on purpose: it snaps straight to the
+           title's current position every frame instead of easing there,
+           so the browser isn't re-stroking this shape for 2s of motion it
+           doesn't need to (a stroke is pricier to repaint than a fill).
+           Opacity only fades in -- and JS delays that fade until the
+           title's own 2s rise has actually finished (transitionDelay set
+           in applyState()), so the outline doesn't visibly trail behind
+           the moving letters. */
+        #outlineGroup {
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        /* The dicho: visible at rest alongside the bottom title, fades out
+           the moment the title starts rising (same trigger, same timing --
+           it reads as one scene leaving together, not two unrelated
+           fades). Sits in the upper-middle of the frame so it never
+           competes with the title's own space at the bottom.
+
+           Legibility: no background treatment at all (see history below --
+           both attempts at one looked or read wrong). Instead, JS samples
+           the actual photo pixels behind this box once on load and sets
+           --ink / --ink-shadow to plain dark or light ink, like a designer
+           choosing type color by eye per photo. Defaults below are the
+           fallback for the instant before that sample runs.
+
+           Tried first: mix-blend-mode: difference (inverts text against
+           whatever's behind it, no image analysis needed) -- fell apart on
+           mixed-tone backdrops, e.g. a horizon half blue sky / half gray
+           mountain turned the text a muddy low-contrast brown, since the
+           invert is computed per pixel against two very different regions
+           at once.
+           Tried second: a blurred dark radial-gradient scrim behind the
+           text -- fixed contrast everywhere, but reads as a visible
+           dark smudge/halo sitting on the photo, which doesn't belong. */
+        .quote {
+            margin: 0; /* reset the UA default blockquote margin -- it would throw off the centering transform below */
+            position: absolute;
+            top: 34%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(80vw, 640px);
+            text-align: center;
+            --ink: #fff;
+            --ink-shadow: rgba(0, 0, 0, 0.6);
+            color: var(--ink);
+            text-shadow: 0 1px 3px var(--ink-shadow);
+            transition: opacity 2s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease, text-shadow 0.4s ease;
+        }
+
+        .quote p {
+            margin: 0;
+            font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+            font-style: italic;
+            font-size: clamp(1.3rem, 2.9vw, 1.9rem);
+            line-height: 1.35;
+            letter-spacing: 0.015em; /* all-caps italic reads a touch cramped otherwise */
+        }
+
+        /* Byline: same face as the quote, not a third typeface -- upright
+           (not italic), uppercase, and tracked out wide enough to read as
+           a distinct, more legible register on its own rather than a
+           smaller/fainter copy of the quote above it. */
+        .quote footer {
+            margin-top: 1.1em;
+            font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -74,70 +295,505 @@
 <body>
 
     <div class="hero" id="hero">
-        <img class="hero-image" src="../images/HanamHarvest1.jpg" alt="Hanam Harvest">
+        <!-- src is picked at random from IMAGE_POOL below on every load.
+             Note: since these photos are wider than the viewport (not
+             taller), object-fit:cover only ever crops left/right -- the
+             full image height always renders, so only its TOP strip ever
+             shows through the pinned title. Photos with sky/negative space
+             along the top edge (e.g. JumpinCholla.jpg) will wash the
+             pinned title out blank on that side; that's expected until a
+             final image is chosen. -->
+        <img class="hero-image" id="heroImage" alt="">
 
-        <svg class="mask-layer" xmlns="http://www.w3.org/2000/svg">
+        <svg class="wash" id="wash" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <mask id="textMask">
-                    <rect id="maskBg" width="100%" height="100%" fill="white" />
-                    <!-- Inner SVG with viewBox to scale the path. xMinYMin = align top-left -->
-                    <svg id="titleSvg" x="0" y="0" width="100%" viewBox="0 0 1192.10 97.00"
-                        preserveAspectRatio="xMidYMin meet">
-                        <path id="titlePath" fill="black"
-                            d="M66 38.30L66 38.30Q66 46.60 61.20 52.20Q56.40 57.80 45.90 59.70L45.90 59.70L69.10 86.30Q71.50 89.10 74.80 90.55Q78.10 92 81.50 92L81.50 92L81.50 96L57.80 96L33 65.60Q31.40 63.60 30 62.50Q28.60 61.40 27.45 60.95Q26.30 60.50 25.20 60.50L25.20 60.50L25.20 80.10Q25.20 85 26.20 87.60Q27.20 90.20 30.30 91.10Q33.40 92 39.70 92L39.70 92L39.70 96L0 96L0 92Q4.40 92 6.65 91.10Q8.90 90.20 9.70 87.75Q10.50 85.30 10.50 80.60L10.50 80.60L10.50 34.40Q10.50 29.70 9.85 27.35Q9.20 25 7.20 24.10Q5.20 23.20 1.10 23L1.10 23L1.10 19L35.70 19Q50.10 19 58.05 24.10Q66 29.20 66 38.30ZM25.20 26.30L25.20 26.30L25.20 54.50L31.70 54.50Q41.10 54.50 45.75 50.80Q50.40 47.10 50.40 38.80L50.40 38.80Q50.40 32.40 46.50 28.50Q42.60 24.60 35.70 24.60L35.70 24.60L27 24.60Q25.20 24.60 25.20 26.30ZM106.70 28L106.70 28L106.70 53.40Q113.10 53.40 117 53Q120.90 52.60 123.05 51.35Q125.20 50.10 126.15 47.65Q127.10 45.20 127.50 41.20L127.50 41.20L131.20 41.20L131.20 70.50L127.50 70.50Q126.90 66.40 125.85 64Q124.80 61.60 122.70 60.45Q120.60 59.30 116.80 58.90Q113 58.50 106.70 58.50L106.70 58.50L106.70 79.10Q106.70 83.40 108.30 85.90Q109.90 88.40 113.65 89.45Q117.40 90.50 123.80 90.50L123.80 90.50Q131.40 90.50 135.95 89Q140.50 87.50 143 83.70Q145.50 79.90 146.90 73.10L146.90 73.10L150.90 73.10L149.30 96L81.50 96L81.50 92Q86 91.80 88.25 90.95Q90.50 90.10 91.25 87.70Q92 85.30 92 80.60L92 80.60L92 34.40Q92 29.70 91.30 27.35Q90.60 25 88.60 24.10Q86.60 23.20 82.60 23L82.60 23L82.60 19L145.80 19L146.50 38.60L142.20 38.60Q141.40 33 139.30 29.90Q137.20 26.80 133.05 25.55Q128.90 24.30 121.80 24.30L121.80 24.30L110.50 24.30Q108 24.30 107.35 24.95Q106.70 25.60 106.70 28ZM198.20 97L198.20 97Q186.20 97 177.45 92.35Q168.70 87.70 163.90 79.15Q159.10 70.60 159.10 58.90L159.10 58.90Q159.10 46.70 164.20 37.50Q169.30 28.30 178.40 23.15Q187.50 18 199.40 18L199.40 18Q205.60 18 211.20 19.70Q216.80 21.40 223.30 25.20L223.30 25.20L225.20 19L228.80 19L228.80 44.30L223.80 44.30Q222.50 38 219.35 33.60Q216.20 29.20 211.45 26.85Q206.70 24.50 200.60 24.50L200.60 24.50Q193 24.50 187.60 28.50Q182.20 32.50 179.30 40Q176.40 47.50 176.40 58.10L176.40 58.10Q176.40 73.60 182.65 81.95Q188.90 90.30 200.60 90.30L200.60 90.30Q206.20 90.30 210.25 88.30Q214.30 86.30 216.45 82.65Q218.60 79 218.60 73.90L218.60 73.90Q218.60 69.30 216.15 67.10Q213.70 64.90 208.10 64.50L208.10 64.50L208.10 60.50L240.50 60.50L240.50 64.50Q235.60 64.50 233.70 66.65Q231.80 68.80 231.80 74.40L231.80 74.40L231.80 87.70Q228.90 87.70 227.05 88Q225.20 88.30 223.15 89.30Q221.10 90.30 217.40 92.50L217.40 92.50Q213.60 94.70 208.75 95.85Q203.90 97 198.20 97ZM270.70 28L270.70 28L270.70 53.40Q277.10 53.40 281 53Q284.90 52.60 287.05 51.35Q289.20 50.10 290.15 47.65Q291.10 45.20 291.50 41.20L291.50 41.20L295.20 41.20L295.20 70.50L291.50 70.50Q290.90 66.40 289.85 64Q288.80 61.60 286.70 60.45Q284.60 59.30 280.80 58.90Q277 58.50 270.70 58.50L270.70 58.50L270.70 79.10Q270.70 83.40 272.30 85.90Q273.90 88.40 277.65 89.45Q281.40 90.50 287.80 90.50L287.80 90.50Q295.40 90.50 299.95 89Q304.50 87.50 307 83.70Q309.50 79.90 310.90 73.10L310.90 73.10L314.90 73.10L313.30 96L245.50 96L245.50 92Q250 91.80 252.25 90.95Q254.50 90.10 255.25 87.70Q256 85.30 256 80.60L256 80.60L256 34.40Q256 29.70 255.30 27.35Q254.60 25 252.60 24.10Q250.60 23.20 246.60 23L246.60 23L246.60 19L309.80 19L310.50 38.60L306.20 38.60Q305.40 33 303.30 29.90Q301.20 26.80 297.05 25.55Q292.90 24.30 285.80 24.30L285.80 24.30L274.50 24.30Q272 24.30 271.35 24.95Q270.70 25.60 270.70 28ZM398.80 97L385.40 97L341.10 33.90L340.70 33.90L340.70 76.90Q340.70 83.50 341.45 86.65Q342.20 89.80 344.45 90.80Q346.70 91.80 351.10 92L351.10 92L351.10 96L321.40 96L321.40 92Q326.30 91.80 328.75 90.80Q331.20 89.80 332.05 86.80Q332.90 83.80 332.90 77.60L332.90 77.60L332.90 37.40Q332.90 31.70 332.15 28.70Q331.40 25.70 329.15 24.45Q326.90 23.20 322.40 23L322.40 23L322.40 19L350.30 19L390.60 76.80L391 76.80L391 38.10Q391 31.50 390.25 28.35Q389.50 25.20 387.30 24.15Q385.10 23.10 380.60 23L380.60 23L380.60 19L410.30 19L410.30 23Q405.40 23.10 402.95 24.15Q400.50 25.20 399.65 28.20Q398.80 31.20 398.80 37.40L398.80 37.40L398.80 97ZM441.10 28L441.10 28L441.10 53.40Q447.50 53.40 451.40 53Q455.30 52.60 457.45 51.35Q459.60 50.10 460.55 47.65Q461.50 45.20 461.90 41.20L461.90 41.20L465.60 41.20L465.60 70.50L461.90 70.50Q461.30 66.40 460.25 64Q459.20 61.60 457.10 60.45Q455 59.30 451.20 58.90Q447.40 58.50 441.10 58.50L441.10 58.50L441.10 79.10Q441.10 83.40 442.70 85.90Q444.30 88.40 448.05 89.45Q451.80 90.50 458.20 90.50L458.20 90.50Q465.80 90.50 470.35 89Q474.90 87.50 477.40 83.70Q479.90 79.90 481.30 73.10L481.30 73.10L485.30 73.10L483.70 96L415.90 96L415.90 92Q420.40 91.80 422.65 90.95Q424.90 90.10 425.65 87.70Q426.40 85.30 426.40 80.60L426.40 80.60L426.40 34.40Q426.40 29.70 425.70 27.35Q425 25 423 24.10Q421 23.20 417 23L417 23L417 19L480.20 19L480.90 38.60L476.60 38.60Q475.80 33 473.70 29.90Q471.60 26.80 467.45 25.55Q463.30 24.30 456.20 24.30L456.20 24.30L444.90 24.30Q442.40 24.30 441.75 24.95Q441.10 25.60 441.10 28ZM558.30 38.30L558.30 38.30Q558.30 46.60 553.50 52.20Q548.70 57.80 538.20 59.70L538.20 59.70L561.40 86.30Q563.80 89.10 567.10 90.55Q570.40 92 573.80 92L573.80 92L573.80 96L550.10 96L525.30 65.60Q523.70 63.60 522.30 62.50Q520.90 61.40 519.75 60.95Q518.60 60.50 517.50 60.50L517.50 60.50L517.50 80.10Q517.50 85 518.50 87.60Q519.50 90.20 522.60 91.10Q525.70 92 532 92L532 92L532 96L492.30 96L492.30 92Q496.70 92 498.95 91.10Q501.20 90.20 502.00 87.75Q502.80 85.30 502.80 80.60L502.80 80.60L502.80 34.40Q502.80 29.70 502.15 27.35Q501.50 25 499.50 24.10Q497.50 23.20 493.40 23L493.40 23L493.40 19L528 19Q542.40 19 550.35 24.10Q558.30 29.20 558.30 38.30ZM517.50 26.30L517.50 26.30L517.50 54.50L524 54.50Q533.40 54.50 538.05 50.80Q542.70 47.10 542.70 38.80L542.70 38.80Q542.70 32.40 538.80 28.50Q534.90 24.60 528 24.60L528 24.60L519.30 24.60Q517.50 24.60 517.50 26.30ZM596.40 96L569 96L569 92Q573.80 91.50 576.30 89.85Q578.80 88.20 580.50 83.90L580.50 83.90L606.80 18L614.20 18L638.10 76.40Q640.20 81.50 641.70 84.45Q643.20 87.40 644.80 88.90Q646.40 90.40 648.55 91Q650.70 91.60 654.10 91.90L654.10 91.90L654.10 96L616.30 96L616.30 91.90Q621.10 91.70 623.20 90.90Q625.30 90.10 625.30 87.70L625.30 87.70Q625.30 86.30 624.60 84.05Q623.90 81.80 622.70 78.70L622.70 78.70L620.40 72.70L592.10 72.70Q589.70 78.10 588.55 81.70Q587.40 85.30 587.40 87.40L587.40 87.40Q587.40 90.40 589.65 91.20Q591.90 92 596.40 92L596.40 92L596.40 96ZM606.30 36.40L594.40 66.70L618.20 66.70L606.70 36.40L606.30 36.40ZM717.70 25.20L717.70 25.20L719.60 19L724.50 19L722.50 44.30L718.50 44.30Q716.40 35.10 710.35 29.80Q704.30 24.50 695.70 24.50L695.70 24.50Q687.90 24.50 682.35 28.55Q676.80 32.60 673.90 40.15Q671 47.70 671 58.20L671 58.20Q671 73.60 677.40 82Q683.80 90.40 696.10 90.40L696.10 90.40Q706 90.40 712.60 84.95Q719.20 79.50 722 68.90L722 68.90L726.40 68.90L726.40 96L721.70 96L720.30 88.10Q709.30 97 693.60 97L693.60 97Q681.50 97 672.50 92.30Q663.50 87.60 658.55 79.05Q653.60 70.50 653.60 58.80L653.60 58.80Q653.60 49.70 656.60 42.25Q659.60 34.80 665.05 29.35Q670.50 23.90 678.10 20.95Q685.70 18 694.80 18L694.80 18Q700.90 18 706.25 19.70Q711.60 21.40 717.70 25.20ZM770.50 96L734.80 96L734.80 92Q739.30 91.80 741.55 90.80Q743.80 89.80 744.55 86.80Q745.30 83.80 745.30 77.60L745.30 77.60L745.30 37.40Q745.30 31.70 744.65 28.70Q744 25.70 741.95 24.45Q739.90 23.20 735.80 23L735.80 23L735.80 19L769.50 19L769.50 23Q765.40 23.20 763.35 24.45Q761.30 25.70 760.65 28.70Q760 31.70 760 37.40L760 37.40L760 77.60Q760 83.80 760.75 86.80Q761.50 89.80 763.75 90.80Q766 91.80 770.50 92L770.50 92L770.50 96ZM820.10 18L820.10 18Q829.10 18 836.85 21.05Q844.60 24.10 850.45 29.55Q856.30 35 859.55 42.30Q862.80 49.60 862.80 58.10L862.80 58.10Q862.80 66.20 859.50 73.30Q856.20 80.40 850.35 85.70Q844.50 91 836.75 94Q829 97 820.10 97L820.10 97Q811.20 97 803.45 94Q795.70 91 789.85 85.70Q784 80.40 780.70 73.30Q777.40 66.20 777.40 58.10L777.40 58.10Q777.40 49.60 780.65 42.30Q783.90 35 789.75 29.55Q795.60 24.10 803.35 21.05Q811.10 18 820.10 18ZM820.10 90.50L820.10 90.50Q827.90 90.50 833.55 86.60Q839.20 82.70 842.30 75.45Q845.40 68.20 845.40 58.40L845.40 58.40Q845.40 48 842.35 40.40Q839.30 32.80 833.60 28.65Q827.90 24.50 820.10 24.50L820.10 24.50Q812.30 24.50 806.65 28.65Q801 32.80 797.90 40.40Q794.80 48 794.80 58.40L794.80 58.40Q794.80 68.20 797.90 75.45Q801 82.70 806.65 86.60Q812.30 90.50 820.10 90.50ZM828.40 10.20L816.80 13L809.50 13L822.10 3.30Q824.10 1.80 826.55 0.90Q829 0 831.50 0L831.50 0Q834.30 0 835.75 1Q837.20 2 837.20 3.70L837.20 3.70Q837.20 5.90 835.40 7.40Q833.60 8.90 828.40 10.20L828.40 10.20ZM946.30 97L932.90 97L888.60 33.90L888.20 33.90L888.20 76.90Q888.20 83.50 888.95 86.65Q889.70 89.80 891.95 90.80Q894.20 91.80 898.60 92L898.60 92L898.60 96L868.90 96L868.90 92Q873.80 91.80 876.25 90.80Q878.70 89.80 879.55 86.80Q880.40 83.80 880.40 77.60L880.40 77.60L880.40 37.40Q880.40 31.70 879.65 28.70Q878.90 25.70 876.65 24.45Q874.40 23.20 869.90 23L869.90 23L869.90 19L897.80 19L938.10 76.80L938.50 76.80L938.50 38.10Q938.50 31.50 937.75 28.35Q937.00 25.20 934.80 24.15Q932.60 23.10 928.10 23L928.10 23L928.10 19L957.80 19L957.80 23Q952.90 23.10 950.45 24.15Q948.00 25.20 947.15 28.20Q946.30 31.20 946.30 37.40L946.30 37.40L946.30 97ZM1032.30 96L963.40 96L963.40 92Q967.90 91.80 970.15 90.95Q972.40 90.10 973.15 87.70Q973.90 85.30 973.90 80.60L973.90 80.60L973.90 34.40Q973.90 29.70 973.20 27.35Q972.50 25 970.50 24.10Q968.50 23.20 964.50 23L964.50 23L964.50 19L999.00 19L999.00 23Q994.50 23.10 992.30 24.05Q990.10 25 989.35 27.50Q988.60 30 988.60 35.10L988.60 35.10L988.60 77Q988.60 82.60 990.25 85.50Q991.90 88.40 995.85 89.45Q999.80 90.50 1006.70 90.50L1006.70 90.50Q1014.40 90.50 1018.95 89.10Q1023.50 87.70 1025.95 84Q1028.40 80.30 1029.90 73.30L1029.90 73.30L1033.90 73.30L1032.30 96ZM1061.50 96L1034.10 96L1034.10 92Q1038.90 91.50 1041.40 89.85Q1043.90 88.20 1045.60 83.90L1045.60 83.90L1071.90 18L1079.30 18L1103.20 76.40Q1105.30 81.50 1106.80 84.45Q1108.30 87.40 1109.90 88.90Q1111.50 90.40 1113.65 91Q1115.80 91.60 1119.20 91.90L1119.20 91.90L1119.20 96L1081.40 96L1081.40 91.90Q1086.20 91.70 1088.30 90.90Q1090.40 90.10 1090.40 87.70L1090.40 87.70Q1090.40 86.30 1089.70 84.05Q1089 81.80 1087.80 78.70L1087.80 78.70L1085.50 72.70L1057.20 72.70Q1054.80 78.10 1053.65 81.70Q1052.50 85.30 1052.50 87.40L1052.50 87.40Q1052.50 90.40 1054.75 91.20Q1057 92 1061.50 92L1061.50 92L1061.50 96ZM1071.40 36.40L1059.50 66.70L1083.30 66.70L1071.80 36.40L1071.40 36.40ZM1158.10 96L1119.60 96L1119.60 92Q1124.10 91.80 1126.35 90.95Q1128.60 90.10 1129.40 87.70Q1130.20 85.30 1130.20 80.60L1130.20 80.60L1130.20 34.40Q1130.20 29.70 1129.60 27.35Q1129.00 25 1127.15 24.10Q1125.30 23.20 1121.70 23L1121.70 23L1121.70 19L1153.80 19Q1168.80 19 1177.00 23.90Q1185.20 28.80 1185.20 37.70L1185.20 37.70Q1185.20 43.70 1180.95 47.85Q1176.70 52 1168.10 54.50L1168.10 54.50L1168.10 54.90Q1175.50 54.90 1180.85 57.60Q1186.20 60.30 1189.15 65Q1192.10 69.70 1192.10 75.70L1192.10 75.70Q1192.10 80.80 1189.65 84.60Q1187.20 88.40 1182.60 91L1182.60 91Q1178.20 93.50 1172.00 94.75Q1165.80 96 1158.10 96L1158.10 96ZM1158.80 89.90L1158.80 89.90Q1174.90 89.90 1174.90 75.40L1174.90 75.40Q1174.90 71 1173.50 67.75Q1172.10 64.50 1169.10 62.40L1169.10 62.40Q1166.10 60.30 1161.30 59.40Q1156.50 58.50 1149.70 58.50L1149.70 58.50L1144.90 58.50L1144.90 78.50Q1144.90 84.60 1148.10 87.25Q1151.30 89.90 1158.80 89.90ZM1144.90 26.80L1144.90 52.50L1150.80 52.50Q1155.30 52.50 1158.65 51.65Q1162.00 50.80 1164.20 49.20L1164.20 49.20Q1166.70 47.50 1167.85 44.90Q1169.00 42.30 1169.00 38.90L1169.00 38.90Q1169.00 31.60 1165.40 28.35Q1161.80 25.10 1153.80 25.10L1153.80 25.10L1146.70 25.10Q1144.90 25.10 1144.90 26.80L1144.90 26.80Z" />
-                    </svg>
+                <mask id="titleHoleMask" maskUnits="userSpaceOnUse">
+                    <rect width="100%" height="100%" fill="white" />
+                    <g id="washTitleGroup">
+                        <path id="glyph0" d="M66 38.30L66 38.30Q66 46.60 61.20 52.20Q56.40 57.80 45.90 59.70L45.90 59.70L69.10 86.30Q71.50 89.10 74.80 90.55Q78.10 92 81.50 92L81.50 92L81.50 96L57.80 96L33 65.60Q31.40 63.60 30 62.50Q28.60 61.40 27.45 60.95Q26.30 60.50 25.20 60.50L25.20 60.50L25.20 80.10Q25.20 85 26.20 87.60Q27.20 90.20 30.30 91.10Q33.40 92 39.70 92L39.70 92L39.70 96L0 96L0 92Q4.40 92 6.65 91.10Q8.90 90.20 9.70 87.75Q10.50 85.30 10.50 80.60L10.50 80.60L10.50 34.40Q10.50 29.70 9.85 27.35Q9.20 25 7.20 24.10Q5.20 23.20 1.10 23L1.10 23L1.10 19L35.70 19Q50.10 19 58.05 24.10Q66 29.20 66 38.30ZM25.20 26.30L25.20 26.30L25.20 54.50L31.70 54.50Q41.10 54.50 45.75 50.80Q50.40 47.10 50.40 38.80L50.40 38.80Q50.40 32.40 46.50 28.50Q42.60 24.60 35.70 24.60L35.70 24.60L27 24.60Q25.20 24.60 25.20 26.30Z" />
+                        <path id="glyph1" d="M106.70 28L106.70 28L106.70 53.40Q113.10 53.40 117 53Q120.90 52.60 123.05 51.35Q125.20 50.10 126.15 47.65Q127.10 45.20 127.50 41.20L127.50 41.20L131.20 41.20L131.20 70.50L127.50 70.50Q126.90 66.40 125.85 64Q124.80 61.60 122.70 60.45Q120.60 59.30 116.80 58.90Q113 58.50 106.70 58.50L106.70 58.50L106.70 79.10Q106.70 83.40 108.30 85.90Q109.90 88.40 113.65 89.45Q117.40 90.50 123.80 90.50L123.80 90.50Q131.40 90.50 135.95 89Q140.50 87.50 143 83.70Q145.50 79.90 146.90 73.10L146.90 73.10L150.90 73.10L149.30 96L81.50 96L81.50 92Q86 91.80 88.25 90.95Q90.50 90.10 91.25 87.70Q92 85.30 92 80.60L92 80.60L92 34.40Q92 29.70 91.30 27.35Q90.60 25 88.60 24.10Q86.60 23.20 82.60 23L82.60 23L82.60 19L145.80 19L146.50 38.60L142.20 38.60Q141.40 33 139.30 29.90Q137.20 26.80 133.05 25.55Q128.90 24.30 121.80 24.30L121.80 24.30L110.50 24.30Q108 24.30 107.35 24.95Q106.70 25.60 106.70 28Z" transform="translate(6, 0)" />
+                        <path id="glyph2" d="M198.20 97L198.20 97Q186.20 97 177.45 92.35Q168.70 87.70 163.90 79.15Q159.10 70.60 159.10 58.90L159.10 58.90Q159.10 46.70 164.20 37.50Q169.30 28.30 178.40 23.15Q187.50 18 199.40 18L199.40 18Q205.60 18 211.20 19.70Q216.80 21.40 223.30 25.20L223.30 25.20L225.20 19L228.80 19L228.80 44.30L223.80 44.30Q222.50 38 219.35 33.60Q216.20 29.20 211.45 26.85Q206.70 24.50 200.60 24.50L200.60 24.50Q193 24.50 187.60 28.50Q182.20 32.50 179.30 40Q176.40 47.50 176.40 58.10L176.40 58.10Q176.40 73.60 182.65 81.95Q188.90 90.30 200.60 90.30L200.60 90.30Q206.20 90.30 210.25 88.30Q214.30 86.30 216.45 82.65Q218.60 79 218.60 73.90L218.60 73.90Q218.60 69.30 216.15 67.10Q213.70 64.90 208.10 64.50L208.10 64.50L208.10 60.50L240.50 60.50L240.50 64.50Q235.60 64.50 233.70 66.65Q231.80 68.80 231.80 74.40L231.80 74.40L231.80 87.70Q228.90 87.70 227.05 88Q225.20 88.30 223.15 89.30Q221.10 90.30 217.40 92.50L217.40 92.50Q213.60 94.70 208.75 95.85Q203.90 97 198.20 97Z" transform="translate(3.8, 0)" />
+                        <path id="glyph3" d="M270.70 28L270.70 28L270.70 53.40Q277.10 53.40 281 53Q284.90 52.60 287.05 51.35Q289.20 50.10 290.15 47.65Q291.10 45.20 291.50 41.20L291.50 41.20L295.20 41.20L295.20 70.50L291.50 70.50Q290.90 66.40 289.85 64Q288.80 61.60 286.70 60.45Q284.60 59.30 280.80 58.90Q277 58.50 270.70 58.50L270.70 58.50L270.70 79.10Q270.70 83.40 272.30 85.90Q273.90 88.40 277.65 89.45Q281.40 90.50 287.80 90.50L287.80 90.50Q295.40 90.50 299.95 89Q304.50 87.50 307 83.70Q309.50 79.90 310.90 73.10L310.90 73.10L314.90 73.10L313.30 96L245.50 96L245.50 92Q250 91.80 252.25 90.95Q254.50 90.10 255.25 87.70Q256 85.30 256 80.60L256 80.60L256 34.40Q256 29.70 255.30 27.35Q254.60 25 252.60 24.10Q250.60 23.20 246.60 23L246.60 23L246.60 19L309.80 19L310.50 38.60L306.20 38.60Q305.40 33 303.30 29.90Q301.20 26.80 297.05 25.55Q292.90 24.30 285.80 24.30L285.80 24.30L274.50 24.30Q272 24.30 271.35 24.95Q270.70 25.60 270.70 28Z" transform="translate(4.8, 0)" />
+                        <path id="glyph4" d="M398.80 97L385.40 97L341.10 33.90L340.70 33.90L340.70 76.90Q340.70 83.50 341.45 86.65Q342.20 89.80 344.45 90.80Q346.70 91.80 351.10 92L351.10 92L351.10 96L321.40 96L321.40 92Q326.30 91.80 328.75 90.80Q331.20 89.80 332.05 86.80Q332.90 83.80 332.90 77.60L332.90 77.60L332.90 37.40Q332.90 31.70 332.15 28.70Q331.40 25.70 329.15 24.45Q326.90 23.20 322.40 23L322.40 23L322.40 19L350.30 19L390.60 76.80L391 76.80L391 38.10Q391 31.50 390.25 28.35Q389.50 25.20 387.30 24.15Q385.10 23.10 380.60 23L380.60 23L380.60 19L410.30 19L410.30 23Q405.40 23.10 402.95 24.15Q400.50 25.20 399.65 28.20Q398.80 31.20 398.80 37.40L398.80 37.40L398.80 97Z" transform="translate(4.3, 0)" />
+                        <path id="glyph5" d="M441.10 28L441.10 28L441.10 53.40Q447.50 53.40 451.40 53Q455.30 52.60 457.45 51.35Q459.60 50.10 460.55 47.65Q461.50 45.20 461.90 41.20L461.90 41.20L465.60 41.20L465.60 70.50L461.90 70.50Q461.30 66.40 460.25 64Q459.20 61.60 457.10 60.45Q455 59.30 451.20 58.90Q447.40 58.50 441.10 58.50L441.10 58.50L441.10 79.10Q441.10 83.40 442.70 85.90Q444.30 88.40 448.05 89.45Q451.80 90.50 458.20 90.50L458.20 90.50Q465.80 90.50 470.35 89Q474.90 87.50 477.40 83.70Q479.90 79.90 481.30 73.10L481.30 73.10L485.30 73.10L483.70 96L415.90 96L415.90 92Q420.40 91.80 422.65 90.95Q424.90 90.10 425.65 87.70Q426.40 85.30 426.40 80.60L426.40 80.60L426.40 34.40Q426.40 29.70 425.70 27.35Q425 25 423 24.10Q421 23.20 417 23L417 23L417 19L480.20 19L480.90 38.60L476.60 38.60Q475.80 33 473.70 29.90Q471.60 26.80 467.45 25.55Q463.30 24.30 456.20 24.30L456.20 24.30L444.90 24.30Q442.40 24.30 441.75 24.95Q441.10 25.60 441.10 28Z" transform="translate(4.7, 0)" />
+                        <path id="glyph6" d="M558.30 38.30L558.30 38.30Q558.30 46.60 553.50 52.20Q548.70 57.80 538.20 59.70L538.20 59.70L561.40 86.30Q563.80 89.10 567.10 90.55Q570.40 92 573.80 92L573.80 92L573.80 96L550.10 96L525.30 65.60Q523.70 63.60 522.30 62.50Q520.90 61.40 519.75 60.95Q518.60 60.50 517.50 60.50L517.50 60.50L517.50 80.10Q517.50 85 518.50 87.60Q519.50 90.20 522.60 91.10Q525.70 92 532 92L532 92L532 96L492.30 96L492.30 92Q496.70 92 498.95 91.10Q501.20 90.20 502.00 87.75Q502.80 85.30 502.80 80.60L502.80 80.60L502.80 34.40Q502.80 29.70 502.15 27.35Q501.50 25 499.50 24.10Q497.50 23.20 493.40 23L493.40 23L493.40 19L528 19Q542.40 19 550.35 24.10Q558.30 29.20 558.30 38.30ZM517.50 26.30L517.50 26.30L517.50 54.50L524 54.50Q533.40 54.50 538.05 50.80Q542.70 47.10 542.70 38.80L542.70 38.80Q542.70 32.40 538.80 28.50Q534.90 24.60 528 24.60L528 24.60L519.30 24.60Q517.50 24.60 517.50 26.30Z" transform="translate(3.7, 0)" />
+                        <path id="glyph7" d="M596.40 96L569 96L569 92Q573.80 91.50 576.30 89.85Q578.80 88.20 580.50 83.90L580.50 83.90L606.80 18L614.20 18L638.10 76.40Q640.20 81.50 641.70 84.45Q643.20 87.40 644.80 88.90Q646.40 90.40 648.55 91Q650.70 91.60 654.10 91.90L654.10 91.90L654.10 96L616.30 96L616.30 91.90Q621.10 91.70 623.20 90.90Q625.30 90.10 625.30 87.70L625.30 87.70Q625.30 86.30 624.60 84.05Q623.90 81.80 622.70 78.70L622.70 78.70L620.40 72.70L592.10 72.70Q589.70 78.10 588.55 81.70Q587.40 85.30 587.40 87.40L587.40 87.40Q587.40 90.40 589.65 91.20Q591.90 92 596.40 92L596.40 92L596.40 96ZM606.30 36.40L594.40 66.70L618.20 66.70L606.70 36.40L606.30 36.40Z" transform="translate(14.5, 0)" />
+                        <path id="glyph8" d="M717.70 25.20L717.70 25.20L719.60 19L724.50 19L722.50 44.30L718.50 44.30Q716.40 35.10 710.35 29.80Q704.30 24.50 695.70 24.50L695.70 24.50Q687.90 24.50 682.35 28.55Q676.80 32.60 673.90 40.15Q671 47.70 671 58.20L671 58.20Q671 73.60 677.40 82Q683.80 90.40 696.10 90.40L696.10 90.40Q706 90.40 712.60 84.95Q719.20 79.50 722 68.90L722 68.90L726.40 68.90L726.40 96L721.70 96L720.30 88.10Q709.30 97 693.60 97L693.60 97Q681.50 97 672.50 92.30Q663.50 87.60 658.55 79.05Q653.60 70.50 653.60 58.80L653.60 58.80Q653.60 49.70 656.60 42.25Q659.60 34.80 665.05 29.35Q670.50 23.90 678.10 20.95Q685.70 18 694.80 18L694.80 18Q700.90 18 706.25 19.70Q711.60 21.40 717.70 25.20Z" transform="translate(17, 0)" />
+                        <path id="glyph9" d="M770.50 96L734.80 96L734.80 92Q739.30 91.80 741.55 90.80Q743.80 89.80 744.55 86.80Q745.30 83.80 745.30 77.60L745.30 77.60L745.30 37.40Q745.30 31.70 744.65 28.70Q744 25.70 741.95 24.45Q739.90 23.20 735.80 23L735.80 23L735.80 19L769.50 19L769.50 23Q765.40 23.20 763.35 24.45Q761.30 25.70 760.65 28.70Q760 31.70 760 37.40L760 37.40L760 77.60Q760 83.80 760.75 86.80Q761.50 89.80 763.75 90.80Q766 91.80 770.50 92L770.50 92L770.50 96Z" transform="translate(14.6, 0)" />
+                        <path id="glyph10" d="M820.10 18L820.10 18Q829.10 18 836.85 21.05Q844.60 24.10 850.45 29.55Q856.30 35 859.55 42.30Q862.80 49.60 862.80 58.10L862.80 58.10Q862.80 66.20 859.50 73.30Q856.20 80.40 850.35 85.70Q844.50 91 836.75 94Q829 97 820.10 97L820.10 97Q811.20 97 803.45 94Q795.70 91 789.85 85.70Q784 80.40 780.70 73.30Q777.40 66.20 777.40 58.10L777.40 58.10Q777.40 49.60 780.65 42.30Q783.90 35 789.75 29.55Q795.60 24.10 803.35 21.05Q811.10 18 820.10 18ZM820.10 90.50L820.10 90.50Q827.90 90.50 833.55 86.60Q839.20 82.70 842.30 75.45Q845.40 68.20 845.40 58.40L845.40 58.40Q845.40 48 842.35 40.40Q839.30 32.80 833.60 28.65Q827.90 24.50 820.10 24.50L820.10 24.50Q812.30 24.50 806.65 28.65Q801 32.80 797.90 40.40Q794.80 48 794.80 58.40L794.80 58.40Q794.80 68.20 797.90 75.45Q801 82.70 806.65 86.60Q812.30 90.50 820.10 90.50ZM828.40 10.20L816.80 13L809.50 13L822.10 3.30Q824.10 1.80 826.55 0.90Q829 0 831.50 0L831.50 0Q834.30 0 835.75 1Q837.20 2 837.20 3.70L837.20 3.70Q837.20 5.90 835.40 7.40Q833.60 8.90 828.40 10.20L828.40 10.20Z" transform="translate(13.7, 0)" />
+                        <path id="glyph11" d="M946.30 97L932.90 97L888.60 33.90L888.20 33.90L888.20 76.90Q888.20 83.50 888.95 86.65Q889.70 89.80 891.95 90.80Q894.20 91.80 898.60 92L898.60 92L898.60 96L868.90 96L868.90 92Q873.80 91.80 876.25 90.80Q878.70 89.80 879.55 86.80Q880.40 83.80 880.40 77.60L880.40 77.60L880.40 37.40Q880.40 31.70 879.65 28.70Q878.90 25.70 876.65 24.45Q874.40 23.20 869.90 23L869.90 23L869.90 19L897.80 19L938.10 76.80L938.50 76.80L938.50 38.10Q938.50 31.50 937.75 28.35Q937.00 25.20 934.80 24.15Q932.60 23.10 928.10 23L928.10 23L928.10 19L957.80 19L957.80 23Q952.90 23.10 950.45 24.15Q948.00 25.20 947.15 28.20Q946.30 31.20 946.30 37.40L946.30 37.40L946.30 97Z" transform="translate(13.6, 0)" />
+                        <path id="glyph12" d="M1032.30 96L963.40 96L963.40 92Q967.90 91.80 970.15 90.95Q972.40 90.10 973.15 87.70Q973.90 85.30 973.90 80.60L973.90 80.60L973.90 34.40Q973.90 29.70 973.20 27.35Q972.50 25 970.50 24.10Q968.50 23.20 964.50 23L964.50 23L964.50 19L999.00 19L999.00 23Q994.50 23.10 992.30 24.05Q990.10 25 989.35 27.50Q988.60 30 988.60 35.10L988.60 35.10L988.60 77Q988.60 82.60 990.25 85.50Q991.90 88.40 995.85 89.45Q999.80 90.50 1006.70 90.50L1006.70 90.50Q1014.40 90.50 1018.95 89.10Q1023.50 87.70 1025.95 84Q1028.40 80.30 1029.90 73.30L1029.90 73.30L1033.90 73.30L1032.30 96Z" transform="translate(78, 0)" />
+                        <path id="glyph13" d="M1061.50 96L1034.10 96L1034.10 92Q1038.90 91.50 1041.40 89.85Q1043.90 88.20 1045.60 83.90L1045.60 83.90L1071.90 18L1079.30 18L1103.20 76.40Q1105.30 81.50 1106.80 84.45Q1108.30 87.40 1109.90 88.90Q1111.50 90.40 1113.65 91Q1115.80 91.60 1119.20 91.90L1119.20 91.90L1119.20 96L1081.40 96L1081.40 91.90Q1086.20 91.70 1088.30 90.90Q1090.40 90.10 1090.40 87.70L1090.40 87.70Q1090.40 86.30 1089.70 84.05Q1089 81.80 1087.80 78.70L1087.80 78.70L1085.50 72.70L1057.20 72.70Q1054.80 78.10 1053.65 81.70Q1052.50 85.30 1052.50 87.40L1052.50 87.40Q1052.50 90.40 1054.75 91.20Q1057 92 1061.50 92L1061.50 92L1061.50 96ZM1071.40 36.40L1059.50 66.70L1083.30 66.70L1071.80 36.40L1071.40 36.40Z" transform="translate(83.8, 0)" />
+                        <path id="glyph14" d="M1158.10 96L1119.60 96L1119.60 92Q1124.10 91.80 1126.35 90.95Q1128.60 90.10 1129.40 87.70Q1130.20 85.30 1130.20 80.60L1130.20 80.60L1130.20 34.40Q1130.20 29.70 1129.60 27.35Q1129.00 25 1127.15 24.10Q1125.30 23.20 1121.70 23L1121.70 23L1121.70 19L1153.80 19Q1168.80 19 1177.00 23.90Q1185.20 28.80 1185.20 37.70L1185.20 37.70Q1185.20 43.70 1180.95 47.85Q1176.70 52 1168.10 54.50L1168.10 54.50L1168.10 54.90Q1175.50 54.90 1180.85 57.60Q1186.20 60.30 1189.15 65Q1192.10 69.70 1192.10 75.70L1192.10 75.70Q1192.10 80.80 1189.65 84.60Q1187.20 88.40 1182.60 91L1182.60 91Q1178.20 93.50 1172.00 94.75Q1165.80 96 1158.10 96L1158.10 96ZM1158.80 89.90L1158.80 89.90Q1174.90 89.90 1174.90 75.40L1174.90 75.40Q1174.90 71 1173.50 67.75Q1172.10 64.50 1169.10 62.40L1169.10 62.40Q1166.10 60.30 1161.30 59.40Q1156.50 58.50 1149.70 58.50L1149.70 58.50L1144.90 58.50L1144.90 78.50Q1144.90 84.60 1148.10 87.25Q1151.30 89.90 1158.80 89.90ZM1144.90 26.80L1144.90 52.50L1150.80 52.50Q1155.30 52.50 1158.65 51.65Q1162.00 50.80 1164.20 49.20L1164.20 49.20Q1166.70 47.50 1167.85 44.90Q1169.00 42.30 1169.00 38.90L1169.00 38.90Q1169.00 31.60 1165.40 28.35Q1161.80 25.10 1153.80 25.10L1153.80 25.10L1146.70 25.10Q1144.90 25.10 1144.90 26.80L1144.90 26.80Z" transform="translate(89.4, 0)" />
+                    </g>
                 </mask>
             </defs>
 
-            <rect id="bgRect" width="100%" height="100%" fill="#765163" mask="url(#textMask)" />
+            <rect class="wash-rect" width="100%" height="100%" mask="url(#titleHoleMask)" />
+
+            <!-- Traces the letter edges on top of everything, so the
+                 pinned title stays visible as a shape even when the photo
+                 showing through it is pale (see BOTTOM_MARGIN_FRACTION
+                 note above re: only the photo's top strip ever shows here).
+                 References the same paths the mask hole uses via <use>,
+                 so there's a single source of truth for the letterforms. -->
+            <g id="outlineGroup">
+                <use href="#glyph0" />
+                <use href="#glyph1" />
+                <use href="#glyph2" />
+                <use href="#glyph3" />
+                <use href="#glyph4" />
+                <use href="#glyph5" />
+                <use href="#glyph6" />
+                <use href="#glyph7" />
+                <use href="#glyph8" />
+                <use href="#glyph9" />
+                <use href="#glyph10" />
+                <use href="#glyph11" />
+                <use href="#glyph12" />
+                <use href="#glyph13" />
+                <use href="#glyph14" />
+            </g>
         </svg>
+
+        <svg class="title-white" id="titleWhite" viewBox="0 0 1281.50 97.00" preserveAspectRatio="xMidYMid meet">
+            <path fill="white" d="M66 38.30L66 38.30Q66 46.60 61.20 52.20Q56.40 57.80 45.90 59.70L45.90 59.70L69.10 86.30Q71.50 89.10 74.80 90.55Q78.10 92 81.50 92L81.50 92L81.50 96L57.80 96L33 65.60Q31.40 63.60 30 62.50Q28.60 61.40 27.45 60.95Q26.30 60.50 25.20 60.50L25.20 60.50L25.20 80.10Q25.20 85 26.20 87.60Q27.20 90.20 30.30 91.10Q33.40 92 39.70 92L39.70 92L39.70 96L0 96L0 92Q4.40 92 6.65 91.10Q8.90 90.20 9.70 87.75Q10.50 85.30 10.50 80.60L10.50 80.60L10.50 34.40Q10.50 29.70 9.85 27.35Q9.20 25 7.20 24.10Q5.20 23.20 1.10 23L1.10 23L1.10 19L35.70 19Q50.10 19 58.05 24.10Q66 29.20 66 38.30ZM25.20 26.30L25.20 26.30L25.20 54.50L31.70 54.50Q41.10 54.50 45.75 50.80Q50.40 47.10 50.40 38.80L50.40 38.80Q50.40 32.40 46.50 28.50Q42.60 24.60 35.70 24.60L35.70 24.60L27 24.60Q25.20 24.60 25.20 26.30Z" />
+            <path fill="white" d="M106.70 28L106.70 28L106.70 53.40Q113.10 53.40 117 53Q120.90 52.60 123.05 51.35Q125.20 50.10 126.15 47.65Q127.10 45.20 127.50 41.20L127.50 41.20L131.20 41.20L131.20 70.50L127.50 70.50Q126.90 66.40 125.85 64Q124.80 61.60 122.70 60.45Q120.60 59.30 116.80 58.90Q113 58.50 106.70 58.50L106.70 58.50L106.70 79.10Q106.70 83.40 108.30 85.90Q109.90 88.40 113.65 89.45Q117.40 90.50 123.80 90.50L123.80 90.50Q131.40 90.50 135.95 89Q140.50 87.50 143 83.70Q145.50 79.90 146.90 73.10L146.90 73.10L150.90 73.10L149.30 96L81.50 96L81.50 92Q86 91.80 88.25 90.95Q90.50 90.10 91.25 87.70Q92 85.30 92 80.60L92 80.60L92 34.40Q92 29.70 91.30 27.35Q90.60 25 88.60 24.10Q86.60 23.20 82.60 23L82.60 23L82.60 19L145.80 19L146.50 38.60L142.20 38.60Q141.40 33 139.30 29.90Q137.20 26.80 133.05 25.55Q128.90 24.30 121.80 24.30L121.80 24.30L110.50 24.30Q108 24.30 107.35 24.95Q106.70 25.60 106.70 28Z" transform="translate(6, 0)" />
+            <path fill="white" d="M198.20 97L198.20 97Q186.20 97 177.45 92.35Q168.70 87.70 163.90 79.15Q159.10 70.60 159.10 58.90L159.10 58.90Q159.10 46.70 164.20 37.50Q169.30 28.30 178.40 23.15Q187.50 18 199.40 18L199.40 18Q205.60 18 211.20 19.70Q216.80 21.40 223.30 25.20L223.30 25.20L225.20 19L228.80 19L228.80 44.30L223.80 44.30Q222.50 38 219.35 33.60Q216.20 29.20 211.45 26.85Q206.70 24.50 200.60 24.50L200.60 24.50Q193 24.50 187.60 28.50Q182.20 32.50 179.30 40Q176.40 47.50 176.40 58.10L176.40 58.10Q176.40 73.60 182.65 81.95Q188.90 90.30 200.60 90.30L200.60 90.30Q206.20 90.30 210.25 88.30Q214.30 86.30 216.45 82.65Q218.60 79 218.60 73.90L218.60 73.90Q218.60 69.30 216.15 67.10Q213.70 64.90 208.10 64.50L208.10 64.50L208.10 60.50L240.50 60.50L240.50 64.50Q235.60 64.50 233.70 66.65Q231.80 68.80 231.80 74.40L231.80 74.40L231.80 87.70Q228.90 87.70 227.05 88Q225.20 88.30 223.15 89.30Q221.10 90.30 217.40 92.50L217.40 92.50Q213.60 94.70 208.75 95.85Q203.90 97 198.20 97Z" transform="translate(3.8, 0)" />
+            <path fill="white" d="M270.70 28L270.70 28L270.70 53.40Q277.10 53.40 281 53Q284.90 52.60 287.05 51.35Q289.20 50.10 290.15 47.65Q291.10 45.20 291.50 41.20L291.50 41.20L295.20 41.20L295.20 70.50L291.50 70.50Q290.90 66.40 289.85 64Q288.80 61.60 286.70 60.45Q284.60 59.30 280.80 58.90Q277 58.50 270.70 58.50L270.70 58.50L270.70 79.10Q270.70 83.40 272.30 85.90Q273.90 88.40 277.65 89.45Q281.40 90.50 287.80 90.50L287.80 90.50Q295.40 90.50 299.95 89Q304.50 87.50 307 83.70Q309.50 79.90 310.90 73.10L310.90 73.10L314.90 73.10L313.30 96L245.50 96L245.50 92Q250 91.80 252.25 90.95Q254.50 90.10 255.25 87.70Q256 85.30 256 80.60L256 80.60L256 34.40Q256 29.70 255.30 27.35Q254.60 25 252.60 24.10Q250.60 23.20 246.60 23L246.60 23L246.60 19L309.80 19L310.50 38.60L306.20 38.60Q305.40 33 303.30 29.90Q301.20 26.80 297.05 25.55Q292.90 24.30 285.80 24.30L285.80 24.30L274.50 24.30Q272 24.30 271.35 24.95Q270.70 25.60 270.70 28Z" transform="translate(4.8, 0)" />
+            <path fill="white" d="M398.80 97L385.40 97L341.10 33.90L340.70 33.90L340.70 76.90Q340.70 83.50 341.45 86.65Q342.20 89.80 344.45 90.80Q346.70 91.80 351.10 92L351.10 92L351.10 96L321.40 96L321.40 92Q326.30 91.80 328.75 90.80Q331.20 89.80 332.05 86.80Q332.90 83.80 332.90 77.60L332.90 77.60L332.90 37.40Q332.90 31.70 332.15 28.70Q331.40 25.70 329.15 24.45Q326.90 23.20 322.40 23L322.40 23L322.40 19L350.30 19L390.60 76.80L391 76.80L391 38.10Q391 31.50 390.25 28.35Q389.50 25.20 387.30 24.15Q385.10 23.10 380.60 23L380.60 23L380.60 19L410.30 19L410.30 23Q405.40 23.10 402.95 24.15Q400.50 25.20 399.65 28.20Q398.80 31.20 398.80 37.40L398.80 37.40L398.80 97Z" transform="translate(4.3, 0)" />
+            <path fill="white" d="M441.10 28L441.10 28L441.10 53.40Q447.50 53.40 451.40 53Q455.30 52.60 457.45 51.35Q459.60 50.10 460.55 47.65Q461.50 45.20 461.90 41.20L461.90 41.20L465.60 41.20L465.60 70.50L461.90 70.50Q461.30 66.40 460.25 64Q459.20 61.60 457.10 60.45Q455 59.30 451.20 58.90Q447.40 58.50 441.10 58.50L441.10 58.50L441.10 79.10Q441.10 83.40 442.70 85.90Q444.30 88.40 448.05 89.45Q451.80 90.50 458.20 90.50L458.20 90.50Q465.80 90.50 470.35 89Q474.90 87.50 477.40 83.70Q479.90 79.90 481.30 73.10L481.30 73.10L485.30 73.10L483.70 96L415.90 96L415.90 92Q420.40 91.80 422.65 90.95Q424.90 90.10 425.65 87.70Q426.40 85.30 426.40 80.60L426.40 80.60L426.40 34.40Q426.40 29.70 425.70 27.35Q425 25 423 24.10Q421 23.20 417 23L417 23L417 19L480.20 19L480.90 38.60L476.60 38.60Q475.80 33 473.70 29.90Q471.60 26.80 467.45 25.55Q463.30 24.30 456.20 24.30L456.20 24.30L444.90 24.30Q442.40 24.30 441.75 24.95Q441.10 25.60 441.10 28Z" transform="translate(4.7, 0)" />
+            <path fill="white" d="M558.30 38.30L558.30 38.30Q558.30 46.60 553.50 52.20Q548.70 57.80 538.20 59.70L538.20 59.70L561.40 86.30Q563.80 89.10 567.10 90.55Q570.40 92 573.80 92L573.80 92L573.80 96L550.10 96L525.30 65.60Q523.70 63.60 522.30 62.50Q520.90 61.40 519.75 60.95Q518.60 60.50 517.50 60.50L517.50 60.50L517.50 80.10Q517.50 85 518.50 87.60Q519.50 90.20 522.60 91.10Q525.70 92 532 92L532 92L532 96L492.30 96L492.30 92Q496.70 92 498.95 91.10Q501.20 90.20 502.00 87.75Q502.80 85.30 502.80 80.60L502.80 80.60L502.80 34.40Q502.80 29.70 502.15 27.35Q501.50 25 499.50 24.10Q497.50 23.20 493.40 23L493.40 23L493.40 19L528 19Q542.40 19 550.35 24.10Q558.30 29.20 558.30 38.30ZM517.50 26.30L517.50 26.30L517.50 54.50L524 54.50Q533.40 54.50 538.05 50.80Q542.70 47.10 542.70 38.80L542.70 38.80Q542.70 32.40 538.80 28.50Q534.90 24.60 528 24.60L528 24.60L519.30 24.60Q517.50 24.60 517.50 26.30Z" transform="translate(3.7, 0)" />
+            <path fill="white" d="M596.40 96L569 96L569 92Q573.80 91.50 576.30 89.85Q578.80 88.20 580.50 83.90L580.50 83.90L606.80 18L614.20 18L638.10 76.40Q640.20 81.50 641.70 84.45Q643.20 87.40 644.80 88.90Q646.40 90.40 648.55 91Q650.70 91.60 654.10 91.90L654.10 91.90L654.10 96L616.30 96L616.30 91.90Q621.10 91.70 623.20 90.90Q625.30 90.10 625.30 87.70L625.30 87.70Q625.30 86.30 624.60 84.05Q623.90 81.80 622.70 78.70L622.70 78.70L620.40 72.70L592.10 72.70Q589.70 78.10 588.55 81.70Q587.40 85.30 587.40 87.40L587.40 87.40Q587.40 90.40 589.65 91.20Q591.90 92 596.40 92L596.40 92L596.40 96ZM606.30 36.40L594.40 66.70L618.20 66.70L606.70 36.40L606.30 36.40Z" transform="translate(14.5, 0)" />
+            <path fill="white" d="M717.70 25.20L717.70 25.20L719.60 19L724.50 19L722.50 44.30L718.50 44.30Q716.40 35.10 710.35 29.80Q704.30 24.50 695.70 24.50L695.70 24.50Q687.90 24.50 682.35 28.55Q676.80 32.60 673.90 40.15Q671 47.70 671 58.20L671 58.20Q671 73.60 677.40 82Q683.80 90.40 696.10 90.40L696.10 90.40Q706 90.40 712.60 84.95Q719.20 79.50 722 68.90L722 68.90L726.40 68.90L726.40 96L721.70 96L720.30 88.10Q709.30 97 693.60 97L693.60 97Q681.50 97 672.50 92.30Q663.50 87.60 658.55 79.05Q653.60 70.50 653.60 58.80L653.60 58.80Q653.60 49.70 656.60 42.25Q659.60 34.80 665.05 29.35Q670.50 23.90 678.10 20.95Q685.70 18 694.80 18L694.80 18Q700.90 18 706.25 19.70Q711.60 21.40 717.70 25.20Z" transform="translate(17, 0)" />
+            <path fill="white" d="M770.50 96L734.80 96L734.80 92Q739.30 91.80 741.55 90.80Q743.80 89.80 744.55 86.80Q745.30 83.80 745.30 77.60L745.30 77.60L745.30 37.40Q745.30 31.70 744.65 28.70Q744 25.70 741.95 24.45Q739.90 23.20 735.80 23L735.80 23L735.80 19L769.50 19L769.50 23Q765.40 23.20 763.35 24.45Q761.30 25.70 760.65 28.70Q760 31.70 760 37.40L760 37.40L760 77.60Q760 83.80 760.75 86.80Q761.50 89.80 763.75 90.80Q766 91.80 770.50 92L770.50 92L770.50 96Z" transform="translate(14.6, 0)" />
+            <path fill="white" d="M820.10 18L820.10 18Q829.10 18 836.85 21.05Q844.60 24.10 850.45 29.55Q856.30 35 859.55 42.30Q862.80 49.60 862.80 58.10L862.80 58.10Q862.80 66.20 859.50 73.30Q856.20 80.40 850.35 85.70Q844.50 91 836.75 94Q829 97 820.10 97L820.10 97Q811.20 97 803.45 94Q795.70 91 789.85 85.70Q784 80.40 780.70 73.30Q777.40 66.20 777.40 58.10L777.40 58.10Q777.40 49.60 780.65 42.30Q783.90 35 789.75 29.55Q795.60 24.10 803.35 21.05Q811.10 18 820.10 18ZM820.10 90.50L820.10 90.50Q827.90 90.50 833.55 86.60Q839.20 82.70 842.30 75.45Q845.40 68.20 845.40 58.40L845.40 58.40Q845.40 48 842.35 40.40Q839.30 32.80 833.60 28.65Q827.90 24.50 820.10 24.50L820.10 24.50Q812.30 24.50 806.65 28.65Q801 32.80 797.90 40.40Q794.80 48 794.80 58.40L794.80 58.40Q794.80 68.20 797.90 75.45Q801 82.70 806.65 86.60Q812.30 90.50 820.10 90.50ZM828.40 10.20L816.80 13L809.50 13L822.10 3.30Q824.10 1.80 826.55 0.90Q829 0 831.50 0L831.50 0Q834.30 0 835.75 1Q837.20 2 837.20 3.70L837.20 3.70Q837.20 5.90 835.40 7.40Q833.60 8.90 828.40 10.20L828.40 10.20Z" transform="translate(13.7, 0)" />
+            <path fill="white" d="M946.30 97L932.90 97L888.60 33.90L888.20 33.90L888.20 76.90Q888.20 83.50 888.95 86.65Q889.70 89.80 891.95 90.80Q894.20 91.80 898.60 92L898.60 92L898.60 96L868.90 96L868.90 92Q873.80 91.80 876.25 90.80Q878.70 89.80 879.55 86.80Q880.40 83.80 880.40 77.60L880.40 77.60L880.40 37.40Q880.40 31.70 879.65 28.70Q878.90 25.70 876.65 24.45Q874.40 23.20 869.90 23L869.90 23L869.90 19L897.80 19L938.10 76.80L938.50 76.80L938.50 38.10Q938.50 31.50 937.75 28.35Q937.00 25.20 934.80 24.15Q932.60 23.10 928.10 23L928.10 23L928.10 19L957.80 19L957.80 23Q952.90 23.10 950.45 24.15Q948.00 25.20 947.15 28.20Q946.30 31.20 946.30 37.40L946.30 37.40L946.30 97Z" transform="translate(13.6, 0)" />
+            <path fill="white" d="M1032.30 96L963.40 96L963.40 92Q967.90 91.80 970.15 90.95Q972.40 90.10 973.15 87.70Q973.90 85.30 973.90 80.60L973.90 80.60L973.90 34.40Q973.90 29.70 973.20 27.35Q972.50 25 970.50 24.10Q968.50 23.20 964.50 23L964.50 23L964.50 19L999.00 19L999.00 23Q994.50 23.10 992.30 24.05Q990.10 25 989.35 27.50Q988.60 30 988.60 35.10L988.60 35.10L988.60 77Q988.60 82.60 990.25 85.50Q991.90 88.40 995.85 89.45Q999.80 90.50 1006.70 90.50L1006.70 90.50Q1014.40 90.50 1018.95 89.10Q1023.50 87.70 1025.95 84Q1028.40 80.30 1029.90 73.30L1029.90 73.30L1033.90 73.30L1032.30 96Z" transform="translate(78, 0)" />
+            <path fill="white" d="M1061.50 96L1034.10 96L1034.10 92Q1038.90 91.50 1041.40 89.85Q1043.90 88.20 1045.60 83.90L1045.60 83.90L1071.90 18L1079.30 18L1103.20 76.40Q1105.30 81.50 1106.80 84.45Q1108.30 87.40 1109.90 88.90Q1111.50 90.40 1113.65 91Q1115.80 91.60 1119.20 91.90L1119.20 91.90L1119.20 96L1081.40 96L1081.40 91.90Q1086.20 91.70 1088.30 90.90Q1090.40 90.10 1090.40 87.70L1090.40 87.70Q1090.40 86.30 1089.70 84.05Q1089 81.80 1087.80 78.70L1087.80 78.70L1085.50 72.70L1057.20 72.70Q1054.80 78.10 1053.65 81.70Q1052.50 85.30 1052.50 87.40L1052.50 87.40Q1052.50 90.40 1054.75 91.20Q1057 92 1061.50 92L1061.50 92L1061.50 96ZM1071.40 36.40L1059.50 66.70L1083.30 66.70L1071.80 36.40L1071.40 36.40Z" transform="translate(83.8, 0)" />
+            <path fill="white" d="M1158.10 96L1119.60 96L1119.60 92Q1124.10 91.80 1126.35 90.95Q1128.60 90.10 1129.40 87.70Q1130.20 85.30 1130.20 80.60L1130.20 80.60L1130.20 34.40Q1130.20 29.70 1129.60 27.35Q1129.00 25 1127.15 24.10Q1125.30 23.20 1121.70 23L1121.70 23L1121.70 19L1153.80 19Q1168.80 19 1177.00 23.90Q1185.20 28.80 1185.20 37.70L1185.20 37.70Q1185.20 43.70 1180.95 47.85Q1176.70 52 1168.10 54.50L1168.10 54.50L1168.10 54.90Q1175.50 54.90 1180.85 57.60Q1186.20 60.30 1189.15 65Q1192.10 69.70 1192.10 75.70L1192.10 75.70Q1192.10 80.80 1189.65 84.60Q1187.20 88.40 1182.60 91L1182.60 91Q1178.20 93.50 1172.00 94.75Q1165.80 96 1158.10 96L1158.10 96ZM1158.80 89.90L1158.80 89.90Q1174.90 89.90 1174.90 75.40L1174.90 75.40Q1174.90 71 1173.50 67.75Q1172.10 64.50 1169.10 62.40L1169.10 62.40Q1166.10 60.30 1161.30 59.40Q1156.50 58.50 1149.70 58.50L1149.70 58.50L1144.90 58.50L1144.90 78.50Q1144.90 84.60 1148.10 87.25Q1151.30 89.90 1158.80 89.90ZM1144.90 26.80L1144.90 52.50L1150.80 52.50Q1155.30 52.50 1158.65 51.65Q1162.00 50.80 1164.20 49.20L1164.20 49.20Q1166.70 47.50 1167.85 44.90Q1169.00 42.30 1169.00 38.90L1169.00 38.90Q1169.00 31.60 1165.40 28.35Q1161.80 25.10 1153.80 25.10L1153.80 25.10L1146.70 25.10Q1144.90 25.10 1144.90 26.80L1144.90 26.80Z" transform="translate(89.4, 0)" />
+        </svg>
+
+        <blockquote class="quote" id="quote">
+            <p>THEY TRIED TO BURY US BUT THEY DIDN&rsquo;T KNOW<br>WE WERE SEEDS</p>
+            <footer>&mdash; Mexican revolutionary dicho, circa 1910</footer>
+        </blockquote>
     </div>
 
+    <!-- Reserves scroll room for the hero interaction above (height set by
+         JS, same formula that used to live on <body> directly). Nothing
+         visible -- just space. -->
+    <div class="hero-spacer" id="heroSpacer"></div>
+
+    <!-- Where the page "emerges" once the title pins -- a fixed overlay
+         that fades in on the same trigger as everything else in .hero
+         (see applyState() below), not something scrolled into view. Just
+         a single test paragraph for now (see the second <script> below for
+         the drop-cap effect, reused from design-revamp/pretext-experiment/). -->
+    <main class="page-content" id="pageContent">
+        <div class="dropcap-container" id="dropcapContainer">
+            <canvas id="dropcapCanvas"></canvas>
+        </div>
+    </main>
+
     <script>
-        const titleSvg = document.getElementById('titleSvg');
-        const titlePath = document.getElementById('titlePath');
-        const bgRect = document.getElementById('bgRect');
-        const maskBg = document.getElementById('maskBg');
+        // ---- Random hero photo ------------------------------------------
+        // Shortlisted candidates only (picked by hand, not "all wide
+        // photos" anymore). Re-rolled on every load; hardcode one once a
+        // favorite is picked.
+        const IMAGE_POOL = [
+            'JumpingCholla3.jpg', 'desertsunset.jpg', 'AsequiasSanLucy.jpg',
+            'BarrelCactus.jpg', 'PaintedRock.jpg', 'ImperialDam.jpg',
+            'JumpingCholla1.jpg', 'VikamDoag3.jpg',
+            'JumpinCholla.jpg', 'OcotilloLeaves.jpg'
+        ];
 
-        // The path's native viewBox dimensions
-        const VB_W = 1192.10;
-        const VB_H = 97.00;
-        const ASPECT = VB_W / VB_H; // ~12.29
+        // ---- Tunables -----------------------------------------------------
+        const VB_W = 1281.50, VB_H = 97.00, ASPECT = VB_W / VB_H;
+        const TITLE_MAX_WIDTH = 2400; // px cap, only matters on ultra-wide monitors
+        // A fixed px gutter reads as an intentional margin at any screen
+        // size; a vw-based fraction (tried first) leaves a gap that scales
+        // with viewport width, which at some widths looked like an almost-
+        // -but-not-quite-edge-to-edge mistake rather than a deliberate one.
+        const TITLE_SIDE_MARGIN = 16;
+        const BOTTOM_MARGIN_FRACTION = 0; // glyphs already reach the viewBox edge -- flush to the window
+        const ACTIVATE_AT = 40;  // px scrolled before the rise-to-top animation triggers
+        const DEACTIVATE_AT = 8; // px scrolled below which it drops back down (small gap avoids flicker at the boundary)
+        // How long .page-content and the drop cap wait before appearing,
+        // once the title starts rising. Not 0: the title's ease-out curve
+        // is front-loaded (most of its motion happens in the first ~1s of
+        // its own 2s transition -- see the README), so this just waits for
+        // it to have visually reached its safe top zone first. Short
+        // enough to read as "arriving with the title," not after it.
+        const CONTENT_REVEAL_DELAY_MS = 900;
 
-        function getScaledHeight() {
-            // The SVG fills 100% width; its rendered height = width / aspect ratio
+        const chosenImage = IMAGE_POOL[Math.floor(Math.random() * IMAGE_POOL.length)];
+        const heroImage = document.getElementById('heroImage');
+        heroImage.src = '../../main-site/images/' + chosenImage;
+
+        const quote = document.getElementById('quote');
+        const heroSpacer = document.getElementById('heroSpacer');
+
+        // Once, when the photo has loaded: sample the actual pixels behind
+        // the quote and pick plain dark or light ink -- like a designer
+        // eyeballing type color per photo, just automated. Deliberately a
+        // one-shot measurement (not re-run on scroll/resize) -- the quote
+        // only needs to be legible at rest, before anything's moved.
+        function adaptQuoteInk() {
+            try {
+                const vw = document.documentElement.clientWidth;
+                const vh = window.innerHeight;
+                const naturalW = heroImage.naturalWidth;
+                const naturalH = heroImage.naturalHeight;
+                if (!naturalW || !naturalH) return;
+
+                // object-fit: cover math (default center/center position):
+                // figure out what region of the source photo is actually
+                // showing at the quote's on-screen position.
+                const coverScale = Math.max(vw / naturalW, vh / naturalH);
+                const displayedW = naturalW * coverScale, displayedH = naturalH * coverScale;
+                const offsetX = (vw - displayedW) / 2;
+                const offsetY = (vh - displayedH) / 2;
+
+                const r = quote.getBoundingClientRect();
+                const imgX = (r.left - offsetX) / coverScale;
+                const imgY = (r.top - offsetY) / coverScale;
+                const imgW = r.width / coverScale;
+                const imgH = r.height / coverScale;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = 24;
+                canvas.height = 12; // small on purpose -- only need an average, not detail
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(heroImage, imgX, imgY, imgW, imgH, 0, 0, canvas.width, canvas.height);
+
+                const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let total = 0;
+                for (let i = 0; i < data.length; i += 4) {
+                    total += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                }
+                const avgLuminance = total / (data.length / 4); // 0-255
+
+                const dark = avgLuminance < 150;
+                quote.style.setProperty('--ink', dark ? '#fff' : '#211a12');
+                quote.style.setProperty('--ink-shadow', dark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.65)');
+            } catch (e) {
+                // Pixel sampling can throw (e.g. a tainted canvas under some
+                // file:// setups); keep the CSS default white ink instead
+                // of breaking the page over a cosmetic nicety.
+            }
+        }
+        if (heroImage.complete) adaptQuoteInk();
+        else heroImage.addEventListener('load', adaptQuoteInk, { once: true });
+
+        const wash = document.getElementById('wash');
+        const washTitleGroup = document.getElementById('washTitleGroup');
+        const outlineGroup = document.getElementById('outlineGroup');
+        const titleWhite = document.getElementById('titleWhite');
+        const pageContent = document.getElementById('pageContent');
+
+        function layout() {
             const vw = document.documentElement.clientWidth;
-            return vw / ASPECT;
+            const vh = window.innerHeight;
+
+            const renderedWidth = Math.min(vw - TITLE_SIDE_MARGIN * 2, TITLE_MAX_WIDTH);
+            const scaledHeight = renderedWidth / ASPECT;
+            const scale = renderedWidth / VB_W; // viewBox units -> px
+            const xOffset = (vw - renderedWidth) / 2;
+            const bottomMargin = vh * BOTTOM_MARGIN_FRACTION;
+
+            const yBottom = vh - scaledHeight - bottomMargin; // resting position
+            const yTop = 0; // pinned position
+
+            // .hero-spacer reserves the scroll room for the hero interaction
+            // itself: one full viewport (so .page-content, right after it,
+            // can't be scrolled into view before the hero phase is even
+            // reachable) plus a modest amount past ACTIVATE_AT to
+            // comfortably trigger the rise and confirm the pin holds after.
+            // .page-content supplies its own height naturally after that;
+            // body's total height is just the sum of the two, no manual
+            // sizing needed there anymore.
+            heroSpacer.style.height = (vh + Math.max(ACTIVATE_AT * 6, 300)) + 'px';
+
+            titleWhite.style.width = renderedWidth + 'px';
+
+            // .page-content (a fixed overlay, see its CSS) reads this to
+            // start right below the pinned title instead of covering it.
+            document.documentElement.style.setProperty('--title-height', scaledHeight + 'px');
+
+            return { vw, vh, xOffset, scale, yBottom, yTop };
+        }
+
+        let metrics = layout();
+        let activated = false;
+
+        const ANIMATED_ELS = [titleWhite, wash, washTitleGroup, outlineGroup, heroImage, quote, pageContent];
+
+        // The animation itself is a plain CSS transition (see the
+        // `transition` rules on .hero-image / .wash / .title-white /
+        // #washTitleGroup). Scrolling only flips this boolean between two
+        // end states -- it never scrubs an intermediate value -- which is
+        // what makes the motion glide instead of stepping with the wheel.
+        //
+        // instant=true suppresses that transition for this one update (used
+        // on first paint and on resize) -- otherwise the browser treats the
+        // very first style write as a change from the stylesheet's default
+        // position and animates in uninvited.
+        function applyState(instant) {
+            if (instant) ANIMATED_ELS.forEach(el => { el.style.transitionDuration = '0s'; });
+
+            const y = activated ? metrics.yTop : metrics.yBottom;
+
+            titleWhite.style.transform = 'translate(-50%, ' + y + 'px)';
+            titleWhite.style.opacity = activated ? 0 : 1;
+
+            washTitleGroup.style.transform =
+                'translate(' + metrics.xOffset + 'px, ' + y + 'px) scale(' + metrics.scale + ')';
+            wash.style.opacity = activated ? 1 : 0;
+
+            outlineGroup.style.transform = washTitleGroup.style.transform; // no transition -- snaps instantly
+            // Wait for the title's own rise to finish before fading in;
+            // hide immediately (no delay) when reversing. Keep in sync
+            // with the 2s transform duration used everywhere else above.
+            outlineGroup.style.transitionDelay = activated ? '2s' : '0s';
+            outlineGroup.style.opacity = activated ? 1 : 0;
+
+            heroImage.style.transform = 'scale(' + (activated ? 1.06 : 1) + ')';
+
+            // Fades out together with the title-white layer -- same
+            // trigger, same timing -- so the whole "at rest" scene leaves
+            // as one beat rather than as separate unrelated fades.
+            quote.style.opacity = activated ? 0 : 1;
+
+            // Short delay on the way in (see CONTENT_REVEAL_DELAY_MS),
+            // none on the way out -- everything should vanish together
+            // the instant you scroll back down.
+            pageContent.style.transitionDelay = activated ? (CONTENT_REVEAL_DELAY_MS / 1000) + 's' : '0s';
+            pageContent.style.opacity = activated ? 1 : 0;
+            pageContent.style.pointerEvents = activated ? 'auto' : 'none';
+
+            if (instant) {
+                ANIMATED_ELS.forEach(el => void el.offsetHeight); // force layout before re-enabling
+                ANIMATED_ELS.forEach(el => { el.style.transitionDuration = ''; });
+            }
+        }
+
+        // Tells the drop-cap script (a separate <script type="module">
+        // below) when to grow/shrink. It used to watch its own container
+        // with an IntersectionObserver, which worked when .page-content
+        // scrolled into view -- now that .page-content is a fixed overlay
+        // (always geometrically "in the viewport", opacity aside), that
+        // signal is meaningless, so this dispatches an explicit event
+        // instead. Same CONTENT_REVEAL_DELAY_MS delay as .page-content's
+        // own fade on the way in (so the drop cap starts growing right as
+        // the paragraph appears), none on the way out.
+        let dropcapDispatchTimer = null;
+        function notifyDropcap() {
+            clearTimeout(dropcapDispatchTimer);
+            if (activated) {
+                dropcapDispatchTimer = setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('hero-activated', { detail: { activated: true } }));
+                }, CONTENT_REVEAL_DELAY_MS);
+            } else {
+                window.dispatchEvent(new CustomEvent('hero-activated', { detail: { activated: false } }));
+            }
         }
 
         function onScroll() {
-            const vh = window.innerHeight;
-            const scaledH = getScaledHeight();
+            const y = window.scrollY;
+            const next = activated ? y > DEACTIVATE_AT : y > ACTIVATE_AT;
+            if (next !== activated) {
+                activated = next;
+                applyState();
+                notifyDropcap();
+            }
+        }
 
-            // Use a slight ease-out for the progress to make it feel smoother
-            let rawProgress = Math.min(window.scrollY / (vh * 2.5), 1);
-            // Ease out cubic
-            const progress = 1 - Math.pow(1 - rawProgress, 3);
-
-            // Move from top (y=0) toward bottom (y = vh - scaledH)
-            const yOffset = progress * (vh - scaledH);
-            titleSvg.setAttribute('y', yOffset);
-
-            // subtle image scale parallax
-            const imgScale = 1 + (rawProgress * 0.15);
-            document.querySelector('.hero-image').style.transform = `scale(${imgScale})`;
-
-            // Swap: mask bg white→black (bg-color disappears, image shows)
-            //       mask text black→white (letters fill with bg-color)
-            const bgGray = Math.round(255 * (1 - progress));
-            const textGray = Math.round(255 * progress);
-            maskBg.setAttribute('fill', 'rgb(' + bgGray + ',' + bgGray + ',' + bgGray + ')');
-            titlePath.setAttribute('fill', 'rgb(' + textGray + ',' + textGray + ',' + textGray + ')');
+        function onResize() {
+            metrics = layout();
+            applyState(true);
         }
 
         window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('resize', onScroll);
-        onScroll();
+        window.addEventListener('resize', onResize);
+        applyState(true);
+    </script>
+
+    <!-- ---------------------------------------------------------------
+         Growing drop-cap paragraph, reused from
+         design-revamp/pretext-experiment/index.html one level up (same
+         @chenglou/pretext canvas-layout technique -- it reflows the
+         surrounding text around the drop cap every frame without any DOM
+         reflow). Changes from the original demo:
+           - placeholder ("boring") paragraph instead of the demo copy
+           - drop cap stays --page-text the whole time, no color-mix to
+             an accent color
+           - drop cap font is Instrument Serif (already loaded above for
+             the quote/byline) instead of Georgia bold, so the one big
+             display letter on this part of the page matches the site's
+             existing display voice; body copy is Georgia, a serif
+             specifically drawn for on-screen text at small sizes, needing
+             no extra font load
+         See the README for more on this pairing. --------------------- -->
+    <script type="module">
+        import { prepareWithSegments, layoutNextLine } from 'https://esm.sh/@chenglou/pretext@0.0.4';
+
+        // Placeholder copy -- only here to give the effect real text to
+        // wrap around. Replace with actual lab copy later.
+        const text = "This paragraph exists only to test the drop cap above it. It is intentionally uneventful: no argument, no imagery, nothing worth underlining. Its one job is to be ordinary enough that nobody notices the words at all, so that what actually gets noticed is whether the letter grows smoothly, whether these lines wrap cleanly around it as it does, and whether the whole thing still reads calmly once it settles at full size.";
+
+        const firstLetter = text[0];
+        const restText = text.slice(1).trimStart();
+
+        const pageTextColor = getComputedStyle(document.body).getPropertyValue('--page-text').trim() || '#1a1a1a';
+
+        const fontSize = 18;
+        const lineHeight = 28;
+        const fontString = `${fontSize}px Georgia, serif`;
+
+        const prepared = prepareWithSegments(restText, fontString);
+
+        const canvas = document.getElementById('dropcapCanvas');
+        const container = document.getElementById('dropcapContainer');
+        // alpha: true (the default -- not passing { alpha: false } like the
+        // original demo did) so this canvas can actually be transparent.
+        // It paints only the drop cap and body text; the wash behind
+        // .page-content is the only background (see "Wash color" in the
+        // README), so this has nothing of its own to fill in.
+        const ctx = canvas.getContext('2d');
+
+        let dpr = window.devicePixelRatio || 1;
+        let cWidth, cHeight;
+
+        // Generous fixed height for this placeholder paragraph's length at
+        // the target drop-cap size -- not auto-measured. If the real copy
+        // ends up much longer or shorter, this will need adjusting (or a
+        // two-pass layout that measures total height before drawing).
+        const CANVAS_HEIGHT = 420;
+
+        function resizeCanvas() {
+            const rect = container.getBoundingClientRect();
+            cWidth = rect.width;
+            cHeight = CANVAS_HEIGHT;
+            canvas.width = cWidth * dpr;
+            canvas.height = cHeight * dpr;
+            canvas.style.height = cHeight + 'px';
+            ctx.scale(dpr, dpr);
+            render(progress);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        let progress = 0;
+        let animationFrameId = null;
+
+        function easeOutQuart(t) {
+            return 1 - (--t) * t * t * t;
+        }
+
+        function render(animationVal) {
+            // Erase the previous frame's text without painting a color --
+            // this canvas has no background of its own (see the ctx
+            // comment above).
+            ctx.clearRect(0, 0, cWidth, cHeight);
+
+            const baseSize = fontSize;
+            const targetSize = 140;
+            const dropCapSize = baseSize + (targetSize - baseSize) * animationVal;
+
+            ctx.font = `${dropCapSize}px 'Instrument Serif', Georgia, serif`;
+            ctx.textBaseline = 'top';
+
+            const dropCapWidth = ctx.measureText(firstLetter).width;
+            const dropCapHeight = dropCapSize * 0.75; // optical height estimation
+
+            ctx.fillStyle = pageTextColor; // constant -- no accent-color animation
+            ctx.fillText(firstLetter, 0, -(dropCapSize * 0.05));
+
+            ctx.font = fontString;
+            ctx.fillStyle = pageTextColor;
+            ctx.textBaseline = 'top';
+
+            let cursor = { segmentIndex: 0, graphemeIndex: 0 };
+            let y = 0;
+
+            const paddingBase = 0;
+            const paddingTarget = 20;
+            const currentPadding = paddingBase + (paddingTarget - paddingBase) * animationVal;
+
+            while (true) {
+                const isBeside = y + (lineHeight * 0.4) < dropCapHeight;
+
+                let availableWidth = cWidth;
+                let xOffset = 0;
+
+                if (isBeside && dropCapWidth > 0 && animationVal > 0.01) {
+                    xOffset = dropCapWidth + currentPadding;
+                    availableWidth = cWidth - xOffset;
+                }
+
+                if (availableWidth < 30) availableWidth = 30;
+
+                const line = layoutNextLine(prepared, cursor, availableWidth);
+                if (line === null) break;
+
+                ctx.fillText(line.text, xOffset, y);
+                cursor = line.end;
+                y += lineHeight;
+
+                if (y > cHeight) break;
+            }
+        }
+
+        document.fonts.ready.then(() => {
+            resizeCanvas();
+            render(0);
+        });
+
+        let startProgress = 0;
+        let targetProgress = 0;
+        let currentProgress = 0;
+        let startTime = 0;
+        const DURATION = 1000;
+
+        function animate(time) {
+            if (!startTime) startTime = time;
+            const elapsed = time - startTime;
+            let t = Math.min(elapsed / DURATION, 1);
+            t = easeOutQuart(t);
+
+            currentProgress = startProgress + (targetProgress - startProgress) * t;
+            progress = currentProgress;
+
+            render(progress);
+
+            if (elapsed < DURATION) {
+                animationFrameId = requestAnimationFrame(animate);
+            } else {
+                currentProgress = targetProgress;
+                render(currentProgress);
+                animationFrameId = null;
+            }
+        }
+
+        // Not an IntersectionObserver (the original demo's approach): this
+        // container lives inside .page-content, which is a fixed overlay
+        // covering the whole viewport at all times -- geometrically "in
+        // view" from the moment the page loads, regardless of its opacity.
+        // That would trigger the grow animation immediately on load,
+        // finishing invisibly before .page-content ever fades in. Listen
+        // for the hero's own explicit activation event instead (dispatched
+        // right as .page-content starts fading in -- see notifyDropcap()
+        // in the hero's own <script> above).
+        window.addEventListener('hero-activated', (e) => {
+            const next = e.detail.activated ? 1 : 0;
+            if (targetProgress !== next) {
+                startProgress = currentProgress;
+                targetProgress = next;
+                startTime = 0;
+                if (!animationFrameId) animationFrameId = requestAnimationFrame(animate);
+            }
+        });
     </script>
 </body>
 
