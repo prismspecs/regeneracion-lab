@@ -676,17 +676,13 @@
             // so that extra viewport bought nothing but a dead stretch of
             // scrolling with no content at all on screen.
             //
-            // The floor below (550) isn't the bare minimum either, though
-            // -- that was tried too (300, `ACTIVATE_AT * 6`-ish) and read
-            // as the opposite problem: content arrived so close behind the
-            // title that an ordinary scroll gesture (~150-250px) already
-            // had the first paragraph crowding right up against it. 550
-            // leaves a comfortable gap at that same natural scroll amount
-            // while still keeping the paragraph on screen (not a dead
-            // scroll stretch) right from the first moment past
-            // ACTIVATE_AT -- see "The page below the hero" in the README
-            // for the numbers this was checked against.
-            heroSpacer.style.height = Math.max(ACTIVATE_AT * 6, 550) + 'px';
+            // The floor below has moved twice already, in opposite
+            // directions: 300 (close to `ACTIVATE_AT * 6`) read as the
+            // paragraph crowding the title at a realistic scroll gesture;
+            // 550 overcorrected into feeling too far below it. 425 splits
+            // the difference -- see "The page below the hero" in the
+            // README for the numbers this was checked against.
+            heroSpacer.style.height = Math.max(ACTIVATE_AT * 6, 425) + 'px';
 
             titleWhite.style.width = renderedWidth + 'px';
 
