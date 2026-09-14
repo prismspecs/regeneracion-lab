@@ -114,9 +114,11 @@
            fast-then-slow ease-out curve has already carried it into its
            safe zone (above this box's top edge) before the fade starts.
 
-           overflow-y: auto is a defensive fallback for once there's more
-           than one short paragraph here -- untested so far, since the
-           current single paragraph doesn't need it. */
+           overflow-y: auto: now that .page-projects makes this box
+           taller than the viewport, this is what actually lets you reach
+           the rest of it -- .hero-spacer only reserves scroll room for
+           the hero interaction itself, so scrolling further scrolls
+           *inside* this fixed box, not the document. */
         .page-content {
             position: fixed;
             top: var(--title-height, 0px);
@@ -180,6 +182,111 @@
 
         .page-copy p + p {
             margin-top: 28px;
+        }
+
+        /* A real content type, not just body copy: three of the live
+           site's actual `project` posts (see the projects-grid comment
+           near the markup below for which ones and why). Colors are the
+           live theme's own accent set (regen_wp/style.css --color-
+           secondary-green/-earth-brown), so the cards are testing real
+           brand color against this page's wash/photo backgrounds, not
+           invented ones. Typefaces stay disciplined to this page's
+           existing two (Instrument Serif for the card titles/section
+           header, Georgia for everything else) rather than pulling in
+           the live theme's Inter/IBM Plex Mono -- reintroducing that
+           would be exactly the "too many typefaces" problem this page
+           already solved once. */
+        .page-projects {
+            max-width: 880px;
+            margin: 64px auto 0;
+        }
+
+        .page-projects h2 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 2em;
+            margin-bottom: 28px;
+            color: var(--page-text);
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 640px) {
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .project-card {
+            background: #fff;
+            border-left: 3px solid var(--project-accent, #2a9d8f);
+            padding: 28px 30px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .project-card--turquoise {
+            --project-accent: #2a9d8f;
+        }
+
+        .project-card--brown {
+            --project-accent: #9c5424;
+            background: #f9f6f3;
+        }
+
+        .project-card .project-badge {
+            display: inline-block;
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.8em;
+            color: var(--project-accent);
+            border: 1px solid var(--project-accent);
+            padding: 3px 10px;
+            margin-bottom: 14px;
+        }
+
+        .project-card h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+            font-size: 1.4em;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            color: var(--page-text);
+        }
+
+        .project-card .project-meta {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.85em;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: var(--project-accent);
+            margin-bottom: 14px;
+        }
+
+        .project-card p {
+            font-family: Georgia, serif;
+            font-size: 16px;
+            line-height: 24px;
+            color: var(--page-text);
+            margin-bottom: 16px;
+        }
+
+        .project-card a {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 15px;
+            color: var(--project-accent);
+            text-decoration: none;
+            border-bottom: 1px solid currentColor;
+        }
+
+        .project-card a:hover {
+            opacity: 0.7;
         }
 
         .hero-image {
@@ -418,7 +525,26 @@
          one gets the canvas-drawn drop cap (see the second <script> below,
          reused from design-revamp/pretext-experiment/); the other two are
          plain HTML -- no need to reflow around a growing shape once the
-         drop cap has already settled. -->
+         drop cap has already settled.
+
+         Below that: three real `project` posts, pulled via
+         `wp post get <id>` / `wp post meta list <id>` rather than typed
+         out by hand. Picked for range, not any particular order: #17
+         (Indigenous Border Studies -- no project_style set, defaults to
+         turquoise, has a badge), #20 (Safiya Henderson Holmes... --
+         project_style brown, a manual project_title_line1/2 break), #30
+         (Museum of Us Exhibit -- turquoise, no badge, an external
+         project_link_url). This is a genuinely different kind of content
+         than the paragraphs above -- headings, short meta lines, card
+         backgrounds -- worth testing against the wash/photo the same way.
+         Two differences from how the live theme renders these: badges
+         show whenever project_badge is set (the live front-page.php only
+         ever shows a badge when its text is literally "Ongoing",
+         case-insensitive -- looks like an unintentional bug there, since
+         #17 and #20 both have project_badge "NEW" that never actually
+         renders on the live site); and #17/#20's "Explore" links go
+         nowhere (href="#") since their real target is a WordPress
+         permalink this static prototype doesn't have. -->
     <main class="page-content" id="pageContent">
         <div class="dropcap-container" id="dropcapContainer">
             <canvas id="dropcapCanvas"></canvas>
@@ -427,6 +553,31 @@
             <p>However, the Spanish term regeneraci&oacute;n has been a rebellious political concept, philosophy, and battle cry for over a hundred years. In this context, regeneraci&oacute;n developed as a rejection of eugenics that connected movements engaged in anti-racism, abolition of slavery and mass incarceration, and decolonial resistances rooted in Indigenous and fugitive land relations.</p>
             <p>The Regeneraci&oacute;n Lab is grounded in this older, otherwise meaning of the term that emerged in the late nineteenth century and inspired the 1910 Mexican revolution. Our regenerative work centers community-based research justice, creative-critical practices, and decolonial praxis.</p>
         </div>
+        <section class="page-projects">
+            <h2>Projects</h2>
+            <div class="project-grid">
+                <div class="project-card project-card--turquoise">
+                    <span class="project-badge">New</span>
+                    <h3>Indigenous Border Studies</h3>
+                    <p class="project-meta">Ongoing</p>
+                    <p>A popular education platform offering thematic modules, scholarly research, readings, films, and community dialogue centering Indigenous perspectives on borders, sovereignty, and movement.</p>
+                    <a href="#">Explore</a>
+                </div>
+                <div class="project-card project-card--brown">
+                    <span class="project-badge">New</span>
+                    <h3>Safiya Henderson Holmes<br>Black Arts &amp; Radicalism Archive</h3>
+                    <p class="project-meta">2025&ndash;2026</p>
+                    <p>A research justice and critical archival praxis collaboration with the family of acclaimed Black Arts Movement poet Safiya Henderson Holmes to preserve and digitize her manuscripts, papers, and a wide array of Black feminist, radical movement, and arts ephemera.</p>
+                    <a href="#">Explore</a>
+                </div>
+                <div class="project-card project-card--turquoise">
+                    <h3>Museum of Us Exhibit</h3>
+                    <p class="project-meta">2021&ndash;Current</p>
+                    <p>A response to the impacts of border militarization and deaths of migrants in the Sonoran desert with O&rsquo;odham perspectives and Indigenous histories of colonial occupation and partition. Up now as part of the exhibit Hostile Terrain &lsquo;94 at the Museum of Us in San Diego, CA.</p>
+                    <a href="https://museumofus.org/exhibits/hostile-terrain-94" target="_blank" rel="noopener">Visit Exhibit</a>
+                </div>
+            </div>
+        </section>
     </main>
 
     <script>

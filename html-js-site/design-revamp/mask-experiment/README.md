@@ -33,8 +33,11 @@ territory, not part of the live WordPress build). It is not wired into
 4. Scrolling back up near the top reverses the animation, quote included.
 5. **Keep scrolling past the hero** and the page proper emerges as a
    fade, not a scroll-driven reveal — see "The page below the hero" for
-   why. For now that's the live homepage's first three paragraphs, with a
-   growing drop-cap effect on the opening paragraph's first letter.
+   why. For now that's the live homepage's first three paragraphs (a
+   growing drop-cap effect on the opening paragraph's first letter) plus
+   a small grid of three real projects below them — see "Projects grid".
+   Past this point, scrolling further scrolls *inside* that fixed box,
+   not the page.
 
 ## How it's built
 
@@ -392,6 +395,57 @@ touching its draw resolution. If the drop-cap paragraph's copy changes
 meaningfully in length, the crop still tracks it automatically — only
 `CANVAS_HEIGHT` itself (the draw buffer's ceiling) would need revisiting,
 and only if a much longer paragraph actually exceeded it.
+
+### Projects grid
+
+After the three paragraphs, `.page-projects` holds three real `project`
+posts (`#17` Indigenous Border Studies, `#20` Safiya Henderson Holmes
+Black Arts & Radicalism Archive, `#30` Museum of Us Exhibit), pulled via
+`wp post get <id>` / `wp post meta list <id>` rather than typed by hand —
+picked for range: one with no `project_style` set (defaults to
+turquoise), one `brown`, one with an external `project_link_url` instead
+of an internal permalink. Testing a structurally different kind of
+content than body paragraphs — headings, short meta lines, colored card
+backgrounds — against the same wash/photo treatment was the point of
+adding it.
+
+Colors are the live theme's own accent variables
+(`regen_wp/style.css` → `--color-secondary-green` `#2a9d8f`,
+`--color-earth-brown` `#9c5424`), not invented ones, so the cards are a
+real test of the live brand palette against this page's backgrounds.
+Typefaces deliberately stay within this page's existing two — Instrument
+Serif for card titles/the section header, Georgia for everything else —
+rather than pulling in the live theme's card typefaces (Inter, IBM Plex
+Mono). Bringing those in would reintroduce exactly the "too many
+typefaces" problem this page already solved once for the quote (see "Why
+there are 15 separate letter paths" above for that history) — a card grid
+gets to borrow the live theme's colors without also borrowing its type
+system.
+
+Two intentional differences from how `front-page.php` actually renders
+these:
+
+- **Badges show whenever `project_badge` is set.** The live template
+  only ever renders a badge when its text is literally `"Ongoing"`
+  (case-insensitive) — `#17` and `#20` both have `project_badge` set to
+  `"NEW"`, which never actually shows up on the live site. Looks like an
+  unintentional bug there (the badge and the separate `project_meta`
+  field, which *does* independently say "Ongoing" for `#17`, seem to have
+  gotten crossed), not something worth reproducing here.
+- **`#17` and `#20`'s "Explore" links go nowhere** (`href="#"`) since
+  their real target is a WordPress permalink this static, database-free
+  prototype has no equivalent of. `#30`'s link is real and external
+  (`museumofus.org`, opens in a new tab) since that one's `project_link_url`
+  already pointed off-site.
+
+`.page-content`'s `overflow-y: auto` — previously a defensive fallback
+"untested, since the current single paragraph doesn't need it" — is now
+actually exercised: the grid makes `.page-content` taller than the
+viewport, and scrolling further (once activated) scrolls *inside* that
+fixed box rather than the document, since `.hero-spacer` only reserves
+scroll room for the hero interaction itself. Confirmed working via a
+headless-Chrome check — the pinned title stays put above the content
+while the grid scrolls underneath it.
 
 ## Random background image
 
