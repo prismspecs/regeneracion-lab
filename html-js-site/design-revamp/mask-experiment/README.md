@@ -31,8 +31,9 @@ territory, not part of the live WordPress build). It is not wired into
    they stay legible as shapes even where the photo showing through
    happens to be close in tone to the wash color. The quote is gone.
 4. Scrolling back up near the top reverses the animation, quote included.
-5. **Keep scrolling past the hero** and the page proper emerges as a
-   fade, not a scroll-driven reveal — see "The page below the hero" for
+5. **The page proper comes up together with the title**, not after
+   further scrolling -- a fade, not a scroll-driven reveal, timed to
+   arrive right as the title settles. See "The page below the hero" for
    why. For now that's the live homepage's first three paragraphs (a
    growing drop-cap effect on the opening paragraph's first letter) plus
    a small grid of three real projects below them — see "Projects grid".
@@ -219,7 +220,7 @@ restoring it — so only scroll-triggered changes actually animate.
 | `BOTTOM_MARGIN_FRACTION` | Gap from the bottom edge at rest (`0` = flush; the glyphs already reach the edge of their own viewBox, so no margin is needed to avoid clipping) |
 | `ACTIVATE_AT` / `DEACTIVATE_AT` | Scroll distance (px) that triggers the rise / the reverse (two different thresholds avoid flicker right at the boundary) |
 | `CONTENT_REVEAL_DELAY_MS` | How long `.page-content` (and the drop cap) wait after the title starts rising before they fade in -- see "The page below the hero" |
-| body height, set in `layout()` | `vh + max(ACTIVATE_AT * 6, 300)` — just enough scroll room to comfortably cross `ACTIVATE_AT` and confirm the pin holds after. Was `vh * 2.2`, a leftover from an earlier version that scrubbed the whole animation across the scroll distance; once it became a threshold crossing, that left ~1000px of dead scroll space below the already-pinned title. |
+| `.hero-spacer` height, set in `layout()` | `max(ACTIVATE_AT * 6, 300)` — just enough scroll room to comfortably cross `ACTIVATE_AT` and confirm the pin holds after, deliberately *not* padded with an extra viewport on top (see "The page below the hero" for why that was tried and reverted -- it just adds dead scroll space, since opacity already gates visibility). Was `vh * 2.2` even earlier still, a leftover from a version that scrubbed the whole animation across the scroll distance. |
 | the `2s cubic-bezier(0.16, 1, 0.3, 1)` in each `transition` rule | Animation duration/easing — all five animated layers (image, wash, title, wash's title group, quote) share this so they stay in sync |
 
 Two more tunables live as CSS custom properties on `:root` instead, since
@@ -322,20 +323,32 @@ through four versions:
   scrolled-up content disappeared behind the fixed title with no visible
   relationship between the two, which just reads as content blocked by an
   opaque bar, because that's exactly what it was.
-- **Current (fifth): back to normal document flow, for good this time.**
-  The "long stretch of nothing happening" problem from the first attempt
-  doesn't reproduce now, because `.hero-spacer` is much shorter than it
-  used to be (one viewport plus `~300px`, not enough room to fully settle
-  the title before content starts arriving from below) -- so scrolling
-  into `.page-content` visually catches up to and covers the title while
-  it may still be finishing its rise, rather than only after a long dead
-  stretch. That reads as perfectly ordinary (a page scrolling up over its
-  own header is the single most common thing on the web), unlike the
-  third attempt's *artificial* slide, which had no such precedent to read
-  naturally against. One single document scrollbar now, for the hero
-  interaction and everything below it -- `overflow-y: auto` is gone from
-  `.page-content` entirely, since a second, nested scroll region was the
-  actual problem, not a detail to keep tuning.
+- **Fifth: back to normal document flow, but still with the old
+  `.hero-spacer` height** (one full viewport plus `~300px`, left over from
+  when `.page-content` was a fixed overlay and that height only needed to
+  cover the hero's own interaction). That silently reintroduced the exact
+  first-attempt problem: opacity already gates when `.page-content` is
+  *visible* (`0` until `activated`), so that extra viewport of spacer
+  bought nothing but a dead stretch of scrolling -- title pins almost
+  immediately (`ACTIVATE_AT` is just 40px), then nothing else happens for
+  most of another full viewport of scrolling before any content appears.
+  Reported back as literally the thing this section already described
+  fixing once.
+- **Current (sixth): shrink `.hero-spacer` down to just enough room to
+  trigger the rise and confirm the pin holds** (`Math.max(ACTIVATE_AT *
+  6, 300)`, no added viewport). With the spacer this short, crossing
+  `ACTIVATE_AT` and scrolling `.page-content`'s top into view happen in
+  essentially the same motion -- content reads as arriving *with* the
+  title, not some scroll-distance later. Continuing to scroll then
+  visually catches up to and covers the title while it may still be
+  settling from its own 2s rise, rather than only after a long dead
+  stretch, which reads as perfectly ordinary (a page scrolling up over
+  its own header is the single most common thing on the web) -- unlike
+  the third attempt's *artificial* slide, which had no such precedent to
+  read naturally against. One single document scrollbar now, for the
+  hero interaction and everything below it -- `overflow-y: auto` is gone
+  from `.page-content` entirely, since a second, nested scroll region was
+  the actual problem, not a detail to keep tuning.
 
 The title is still meant to persist as a header for as long as there's
 room for it -- `.page-content` doesn't have a `top` offset to avoid
