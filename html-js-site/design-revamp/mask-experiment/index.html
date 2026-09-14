@@ -114,9 +114,9 @@
            fast-then-slow ease-out curve has already carried it into its
            safe zone (above this box's top edge) before the fade starts.
 
-           overflow-y: auto is a defensive fallback for if the real copy
-           someday doesn't fit in the remaining space -- untested, since
-           the placeholder paragraph here doesn't need it. */
+           overflow-y: auto is a defensive fallback for once there's more
+           than one short paragraph here -- untested so far, since the
+           current single paragraph doesn't need it. */
         .page-content {
             position: fixed;
             top: var(--title-height, 0px);
@@ -388,8 +388,9 @@
     <!-- Where the page "emerges" once the title pins -- a fixed overlay
          that fades in on the same trigger as everything else in .hero
          (see applyState() below), not something scrolled into view. Just
-         a single test paragraph for now (see the second <script> below for
-         the drop-cap effect, reused from design-revamp/pretext-experiment/). -->
+         the homepage's opening paragraph for now, real copy pulled from
+         the live site (see the second <script> below for the drop-cap
+         effect, reused from design-revamp/pretext-experiment/). -->
     <main class="page-content" id="pageContent">
         <div class="dropcap-container" id="dropcapContainer">
             <canvas id="dropcapCanvas"></canvas>
@@ -625,7 +626,8 @@
          @chenglou/pretext canvas-layout technique -- it reflows the
          surrounding text around the drop cap every frame without any DOM
          reflow). Changes from the original demo:
-           - placeholder ("boring") paragraph instead of the demo copy
+           - real copy (the live homepage's opening paragraph) instead of
+             the demo's own text about the effect itself
            - drop cap stays --page-text the whole time, no color-mix to
              an accent color
            - drop cap font is Instrument Serif (already loaded above for
@@ -638,9 +640,12 @@
     <script type="module">
         import { prepareWithSegments, layoutNextLine } from 'https://esm.sh/@chenglou/pretext@0.0.4';
 
-        // Placeholder copy -- only here to give the effect real text to
-        // wrap around. Replace with actual lab copy later.
-        const text = "This paragraph exists only to test the drop cap above it. It is intentionally uneventful: no argument, no imagery, nothing worth underlining. Its one job is to be ordinary enough that nobody notices the words at all, so that what actually gets noticed is whether the letter grows smoothly, whether these lines wrap cleanly around it as it does, and whether the whole thing still reads calmly once it settles at full size.";
+        // Real copy now, not filler: the opening paragraph of the live
+        // site's actual homepage content (WP page ID 7, "Home" --
+        // `wp post get 7 --field=post_content`). Just the first
+        // paragraph of three on that page, enough to test the effect
+        // against real text without duplicating the whole homepage here.
+        const text = "Regeneration has become one of the most commercialized and co-opted terms of the 21st century. It is commonly used to market a plethora of ventures that greenwash extractive and colonial land relations, sell products and settler ways of life, and envision alternatives that may delink from one system but reproduce others.";
 
         const firstLetter = text[0];
         const restText = text.slice(1).trimStart();
@@ -665,9 +670,9 @@
         let dpr = window.devicePixelRatio || 1;
         let cWidth, cHeight;
 
-        // Generous fixed height for this placeholder paragraph's length at
-        // the target drop-cap size -- not auto-measured. If the real copy
-        // ends up much longer or shorter, this will need adjusting (or a
+        // Generous fixed height for this paragraph's length at the target
+        // drop-cap size -- not auto-measured. If it's swapped for a
+        // longer or shorter paragraph, this will need adjusting (or a
         // two-pass layout that measures total height before drawing).
         const CANVAS_HEIGHT = 420;
 

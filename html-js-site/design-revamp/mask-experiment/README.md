@@ -31,11 +31,10 @@ territory, not part of the live WordPress build). It is not wired into
    they stay legible as shapes even where the photo showing through
    happens to be close in tone to the wash color. The quote is gone.
 4. Scrolling back up near the top reverses the animation, quote included.
-5. **Keep scrolling past the hero** and the page proper emerges — `.hero`
-   is `position: fixed` and only ever covers the viewport, so real page
-   content sits after it in normal document flow and slides up over it.
-   For now that's just one placeholder paragraph, to try out a growing
-   drop-cap effect (see "The page below the hero").
+5. **Keep scrolling past the hero** and the page proper emerges as a
+   fade, not a scroll-driven reveal — see "The page below the hero" for
+   why. For now that's the live homepage's opening paragraph, with a
+   growing drop-cap effect on its first letter.
 
 ## How it's built
 
@@ -333,18 +332,19 @@ everything (its `z-index: 2` is what lets it cover `.hero`, which never
 sets its own) and intercept clicks and scroll-wheel input, breaking the
 very scroll gesture that's supposed to reveal it.
 
-Right now `.page-content` holds exactly one thing: a placeholder paragraph
-with a growing drop-cap effect, reused from
+Right now `.page-content` holds exactly one thing: the live homepage's
+opening paragraph, with a growing drop-cap effect, reused from
 `design-revamp/pretext-experiment/index.html` (one level up) almost
 unchanged — same `@chenglou/pretext` canvas-layout library (loaded from
 `esm.sh`, this page's second external dependency alongside Google Fonts),
 same grow animation, same `layoutNextLine` reflow-without-DOM-thrash
 technique. Four changes from the original demo:
 
-- **Placeholder copy.** The demo's paragraph described the effect itself;
-  this one is deliberately inert filler with no real content, just enough
-  length to wrap a few lines around the drop cap. Meant to be replaced
-  once there's real lab copy to put here.
+- **Real copy.** The demo's paragraph described the effect itself; this one
+  is the actual opening paragraph of the live site's homepage (WP page ID
+  7, pulled via `wp post get 7 --field=post_content`), so the effect can be
+  judged against real lab copy instead of filler text. Just the first of
+  three paragraphs on that page — the rest hasn't been added here yet.
 - **No accent color.** The original animates the drop cap from dark gray
   to an amber accent (`#d2691e`) as it grows. Here it stays `--page-text`
   (the same color as the surrounding paragraph) throughout — asked for
@@ -376,8 +376,8 @@ technique. Four changes from the original demo:
 
 One thing not carried over from the original demo: real content-based
 height measurement. `dropcap-container`'s canvas has a fixed
-`CANVAS_HEIGHT` (420px) sized by eye for this specific placeholder
-paragraph's length — if the real copy ends up meaningfully longer or
+`CANVAS_HEIGHT` (420px) sized by eye for this specific paragraph's
+length — if the copy here changes and ends up meaningfully longer or
 shorter, that constant (or a proper two-pass "measure then draw" layout)
 will need revisiting.
 
