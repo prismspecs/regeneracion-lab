@@ -15,7 +15,8 @@ This repository is the custom WordPress theme and design history for **Regenerac
 | `reference-sites/` | Screenshots of design inspiration (Kinfolk, Native Bound Unbound, Culture Hack Labs, Water Justice and Technology Studio). |
 | `PRODUCT.md` | Product brief: register, users, purpose, brand personality, anti-references. |
 | `.impeccable.md` | Design system context: aesthetic direction, typography, design principles. |
-| `GEMINI.md` | Working notes on architecture, the WP migration, and content model — the most detailed reference for how the theme is built. |
+| `CLAUDE.md` | **Canonical agent/project context file.** Working notes on architecture, the WP migration, and content model — the most detailed reference for how the theme is built. |
+| `GEMINI.md`, `AGENTS.md`, `.cursorrules` | Pointer stubs to `CLAUDE.md`, so Gemini CLI, Cursor, and any [agents.md](https://agents.md)-compliant tool (OpenCode, Codex, etc.) find the same context under their own expected filename. Edit `CLAUDE.md`, not these. |
 
 This repo only tracks the theme and design assets, not the full WordPress install (core, plugins, uploads, database). See below for how it plugs into a full site.
 

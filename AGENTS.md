@@ -1,0 +1,1 @@
+See [`CLAUDE.md`](./CLAUDE.md) — that's the canonical project/agent context file for this repo (architecture, dev workflow, WordPress migration notes, design principles). This file exists so agent CLIs that follow the [agents.md](https://agents.md) convention (OpenCode, Codex, Amp, and others) find it by their expected filename.
