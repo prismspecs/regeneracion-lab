@@ -1,10 +1,10 @@
 # Regeneración Lab - Project Context
 
 ## Overview
-**Regeneración Lab** is a digital humanities and Indigenous studies initiative involving three interconnected web projects:
-1.  **Main Research Lab Website (`main-site/`)**: The primary public face of the lab.
-2.  **Indigenous Border Studies Syllabus (`syllabus/`)**: An educational platform with thematic modules.
-3.  **Tribal Community Historical Site**: (Planned/In-progress).
+**Regeneración Lab** is a digital humanities and Indigenous studies initiative. The live site (https://regeneracionlab.org) runs on the WordPress theme in `regen_wp/`. It grew out of an earlier set of interconnected static prototypes, now archived in `html-js-site/`:
+1.  **Main Research Lab Website (`html-js-site/main-site/`)**: The original static prototype for the lab's public face — superseded by `regen_wp/`.
+2.  **Indigenous Border Studies Syllabus (`html-js-site/syllabus/`)**: An educational platform prototype with thematic modules — not yet ported to WordPress.
+3.  **Tribal Community Historical Site**: Planned; not started.
 
 **Core Theme:** Water justice, Indigenous studies, and "Regeneración" (referencing the Mexican anarchist newspaper).
 
@@ -17,9 +17,11 @@
 *   **UI Style:** Sharp, brutalist/modernist aesthetic (no rounded corners), soft shadows, modern typography (Inter/Roboto).
 
 ## Architecture & Tech Stack (Critical)
-**Stack:** Vanilla HTML, CSS, and JavaScript. **NO frameworks** (React, Vue, etc.).
+**Live site (`regen_wp/`):** WordPress theme, PHP templates, no build step. Standard WP hooks/CPTs (see "WordPress Migration" section below for the content model).
 
-### Main Site Architecture (`main-site/`)
+**Archived prototype (`html-js-site/`):** Vanilla HTML, CSS, and JavaScript. **NO frameworks** (React, Vue, etc.). Described below for historical reference only — this is not what's running in production.
+
+### Main Site Architecture (`html-js-site/main-site/`)
 *   **HTML-First SPA:** `index.html` is the shell. `app.js` handles hash-based routing and injects content into `#mainContent`.
 *   **Content Strategy:**
     *   **All content lives in `pages/*.html`.**
@@ -28,38 +30,41 @@
 *   **Partials:** Reusable sections (e.g., `partials/collaborations.html`) are injected via `data-partial` attributes.
 *   **Styling:** `styles.css` (global) and `spa.css` (layout/components) using CSS variables.
 
-### Syllabus Platform (`syllabus/`)
+### Syllabus Platform (`html-js-site/syllabus/`) — archived prototype, not yet in WordPress
 *   **Layout:** Thematic columnar layout with filtering.
 *   **Detail Panel:** Side panel for theme details, visual placeholders, and related items.
 *   **Features:** Filtering (Articles, Books, etc.), definition flashcards, timelines.
 
 ## Directory Structure
-*   `main-site/`: **Active Development**. Main website.
-    *   `pages/`: Content fragments (HTML).
-    *   `partials/`: Reusable content blocks.
-    *   `images/`: Local assets.
-*   `syllabus/`: Active Syllabus platform (v2).
-*   `syllabus-old/`: Archived syllabus platform (v1).
-*   `ingest/`: Raw image assets.
-*   `temporary-landing/`: Placeholder landing page.
-*   `archive/`: Old versions (v1-v5).
+*   `regen_wp/`: **The live WordPress theme.** This is what's actually running in production (https://regeneracionlab.org). All active development happens here.
+*   `html-js-site/`: **Archived.** The pre-WordPress static HTML/JS prototypes this theme evolved from. Not deployed anywhere; kept for design-history reference.
+    *   `main-site/`: The SPA prototype described in the workflow notes below.
+    *   `syllabus/`: Syllabus platform prototype (v2). `archive/` holds older versions (v1-v5) including an earlier syllabus iteration.
+    *   `design-revamp/`, `merged-site/`, `new-main-site/`, `examples/`: Other design exploration snapshots.
+*   `reference-sites/`: Screenshots of design inspiration sites.
+*   `PRODUCT.md`, `.impeccable.md`: Product/design briefs.
 
-## Development Workflow
+## Development Workflow (current — WordPress)
+*   Local environment: **Local** (by WP Engine), site `regeneracion-lab`, https://regeneracion-lab.local, table prefix `wpjp_`. This repo is the `wp-content/themes/` folder inside that site's `app/public/`.
+*   Edit theme templates/PHP/CSS/JS directly in `regen_wp/`.
+*   Production pulls/pushes use the WP Migrate DB Pro plugin (already installed in both environments).
+*   Commit and push theme changes to `origin/main` as normal.
+
+## Development Workflow (archived — static prototype in `html-js-site/main-site/`)
+Kept for reference only; not part of the live build.
 1.  **Local Server:** Required due to `fetch()` usage.
     ```bash
-    cd main-site
+    cd html-js-site/main-site
     python3 -m http.server 8000
     ```
 2.  **Editing Content:** Modify files in `pages/`.
 3.  **Editing Logic:** Modify `app.js`.
 4.  **Adding Pages:** Create `pages/new-page.html` -> Add link in `index.html` -> Update `app.js` if custom routing needed.
 
-## Future Goals & Notes
-*   **WordPress Migration:** Strict separation of HTML/JS facilitates this.
-*   **Experimental Features:** "Melt" WebGL effect on homepage (`melt-effect.js`).
-*   **Images:** Use assets from `ingest/` or `main-site/images/`.
+## Notes
+*   **Experimental Features (archived prototype):** "Melt" WebGL effect on homepage (`melt-effect.js`), never ported to WordPress.
 
-## WordPress Migration (active)
+## WordPress Migration (status: live)
 *   **Goal:** Replace SPA routing with native WP templates and content types while preserving the existing aesthetic.
 *   **Theme setup:** Register nav menu(s), enqueue only needed assets, use `front-page.php` for the landing page, and avoid hash-based navigation (`data-page` links go away). Title tag, thumbnails, primary menu, and customizer options (hero/support CTA) are enabled; SPA script is off by default.
 *   **Landing page content sources:**
