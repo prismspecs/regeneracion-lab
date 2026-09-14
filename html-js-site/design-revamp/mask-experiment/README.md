@@ -36,8 +36,9 @@ territory, not part of the live WordPress build). It is not wired into
    why. For now that's the live homepage's first three paragraphs (a
    growing drop-cap effect on the opening paragraph's first letter) plus
    a small grid of three real projects below them — see "Projects grid".
-   Past this point, scrolling further scrolls *inside* that fixed box,
-   not the page.
+   It's normal document flow, so it scrolls up and progressively covers
+   the still-pinned title as you keep going, the same way any ordinary
+   fixed header gets covered by content scrolling over it.
 
 ## How it's built
 
@@ -286,21 +287,22 @@ flow — the actual scroll room for its own interaction comes from
 that used to be set directly on `<body>`).
 
 `<main class="page-content" id="pageContent">` comes right after the
-spacer, but it's *not* something scrolled into view. First version had it
-in normal document flow, sliding up over the fixed hero as you scrolled —
-but that meant a long stretch of extra scrolling with nothing happening
-between the title pinning and the page actually appearing. It's a fixed
-overlay instead: a plain opacity fade, triggered by the same
-`activated` boolean as everything else in `.hero`. Getting the *timing*
-of that fade right took three tries:
+spacer. Where it sits in the stacking order and document flow went
+through four versions:
 
-- **First: delayed with `transitionDelay`**, waiting for the title's 2s
-  rise to finish before fading in (like `#outlineGroup` still does). No
-  extra scrolling needed, but the paragraph only appeared a beat after
-  the title had already settled — asked to fix that.
-- **Second: no delay, but added a `transform: translateY()` slide** so
+- **First: normal document flow**, sliding up over the fixed hero as you
+  scrolled. Worked, but meant a long stretch of extra scrolling with
+  nothing happening between the title pinning and the page actually
+  appearing (the spacer had to be tall enough to let the title finish
+  rising *before* the page could start sliding over it).
+- **Second: a fixed overlay, delayed with `transitionDelay`**, waiting
+  for the title's 2s rise to finish before fading in (like
+  `#outlineGroup` still does). No extra scrolling needed, but the
+  paragraph only appeared a beat after the title had already settled —
+  asked to fix that.
+- **Third: no delay, but added a `transform: translateY()` slide** so
   the box would rise into place rather than just appear -- reasoning:
-  `.page-content`'s box already sat at its final position (`top:
+  the fixed overlay already sat at its final position (`top:
   var(--title-height)`, covering everything below that) the whole time,
   invisible; fading it in with zero delay meant it spent most of the
   title's 2s rise sitting on top of (hiding) the still-rising title. The
@@ -308,32 +310,69 @@ of that fade right took three tries:
   step with the title. It technically worked, but a visibly sliding white
   panel is a stranger, more distracting thing to watch than a plain fade
   — this was the actual complaint (not the title-hiding bug it was fixing).
-- **Current: `CONTENT_REVEAL_DELAY_MS` (900ms), no transform at all.**
-  Plain opacity fade, `transitionDelay` set from this one constant. The
-  delay is short -- much shorter than the original 2000ms -- because the
-  title's `cubic-bezier(0.16, 1, 0.3, 1)` easing is heavily front-loaded
-  (most of its motion happens in roughly the first second; see the
-  position samples in "Why the animation doesn't scrub"). By 900ms the
-  title has already visually settled into its safe zone above
-  `--title-height`, so the fade can start well before the nominal 2s mark
-  without covering it, and with no motion of its own to look strange.
-  `notifyDropcap()` uses the same constant so the drop cap starts growing
-  right as the paragraph appears.
+- **Fourth: a fixed overlay again, no transform, `CONTENT_REVEAL_DELAY_MS`
+  (900ms) instead.** Plain opacity fade, `transitionDelay` set from this
+  one constant, short enough to feel like it's arriving with the title
+  (whose `cubic-bezier(0.16, 1, 0.3, 1)` easing is heavily front-loaded —
+  see "Why the animation doesn't scrub") without covering it mid-rise.
+  This is also the version that first held more than a short paragraph:
+  once `.page-projects` made the box taller than the viewport, its own
+  `overflow-y: auto` became a second, independent scroll region nested
+  inside the fixed overlay. That's what caused the next problem —
+  scrolled-up content disappeared behind the fixed title with no visible
+  relationship between the two, which just reads as content blocked by an
+  opaque bar, because that's exactly what it was.
+- **Current (fifth): back to normal document flow, for good this time.**
+  The "long stretch of nothing happening" problem from the first attempt
+  doesn't reproduce now, because `.hero-spacer` is much shorter than it
+  used to be (one viewport plus `~300px`, not enough room to fully settle
+  the title before content starts arriving from below) -- so scrolling
+  into `.page-content` visually catches up to and covers the title while
+  it may still be finishing its rise, rather than only after a long dead
+  stretch. That reads as perfectly ordinary (a page scrolling up over its
+  own header is the single most common thing on the web), unlike the
+  third attempt's *artificial* slide, which had no such precedent to read
+  naturally against. One single document scrollbar now, for the hero
+  interaction and everything below it -- `overflow-y: auto` is gone from
+  `.page-content` entirely, since a second, nested scroll region was the
+  actual problem, not a detail to keep tuning.
 
-`--title-height` itself is set by JS in `layout()` from the title's own
-rendered `scaledHeight`, recomputed on resize same as everything else
-there. The title is meant to persist as a header once the page below it
-is showing, not disappear once `.page-content` arrives -- and since the
-title itself is unaffected by any of this (the wash/outline mechanism
-keeps working exactly as before), it keeps reading as a window onto the
-hero photo even while sitting above an otherwise ordinary page.
+The title is still meant to persist as a header for as long as there's
+room for it -- `.page-content` doesn't have a `top` offset to avoid
+covering it, because covering it (as you keep scrolling) is now the
+point, not something to prevent. `--title-height` accordingly no longer
+exists as a CSS variable; nothing reads it anymore.
 
-Since it's `position: fixed` and covers the whole remaining viewport at
-all times, it needs `pointer-events: none` while
-invisible — otherwise, even at `opacity: 0`, it would sit on top of
-everything (its `z-index: 2` is what lets it cover `.hero`, which never
-sets its own) and intercept clicks and scroll-wheel input, breaking the
-very scroll gesture that's supposed to reveal it.
+`.page-content` no longer needs `pointer-events: none` while invisible,
+either -- that was specifically for the fixed-overlay era, when it
+covered the whole remaining viewport at all times regardless of opacity.
+Back in normal flow, it's off-screen (below the fold) until scrolled to,
+same as any other page content.
+
+One consequence worth knowing: `.page-content` still has no background
+of its own (see "Wash color" above for why), and its actual content — the paragraphs,
+the projects grid — sits in a centered column narrower than the full
+viewport. `.hero` still renders at `position: fixed` across the *entire*
+viewport forever (that's the "title should not disappear" decision), so
+the title's outer edges, outside that centered column's width, stay
+faintly visible no matter how far down the page you scroll -- there's
+simply nothing in those side margins to cover them. Nothing is actually
+being hidden there (there's no content in the margins to lose), so this
+reads as a faint watermark rather than a bug, but it's a real side effect
+of keeping `.hero` permanently full-viewport while letting content scroll
+over just the middle of it.
+
+A second consequence: the drop cap's `hero-activated` event still fires
+from the hero's own early `ACTIVATE_AT` threshold (40px scrolled), not
+from `.page-content` actually entering the viewport. With the spacer this
+short, on typical scrolling the drop cap will usually finish growing
+before the paragraph has even scrolled into view — so what you actually
+see arrive on screen is the already-grown result, not the animation. See
+the comment above `notifyDropcap()` in the code for the fix (an
+`IntersectionObserver` on `#dropcapContainer`, viable again now that
+`.page-content` is real document flow) if that visible growth turns out
+to matter more than keeping one single trigger for everything tied to the
+hero.
 
 `.page-content` now holds the live homepage's first three paragraphs (WP
 page ID 7, pulled via `wp post get 7 --field=post_content`): the opening
@@ -438,14 +477,16 @@ these:
   (`museumofus.org`, opens in a new tab) since that one's `project_link_url`
   already pointed off-site.
 
-`.page-content`'s `overflow-y: auto` — previously a defensive fallback
-"untested, since the current single paragraph doesn't need it" — is now
-actually exercised: the grid makes `.page-content` taller than the
-viewport, and scrolling further (once activated) scrolls *inside* that
-fixed box rather than the document, since `.hero-spacer` only reserves
-scroll room for the hero interaction itself. Confirmed working via a
-headless-Chrome check — the pinned title stays put above the content
-while the grid scrolls underneath it.
+Adding this grid is also what first made `.page-content` taller than the
+viewport, which is what originally surfaced the fixed-overlay-plus-
+internal-scroll problem described in "The page below the hero" (a second,
+nested scroll region that clipped scrolled content behind an opaque bar
+with no visible relationship to what was behind it). `.page-content` is
+back in normal document flow now — one single document scrollbar reaches
+all the way through the grid, and it visually covers the still-pinned
+title as you scroll past it, the same way any ordinary fixed header gets
+covered by content scrolling over it. See that section for the full
+history.
 
 ## Random background image
 

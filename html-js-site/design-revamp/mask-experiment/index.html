@@ -71,18 +71,32 @@
         /* Height set by JS -- just enough scroll room to trigger and
            confirm the pin (same formula .hero used on <body> directly
            before .page-content existed). Doesn't need to be any taller
-           than that: .page-content is a fixed overlay now (below), not
-           something scrolled into view, so nothing further down the page
-           needs reserving. */
+           than that: .page-content (below) is normal document flow right
+           after this spacer and supplies its own scroll room from its
+           real content, so there's nothing further to reserve here. */
         .hero-spacer {
             display: block;
         }
 
-        /* The real page. Originally this sat in normal document flow and
-           scrolled/slid up over the fixed hero -- but that meant a long
-           stretch of extra scrolling with nothing happening between the
-           title pinning and the page actually appearing. Fixed overlay
-           instead: plain opacity fade, no motion of its own.
+        /* The real page. This used to be a fixed overlay pinned right
+           below the title (top: var(--title-height)), with its own
+           internal overflow-y: auto scrollbar once .page-projects made it
+           taller than the viewport. That meant two separate scroll
+           regions -- the document, and this box -- and whatever content
+           scrolled up inside this box past its own top edge just vanished
+           there, with .hero's fixed title sitting permanently in front of
+           it the whole time. From outside that looked like scrolled
+           content getting blocked by an opaque bar with no relationship
+           to what was behind it, because that's exactly what it was.
+
+           Back to normal document flow instead: this sits right after
+           .hero-spacer, one single document scrollbar for the whole page,
+           and it's this element's own z-index (above .hero, which has
+           none) that lets it visually scroll up and over the fixed title
+           as you keep going -- covering it, the same way any ordinary
+           fixed header gets covered by content scrolling over it. No
+           special top offset needed to avoid the title: covering it is
+           now the point, not something to prevent.
 
            No background color here -- .hero's own wash (the SVG rect a
            few blocks up, faded in by the same `activated` state on the
@@ -94,52 +108,12 @@
            layered on top of each other, on two different timings --
            visibly a background sweeping in twice, once from the wash and
            again from this element's own paint. One backdrop is enough;
-           this only ever needs to paint its text.
-
-           top is always --title-height (set by JS in layout(), since the
-           title's rendered height depends on viewport width) -- that's
-           the *layout* position (and hence this box's real height: vh
-           minus the title's height), so it never covers the title once
-           it's actually pinned there.
-
-           A version of this also tried sliding the box up via
-           transform: translateY() in sync with the title's own rise
-           (to avoid covering the *still-rising* title during the first
-           couple hundred ms, when it's below this box's fixed top edge).
-           That traded one problem for a worse one -- a visibly sliding
-           white panel is a much bigger, stranger-looking thing than a
-           brief early moment of overlap. Plain fade with a short
-           TRANSITION_DELAY_MS (below) instead: short enough to feel like
-           it's arriving with the title, long enough that the title's
-           fast-then-slow ease-out curve has already carried it into its
-           safe zone (above this box's top edge) before the fade starts.
-
-           overflow-y: auto: now that .page-projects makes this box
-           taller than the viewport, this is what actually lets you reach
-           the rest of it -- .hero-spacer only reserves scroll room for
-           the hero interaction itself, so scrolling further scrolls
-           *inside* this fixed box, not the document. */
+           this only ever needs to paint its text. */
         .page-content {
-            position: fixed;
-            top: var(--title-height, 0px);
-            right: 0;
-            bottom: 0;
-            left: 0;
+            position: relative;
             z-index: 2;
-            overflow-y: auto;
             opacity: 0;
-            /* off while invisible -- otherwise this full-viewport element
-               would intercept scroll/clicks (and swallow wheel scrolling
-               into its own overflow-y:auto) even at opacity 0, breaking
-               the very scroll gesture that's supposed to reveal it. JS
-               flips it to auto once activated. */
-            pointer-events: none;
             color: var(--page-text);
-            /* top padding is much smaller than it used to be -- the title
-               now reserves its own space above via --title-height, so
-               this only needs breathing room below it, not "most of a
-               viewport" worth like when .page-content covered the title
-               too. */
             padding: 8vh 20px 20vh;
             transition: opacity 0.5s ease;
         }
@@ -518,9 +492,11 @@
          visible -- just space. -->
     <div class="hero-spacer" id="heroSpacer"></div>
 
-    <!-- Where the page "emerges" once the title pins -- a fixed overlay
-         that fades in on the same trigger as everything else in .hero
-         (see applyState() below), not something scrolled into view. The
+    <!-- Where the page "emerges" once the title pins -- normal document
+         flow that fades in on the same trigger as everything else in
+         .hero (see applyState() below), then scrolls up and covers the
+         still-pinned title as you keep going (see the .page-content CSS
+         comment above for why it's not a fixed overlay anymore). The
          live homepage's first three paragraphs (WP page ID 7): paragraph
          one gets the canvas-drawn drop cap (see the second <script> below,
          reused from design-revamp/pretext-experiment/); the other two are
@@ -694,16 +670,12 @@
             // can't be scrolled into view before the hero phase is even
             // reachable) plus a modest amount past ACTIVATE_AT to
             // comfortably trigger the rise and confirm the pin holds after.
-            // .page-content supplies its own height naturally after that;
-            // body's total height is just the sum of the two, no manual
-            // sizing needed there anymore.
+            // .page-content is normal document flow right after this spacer
+            // and supplies its own height from its real content -- body's
+            // total scrollable height is just the sum of the two.
             heroSpacer.style.height = (vh + Math.max(ACTIVATE_AT * 6, 300)) + 'px';
 
             titleWhite.style.width = renderedWidth + 'px';
-
-            // .page-content (a fixed overlay, see its CSS) reads this to
-            // start right below the pinned title instead of covering it.
-            document.documentElement.style.setProperty('--title-height', scaledHeight + 'px');
 
             return { vw, vh, xOffset, scale, yBottom, yTop };
         }
@@ -751,10 +723,13 @@
 
             // Short delay on the way in (see CONTENT_REVEAL_DELAY_MS),
             // none on the way out -- everything should vanish together
-            // the instant you scroll back down.
+            // the instant you scroll back down. No pointer-events toggle
+            // needed anymore: back in normal document flow (see the CSS
+            // comment on .page-content), this no longer sits over the
+            // whole viewport intercepting clicks/scroll while invisible --
+            // it's just below-the-fold content like anything else.
             pageContent.style.transitionDelay = activated ? (CONTENT_REVEAL_DELAY_MS / 1000) + 's' : '0s';
             pageContent.style.opacity = activated ? 1 : 0;
-            pageContent.style.pointerEvents = activated ? 'auto' : 'none';
 
             if (instant) {
                 ANIMATED_ELS.forEach(el => void el.offsetHeight); // force layout before re-enabling
@@ -764,13 +739,25 @@
 
         // Tells the drop-cap script (a separate <script type="module">
         // below) when to grow/shrink. It used to watch its own container
-        // with an IntersectionObserver, which worked when .page-content
-        // scrolled into view -- now that .page-content is a fixed overlay
-        // (always geometrically "in the viewport", opacity aside), that
-        // signal is meaningless, so this dispatches an explicit event
-        // instead. Same CONTENT_REVEAL_DELAY_MS delay as .page-content's
-        // own fade on the way in (so the drop cap starts growing right as
-        // the paragraph appears), none on the way out.
+        // with an IntersectionObserver; that broke for the few paragraphs
+        // .page-content used to hold back when it was a fixed overlay
+        // (always geometrically "in the viewport", opacity aside, so the
+        // observer fired immediately and the drop cap finished growing
+        // before it was ever visible). .page-content is normal document
+        // flow again now (see its CSS), so that signal would be
+        // meaningful again -- but this still dispatches the same explicit
+        // event tied to the hero's own early activation threshold rather
+        // than switching back, to keep one single trigger for everything
+        // that reveals with the hero. Same CONTENT_REVEAL_DELAY_MS delay
+        // as .page-content's own fade on the way in, none on the way out.
+        //
+        // Worth knowing: .hero-spacer is short (about one viewport) and
+        // ACTIVATE_AT triggers almost immediately, so on typical scrolling
+        // the drop cap will usually finish growing before .page-content
+        // has even scrolled into view -- the growth itself won't be
+        // visible, only the already-grown result. Switching this back to
+        // an IntersectionObserver on #dropcapContainer would make it grow
+        // exactly as it scrolls into view instead, if that's wanted.
         let dropcapDispatchTimer = null;
         function notifyDropcap() {
             clearTimeout(dropcapDispatchTimer);
@@ -975,14 +962,21 @@
         }
 
         // Not an IntersectionObserver (the original demo's approach): this
-        // container lives inside .page-content, which is a fixed overlay
-        // covering the whole viewport at all times -- geometrically "in
-        // view" from the moment the page loads, regardless of its opacity.
-        // That would trigger the grow animation immediately on load,
-        // finishing invisibly before .page-content ever fades in. Listen
-        // for the hero's own explicit activation event instead (dispatched
-        // right as .page-content starts fading in -- see notifyDropcap()
-        // in the hero's own <script> above).
+        // container used to live inside .page-content back when that was a
+        // fixed overlay covering the whole viewport at all times --
+        // geometrically "in view" from the moment the page loads,
+        // regardless of its opacity, which triggered the grow animation
+        // immediately on load, finishing invisibly before .page-content
+        // ever faded in. .page-content is normal document flow again now
+        // (see its CSS comment), so an IntersectionObserver on this
+        // container would be meaningful again -- but this still listens
+        // for the hero's own early activation event instead, to keep one
+        // single trigger for everything tied to the hero. Trade-off: with
+        // .hero-spacer as short as it is, the drop cap typically finishes
+        // growing before this container has even scrolled into view (see
+        // "The page below the hero" in the README) -- an
+        // IntersectionObserver here would fix that, if the visible growth
+        // turns out to matter more than the single-trigger simplicity.
         window.addEventListener('hero-activated', (e) => {
             const next = e.detail.activated ? 1 : 0;
             if (targetProgress !== next) {
