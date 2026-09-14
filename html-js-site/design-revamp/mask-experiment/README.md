@@ -33,8 +33,8 @@ territory, not part of the live WordPress build). It is not wired into
 4. Scrolling back up near the top reverses the animation, quote included.
 5. **Keep scrolling past the hero** and the page proper emerges as a
    fade, not a scroll-driven reveal — see "The page below the hero" for
-   why. For now that's the live homepage's opening paragraph, with a
-   growing drop-cap effect on its first letter.
+   why. For now that's the live homepage's first three paragraphs, with a
+   growing drop-cap effect on the opening paragraph's first letter.
 
 ## How it's built
 
@@ -332,19 +332,22 @@ everything (its `z-index: 2` is what lets it cover `.hero`, which never
 sets its own) and intercept clicks and scroll-wheel input, breaking the
 very scroll gesture that's supposed to reveal it.
 
-Right now `.page-content` holds exactly one thing: the live homepage's
-opening paragraph, with a growing drop-cap effect, reused from
+`.page-content` now holds the live homepage's first three paragraphs (WP
+page ID 7, pulled via `wp post get 7 --field=post_content`): the opening
+paragraph gets a growing drop-cap effect, reused from
 `design-revamp/pretext-experiment/index.html` (one level up) almost
 unchanged — same `@chenglou/pretext` canvas-layout library (loaded from
 `esm.sh`, this page's second external dependency alongside Google Fonts),
 same grow animation, same `layoutNextLine` reflow-without-DOM-thrash
-technique. Four changes from the original demo:
+technique. The other two paragraphs are plain HTML in a `.page-copy` div
+right after `dropcap-container` — no drop cap or per-frame reflow needed
+once the opening paragraph has already settled, so there's no reason to
+route them through the canvas too. Four changes from the original demo
+(all in the drop-cap paragraph specifically):
 
 - **Real copy.** The demo's paragraph described the effect itself; this one
-  is the actual opening paragraph of the live site's homepage (WP page ID
-  7, pulled via `wp post get 7 --field=post_content`), so the effect can be
-  judged against real lab copy instead of filler text. Just the first of
-  three paragraphs on that page — the rest hasn't been added here yet.
+  is the actual opening paragraph of the live site's homepage, so the
+  effect can be judged against real lab copy instead of filler text.
 - **No accent color.** The original animates the drop cap from dark gray
   to an amber accent (`#d2691e`) as it grows. Here it stays `--page-text`
   (the same color as the surrounding paragraph) throughout — asked for
@@ -375,11 +378,20 @@ technique. Four changes from the original demo:
   as the paragraph fades in, rather than before or long after it.
 
 One thing not carried over from the original demo: real content-based
-height measurement. `dropcap-container`'s canvas has a fixed
-`CANVAS_HEIGHT` (420px) sized by eye for this specific paragraph's
-length — if the copy here changes and ends up meaningfully longer or
-shorter, that constant (or a proper two-pass "measure then draw" layout)
-will need revisiting.
+height measurement, at the canvas level. `dropcap-container`'s canvas
+still draws into a fixed-size buffer (`CANVAS_HEIGHT`, 420px, sized by eye
+generously enough for a few paragraph lengths) rather than measuring text
+before drawing it. But once `.page-copy`'s plain paragraphs started
+sitting right after it, that fixed buffer's unused space at the bottom
+showed up as a visible gap before "However, the Spanish term..." — so
+`render()` now also computes the actual drawn content's height each frame
+(text bottom, or the drop cap's own visual bottom if that's taller) and
+sets `dropcap-container`'s own CSS height to match; `overflow: hidden` on
+the container then crops the canvas's unused buffer space away without
+touching its draw resolution. If the drop-cap paragraph's copy changes
+meaningfully in length, the crop still tracks it automatically — only
+`CANVAS_HEIGHT` itself (the draw buffer's ceiling) would need revisiting,
+and only if a much longer paragraph actually exceeded it.
 
 ## Random background image
 

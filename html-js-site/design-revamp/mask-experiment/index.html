@@ -144,16 +144,42 @@
 
         /* The growing-drop-cap paragraph, reused from
            design-revamp/pretext-experiment/ -- see the script at the
-           bottom for how it works and what changed. */
+           bottom for how it works and what changed.
+
+           overflow: hidden crops the canvas (which draws into a taller,
+           fixed-size buffer -- see CANVAS_HEIGHT below) down to this
+           container's own height, which JS sets to the actual drawn
+           content's height every frame. Without this, whatever blank
+           buffer room CANVAS_HEIGHT leaves below the real text would
+           show up as a gap before .page-copy's paragraphs beneath it. */
         .dropcap-container {
             max-width: 640px;
             margin: 0 auto;
             width: 100%;
+            overflow: hidden;
         }
 
         .dropcap-container canvas {
             display: block;
             width: 100%;
+        }
+
+        /* Plain continuation paragraphs after the drop-cap opener -- same
+           type settings as the canvas-drawn text (18px/28px Georgia,
+           --page-text) so the handoff from canvas to real DOM text is
+           invisible, just regular HTML since there's no drop cap or
+           reflow-around-a-shape need past the first paragraph. */
+        .page-copy {
+            max-width: 640px;
+            margin: 28px auto 0;
+            font-family: Georgia, serif;
+            font-size: 18px;
+            line-height: 28px;
+            color: var(--page-text);
+        }
+
+        .page-copy p + p {
+            margin-top: 28px;
         }
 
         .hero-image {
@@ -387,13 +413,19 @@
 
     <!-- Where the page "emerges" once the title pins -- a fixed overlay
          that fades in on the same trigger as everything else in .hero
-         (see applyState() below), not something scrolled into view. Just
-         the homepage's opening paragraph for now, real copy pulled from
-         the live site (see the second <script> below for the drop-cap
-         effect, reused from design-revamp/pretext-experiment/). -->
+         (see applyState() below), not something scrolled into view. The
+         live homepage's first three paragraphs (WP page ID 7): paragraph
+         one gets the canvas-drawn drop cap (see the second <script> below,
+         reused from design-revamp/pretext-experiment/); the other two are
+         plain HTML -- no need to reflow around a growing shape once the
+         drop cap has already settled. -->
     <main class="page-content" id="pageContent">
         <div class="dropcap-container" id="dropcapContainer">
             <canvas id="dropcapCanvas"></canvas>
+        </div>
+        <div class="page-copy">
+            <p>However, the Spanish term regeneraci&oacute;n has been a rebellious political concept, philosophy, and battle cry for over a hundred years. In this context, regeneraci&oacute;n developed as a rejection of eugenics that connected movements engaged in anti-racism, abolition of slavery and mass incarceration, and decolonial resistances rooted in Indigenous and fugitive land relations.</p>
+            <p>The Regeneraci&oacute;n Lab is grounded in this older, otherwise meaning of the term that emerged in the late nineteenth century and inspired the 1910 Mexican revolution. Our regenerative work centers community-based research justice, creative-critical practices, and decolonial praxis.</p>
         </div>
     </main>
 
@@ -642,9 +674,10 @@
 
         // Real copy now, not filler: the opening paragraph of the live
         // site's actual homepage content (WP page ID 7, "Home" --
-        // `wp post get 7 --field=post_content`). Just the first
-        // paragraph of three on that page, enough to test the effect
-        // against real text without duplicating the whole homepage here.
+        // `wp post get 7 --field=post_content`). Only this first
+        // paragraph gets the canvas drop-cap treatment -- the other two
+        // paragraphs of the same source content are plain HTML right
+        // below it in the markup (see .page-copy).
         const text = "Regeneration has become one of the most commercialized and co-opted terms of the 21st century. It is commonly used to market a plethora of ventures that greenwash extractive and colonial land relations, sell products and settler ways of life, and envision alternatives that may delink from one system but reproduce others.";
 
         const firstLetter = text[0];
@@ -748,6 +781,15 @@
 
                 if (y > cHeight) break;
             }
+
+            // Crop the container down to what actually got drawn (text
+            // bottom, or the drop cap's own visual bottom if that's
+            // taller) instead of leaving CANVAS_HEIGHT's full blank
+            // buffer showing beneath the real content -- see the
+            // .dropcap-container CSS comment for why this container can
+            // be shrunk without touching the canvas's own draw buffer.
+            const dropCapVisualBottom = dropCapSize * 0.95;
+            container.style.height = Math.ceil(Math.max(y, dropCapVisualBottom)) + 'px';
         }
 
         document.fonts.ready.then(() => {
