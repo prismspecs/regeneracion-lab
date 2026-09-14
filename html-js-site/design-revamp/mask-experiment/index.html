@@ -665,22 +665,28 @@
             const yBottom = vh - scaledHeight - bottomMargin; // resting position
             const yTop = 0; // pinned position
 
-            // .hero-spacer reserves just enough scroll room to comfortably
-            // trigger the rise past ACTIVATE_AT and confirm the pin holds
-            // after -- NOT a full extra viewport on top of that. A full
-            // viewport of spacer was tried (reasoning: keep .page-content,
-            // right after it, from being scrollable into view before the
-            // hero phase is even reachable) and it reintroduced the exact
-            // problem that got .page-content moved to a fixed overlay in
-            // the first place: opacity already gates when .page-content is
-            // *visible* (it's 0 until `activated`), so that extra viewport
-            // bought nothing but a dead stretch of scrolling between the
-            // title pinning and any content actually appearing on screen.
-            // Small spacer instead: .page-content's top sits close enough
-            // to the initial viewport that it scrolls into view in the
-            // same motion that crosses ACTIVATE_AT, so it reads as coming
-            // up together with the title, not after it.
-            heroSpacer.style.height = Math.max(ACTIVATE_AT * 6, 300) + 'px';
+            // .hero-spacer reserves scroll room for the hero interaction --
+            // NOT a full extra viewport on top of ACTIVATE_AT, though. A
+            // full viewport of spacer was tried (reasoning: keep
+            // .page-content, right after it, from being scrollable into
+            // view before the hero phase is even reachable) and it
+            // reintroduced the exact problem that got .page-content moved
+            // to a fixed overlay in the first place: opacity already gates
+            // when .page-content is *visible* (it's 0 until `activated`),
+            // so that extra viewport bought nothing but a dead stretch of
+            // scrolling with no content at all on screen.
+            //
+            // The floor below (550) isn't the bare minimum either, though
+            // -- that was tried too (300, `ACTIVATE_AT * 6`-ish) and read
+            // as the opposite problem: content arrived so close behind the
+            // title that an ordinary scroll gesture (~150-250px) already
+            // had the first paragraph crowding right up against it. 550
+            // leaves a comfortable gap at that same natural scroll amount
+            // while still keeping the paragraph on screen (not a dead
+            // scroll stretch) right from the first moment past
+            // ACTIVATE_AT -- see "The page below the hero" in the README
+            // for the numbers this was checked against.
+            heroSpacer.style.height = Math.max(ACTIVATE_AT * 6, 550) + 'px';
 
             titleWhite.style.width = renderedWidth + 'px';
 

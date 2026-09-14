@@ -220,7 +220,7 @@ restoring it — so only scroll-triggered changes actually animate.
 | `BOTTOM_MARGIN_FRACTION` | Gap from the bottom edge at rest (`0` = flush; the glyphs already reach the edge of their own viewBox, so no margin is needed to avoid clipping) |
 | `ACTIVATE_AT` / `DEACTIVATE_AT` | Scroll distance (px) that triggers the rise / the reverse (two different thresholds avoid flicker right at the boundary) |
 | `CONTENT_REVEAL_DELAY_MS` | How long `.page-content` (and the drop cap) wait after the title starts rising before they fade in -- see "The page below the hero" |
-| `.hero-spacer` height, set in `layout()` | `max(ACTIVATE_AT * 6, 300)` — just enough scroll room to comfortably cross `ACTIVATE_AT` and confirm the pin holds after, deliberately *not* padded with an extra viewport on top (see "The page below the hero" for why that was tried and reverted -- it just adds dead scroll space, since opacity already gates visibility). Was `vh * 2.2` even earlier still, a leftover from a version that scrubbed the whole animation across the scroll distance. |
+| `.hero-spacer` height, set in `layout()` | `max(ACTIVATE_AT * 6, 550)` — enough scroll room to cross `ACTIVATE_AT`, confirm the pin holds, and leave the first paragraph comfortably clear of the title at a realistic scroll gesture, deliberately *not* padded with an extra viewport on top (see "The page below the hero" for the history of this number -- both directions were tried and reported back as wrong: `vh + 300` read as a dead scroll stretch with no content, `300` alone read as the paragraph crowding the title). Was `vh * 2.2` even earlier still, a leftover from a version that scrubbed the whole animation across the scroll distance. |
 | the `2s cubic-bezier(0.16, 1, 0.3, 1)` in each `transition` rule | Animation duration/easing — all five animated layers (image, wash, title, wash's title group, quote) share this so they stay in sync |
 
 Two more tunables live as CSS custom properties on `:root` instead, since
@@ -334,13 +334,28 @@ through four versions:
   most of another full viewport of scrolling before any content appears.
   Reported back as literally the thing this section already described
   fixing once.
-- **Current (sixth): shrink `.hero-spacer` down to just enough room to
-  trigger the rise and confirm the pin holds** (`Math.max(ACTIVATE_AT *
-  6, 300)`, no added viewport). With the spacer this short, crossing
-  `ACTIVATE_AT` and scrolling `.page-content`'s top into view happen in
-  essentially the same motion -- content reads as arriving *with* the
-  title, not some scroll-distance later. Continuing to scroll then
-  visually catches up to and covers the title while it may still be
+- **Sixth: shrink `.hero-spacer` down to the bare floor needed to trigger
+  the rise and confirm the pin holds** (tried at `300`, close to
+  `ACTIVATE_AT * 6`). Fixed the dead-stretch problem, but overcorrected
+  into the opposite one: with the spacer this short, an ordinary scroll
+  gesture (~150-250px, not an extreme fling) already had the first
+  paragraph crowding right up against the title -- reported back as "too
+  close."
+- **Current (seventh): `550` as the floor, not `300`.** Chosen by
+  checking `.dropcap-container`'s on-screen position at a spread of
+  realistic scroll amounts (60px, 150px, 250px, 400px) -- at `550`, the
+  paragraph stays comfortably clear of the title across that whole range,
+  while still being on screen (not a dead scroll stretch) right from the
+  first moment past `ACTIVATE_AT`. `300` and `550` are both "small" next
+  to the original `vh + 300` (roughly 1200px on a typical viewport) --
+  the fix for "too close" was retuning the floor, not reversing the
+  decision to drop the added viewport.
+
+  Both this and the previous attempt keep the same underlying idea:
+  crossing `ACTIVATE_AT` and scrolling `.page-content`'s top into view
+  happen in essentially the same motion, so content reads as arriving
+  *with* the title, not some scroll-distance later. Continuing to scroll
+  then visually catches up to and covers the title while it may still be
   settling from its own 2s rise, rather than only after a long dead
   stretch, which reads as perfectly ordinary (a page scrolling up over
   its own header is the single most common thing on the web) -- unlike
