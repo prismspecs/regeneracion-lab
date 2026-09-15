@@ -339,6 +339,55 @@
             transition: opacity 0.4s ease;
         }
 
+        /* A second, independent copy of the pinned title -- solid
+           backdrop plus solid-filled glyphs, no photo-through-the-letters
+           mask -- that sits ABOVE .page-content instead of below it.
+           Why a duplicate instead of just raising .hero's own z-index:
+           .hero-image (the photo) fills the entire viewport at all times,
+           so raising all of .hero above .page-content would hide the
+           whole page below the title, not just cover the title's own
+           row. This element only ever needs to be exactly as tall as the
+           title itself (--title-height, reintroduced here for that one
+           purpose), so raising just this is safe.
+
+           Why no mask/photo-reveal here (unlike .wash below): once
+           .page-content has scrolled up far enough to reach this row,
+           there's no clean way to also show it *through* the letter
+           shapes without reintroducing the exact illegible-overlap bug
+           this element exists to fix. Solid backdrop + solid glyphs
+           keeps the title legible and .page-content's content cleanly
+           hidden behind it here, at the cost of the window-onto-the-photo
+           effect only in this one specific circumstance (title pinned
+           *and* scrolled deep into .page-content) -- everywhere else
+           (at rest, right as it pins, right as .page-content first
+           appears) .wash and #outlineGroup below still do the real
+           window effect exactly as before; this is purely a legibility
+           backstop for deep scrolling. */
+        .title-cap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--title-height, 0px);
+            overflow: hidden;
+            z-index: 3;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .title-cap-bg {
+            fill: var(--wash-color);
+        }
+
+        /* Filled (not stroked) glyphs, in the same ink as the rest of
+           .page-content's text -- reads as a plain, legible header once
+           content is scrolling underneath it, consistent with the page's
+           own type color rather than introducing a new one. */
+        #titleCapGlyphs {
+            fill: var(--page-text);
+        }
+
         /* The dicho: visible at rest alongside the bottom title, fades out
            the moment the title starts rising (same trigger, same timing --
            it reads as one scene leaving together, not two unrelated
@@ -485,6 +534,36 @@
             <p>THEY TRIED TO BURY US BUT THEY DIDN&rsquo;T KNOW<br>WE WERE SEEDS</p>
             <footer>&mdash; Mexican revolutionary dicho, circa 1910</footer>
         </blockquote>
+    </div>
+
+    <!-- Sits above .page-content (see .title-cap CSS above for why this
+         is a whole separate element, not just a z-index change on .hero)
+         so the title stays legible and on top once content has scrolled
+         up far enough to otherwise reach this row. Reuses the same
+         glyph <path>s as the mask/outline above via <use> -- one source
+         of truth for the letterforms, same as #outlineGroup already
+         does. -->
+    <div class="title-cap" id="titleCap">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <rect class="title-cap-bg" width="100%" height="100%" />
+            <g id="titleCapGlyphs">
+                <use href="#glyph0" />
+                <use href="#glyph1" />
+                <use href="#glyph2" />
+                <use href="#glyph3" />
+                <use href="#glyph4" />
+                <use href="#glyph5" />
+                <use href="#glyph6" />
+                <use href="#glyph7" />
+                <use href="#glyph8" />
+                <use href="#glyph9" />
+                <use href="#glyph10" />
+                <use href="#glyph11" />
+                <use href="#glyph12" />
+                <use href="#glyph13" />
+                <use href="#glyph14" />
+            </g>
+        </svg>
     </div>
 
     <!-- Reserves scroll room for the hero interaction above (height set by
@@ -651,6 +730,8 @@
         const outlineGroup = document.getElementById('outlineGroup');
         const titleWhite = document.getElementById('titleWhite');
         const pageContent = document.getElementById('pageContent');
+        const titleCap = document.getElementById('titleCap');
+        const titleCapGlyphs = document.getElementById('titleCapGlyphs');
 
         function layout() {
             const vw = document.documentElement.clientWidth;
@@ -686,13 +767,19 @@
 
             titleWhite.style.width = renderedWidth + 'px';
 
+            // .title-cap (see its CSS/markup comments) reads this to clip
+            // itself to exactly the title's own rendered height -- the one
+            // remaining use of this variable now that .page-content is
+            // normal document flow and doesn't need it for positioning.
+            document.documentElement.style.setProperty('--title-height', scaledHeight + 'px');
+
             return { vw, vh, xOffset, scale, yBottom, yTop };
         }
 
         let metrics = layout();
         let activated = false;
 
-        const ANIMATED_ELS = [titleWhite, wash, washTitleGroup, outlineGroup, heroImage, quote, pageContent];
+        const ANIMATED_ELS = [titleWhite, wash, washTitleGroup, outlineGroup, heroImage, quote, pageContent, titleCap];
 
         // The animation itself is a plain CSS transition (see the
         // `transition` rules on .hero-image / .wash / .title-white /
@@ -722,6 +809,17 @@
             // with the 2s transform duration used everywhere else above.
             outlineGroup.style.transitionDelay = activated ? '2s' : '0s';
             outlineGroup.style.opacity = activated ? 1 : 0;
+
+            // .title-cap's glyphs snap to the exact same transform as
+            // #outlineGroup (same reasoning: no transition, since it's
+            // one SVG group mirroring another frame-for-frame) so the two
+            // stay in perfect registration -- from the viewer's side,
+            // .title-cap is invisible whenever .page-content hasn't
+            // reached this row yet, so it only actually matters once both
+            // are already settled at the pinned position anyway.
+            titleCapGlyphs.style.transform = washTitleGroup.style.transform;
+            titleCap.style.transitionDelay = activated ? '2s' : '0s';
+            titleCap.style.opacity = activated ? 1 : 0;
 
             heroImage.style.transform = 'scale(' + (activated ? 1.06 : 1) + ')';
 

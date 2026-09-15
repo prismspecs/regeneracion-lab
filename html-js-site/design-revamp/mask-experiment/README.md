@@ -37,9 +37,11 @@ territory, not part of the live WordPress build). It is not wired into
    why. For now that's the live homepage's first three paragraphs (a
    growing drop-cap effect on the opening paragraph's first letter) plus
    a small grid of three real projects below them — see "Projects grid".
-   It's normal document flow, so it scrolls up and progressively covers
-   the still-pinned title as you keep going, the same way any ordinary
-   fixed header gets covered by content scrolling over it.
+   It's normal document flow, so it scrolls up underneath the still-pinned
+   title as you keep going -- the title stays legible and on top the
+   whole time, the same way any ordinary sticky header stays above
+   content scrolling past it (see "The page below the hero" for why it's
+   the title covering content here, not the other way around).
 
 ## How it's built
 
@@ -221,7 +223,8 @@ restoring it — so only scroll-triggered changes actually animate.
 | `ACTIVATE_AT` / `DEACTIVATE_AT` | Scroll distance (px) that triggers the rise / the reverse (two different thresholds avoid flicker right at the boundary) |
 | `CONTENT_REVEAL_DELAY_MS` | How long `.page-content` (and the drop cap) wait after the title starts rising before they fade in -- see "The page below the hero" |
 | `.hero-spacer` height, set in `layout()` | `max(ACTIVATE_AT * 6, 425)` — enough scroll room to cross `ACTIVATE_AT`, confirm the pin holds, and leave the first paragraph clear of the title at a realistic scroll gesture, deliberately *not* padded with an extra viewport on top (see "The page below the hero" for the history of this number -- three different floors were tried and reported back wrong in both directions before landing here: `vh + 300` read as a dead scroll stretch with no content, `300` alone read as the paragraph crowding the title, `550` read as too much gap). Was `vh * 2.2` even earlier still, a leftover from a version that scrubbed the whole animation across the scroll distance. |
-| the `2s cubic-bezier(0.16, 1, 0.3, 1)` in each `transition` rule | Animation duration/easing — all five animated layers (image, wash, title, wash's title group, quote) share this so they stay in sync |
+| the `2s cubic-bezier(0.16, 1, 0.3, 1)` in each `transition` rule | Animation duration/easing — all the position/opacity-animated layers (image, wash, title, wash's title group, quote) share this so they stay in sync; `.page-content` and `.title-cap` fade on their own shorter timers instead (see "The page below the hero") |
+| `--title-height`, set in `layout()` | The title's own rendered height, in px -- the one thing that reads it is `.title-cap`'s `height` (clips it to exactly the title's row, see "The page below the hero" for why that element exists) |
 
 Two more tunables live as CSS custom properties on `:root` instead, since
 they're colors rather than layout numbers: `--wash-color` (see "Wash
@@ -369,9 +372,37 @@ through four versions:
 
 The title is still meant to persist as a header for as long as there's
 room for it -- `.page-content` doesn't have a `top` offset to avoid
-covering it, because covering it (as you keep scrolling) is now the
-point, not something to prevent. `--title-height` accordingly no longer
-exists as a CSS variable; nothing reads it anymore.
+sitting under it, because passing underneath it (as you keep scrolling)
+is the point, not something to prevent.
+
+- **Ninth: content scrolling underneath the title turned out to look
+  broken, not just "covered."** `.page-content` has no background of its
+  own (see below), so as its text scrolled up into the title's row, both
+  layers -- title glyphs and paragraph glyphs -- were compositing
+  together with nothing opaque between them: legible letters directly
+  superimposed on other legible letters, an illegible double-exposure.
+  Reported back plainly: *"the page title should always be on top.
+  content should go underneath it."* Simply raising `.hero`'s z-index
+  above `.page-content` was not an option -- `.hero-image` (the photo)
+  fills the entire viewport at all times, so that would have hidden the
+  *whole page* below the title, not just this one row.
+- **Current (tenth): `.title-cap`, a second, simplified copy of the
+  pinned title, layered above `.page-content` instead of `.hero` being
+  raised wholesale.** Solid `--wash-color` backdrop plus solid
+  `--page-text`-filled glyphs (reusing the same `<path>`s as the mask/
+  outline via `<use>`, one source of truth for the letterforms, same
+  trick `#outlineGroup` already used) -- no mask, no photo-through-the-
+  letters here. `--title-height` is back as a CSS variable for this one
+  purpose: clipping `.title-cap` to exactly the title's own rendered
+  height, so it only ever covers its own row and nothing below it. Its
+  glyph group's transform is set from the exact same line that drives
+  `#outlineGroup`, so the two stay in perfect registration; its opacity
+  follows the same 2s-delayed fade. The trade-off: the window-onto-the-
+  photo effect no longer shows through *specifically* where content has
+  scrolled up underneath the title -- everywhere else (at rest, right as
+  it pins, right as `.page-content` first appears) `.wash` and
+  `#outlineGroup` still do the real thing exactly as before. Solid and
+  legible beat "technically still the photo effect, but illegible" here.
 
 `.page-content` no longer needs `pointer-events: none` while invisible,
 either -- that was specifically for the fixed-overlay era, when it
@@ -379,18 +410,18 @@ covered the whole remaining viewport at all times regardless of opacity.
 Back in normal flow, it's off-screen (below the fold) until scrolled to,
 same as any other page content.
 
-One consequence worth knowing: `.page-content` still has no background
-of its own (see "Wash color" above for why), and its actual content — the paragraphs,
-the projects grid — sits in a centered column narrower than the full
-viewport. `.hero` still renders at `position: fixed` across the *entire*
-viewport forever (that's the "title should not disappear" decision), so
-the title's outer edges, outside that centered column's width, stay
-faintly visible no matter how far down the page you scroll -- there's
-simply nothing in those side margins to cover them. Nothing is actually
-being hidden there (there's no content in the margins to lose), so this
-reads as a faint watermark rather than a bug, but it's a real side effect
-of keeping `.hero` permanently full-viewport while letting content scroll
-over just the middle of it.
+One consequence worth knowing, now resolved by `.title-cap`: `.page-content`
+still has no background of its own (see "Wash color" above for why), and
+its actual content — the paragraphs, the projects grid — sits in a
+centered column narrower than the full viewport. Before `.title-cap`
+existed, that meant the title's outer edges, outside that centered
+column's width, stayed visibly *inconsistent* with its own center --
+solid where `.page-content` had scrolled underneath it, unobstructed
+(still the photo-through-letters effect) everywhere else, in the very
+same row. `.title-cap`'s own backdrop is full viewport width regardless
+of `.page-content`'s column width, so the title now reads as one
+consistent, fully opaque bar end-to-end whenever it's actually needed to
+cover something -- no more of that mismatch.
 
 A second consequence: the drop cap's `hero-activated` event still fires
 from the hero's own early `ACTIVATE_AT` threshold (40px scrolled), not
