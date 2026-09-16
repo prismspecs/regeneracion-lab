@@ -60,8 +60,10 @@
 *   `wp-phpstan` — PHPStan static analysis setup for WordPress PHP (not yet wired into this repo — no `phpstan.neon` or Composer install here yet).
 *   `wp-patterns` — registering WordPress block patterns (this repo's Timeline / Resource Header / Resource List patterns).
 *   `wq-accessibility`, `wq-seo`, `wq-performance` (addyosmani/web-quality-skills) — WCAG/screen-reader, SEO/structured-data, and Core Web Vitals guidance; match the WCAG AA requirement and editorial/discoverability goals in `PRODUCT.md`.
+*   `wq-best-practices` (addyosmani/web-quality-skills) — security headers/CSP/HTTPS, browser-compat, and code-quality checks (Lighthouse best-practices pillar).
 *   `theme-factory` (anthropics) — color/font theme presets for artifacts (slides, docs, HTML mockups); useful for quick design exploration before porting into `regen_wp/`.
 *   `frontend-skill` (openai) — composition/hierarchy/imagery guidance for visually strong front-end work. Note: OpenAI deleted this skill from their upstream repo in April 2026; this copy is a last-available snapshot and won't get updates.
+*   `playwright` (openai) — CLI-first real-browser automation via `playwright-cli` (wrapper script self-fetches with `npx`; no global install). Use for visual verification of the theme at https://regeneracion-lab.local — screenshots, responsive layout checks, contrast spot-checks.
 *   Not installed: `anthropics/frontend-design` — identical to the `frontend-design` skill Claude Code already ships built-in, so a project copy would just collide with it.
 *   Not installed from `WordPress/agent-skills`: `wp-block-development`, `wp-block-themes`, `wp-rest-api`, `wp-interactivity-api`, `wp-abilities-api`, `wpds`, `wp-playground`, `wp-plugin-development` — this repo is a classic (non-FSE) theme with no custom blocks, REST endpoints, or plugin code, so these don't apply yet. Revisit if that changes.
 
