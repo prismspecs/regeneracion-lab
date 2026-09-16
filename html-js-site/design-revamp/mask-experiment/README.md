@@ -64,24 +64,12 @@ container that fills the viewport for the whole page:
    the photo. Fade timing is flag-controlled: 2s (the shared ease) by
    default, or `0.5s` under `FAST_FILL` — see "Two renderers" below for
    why that option exists.
-4. **`#outlineGroup`** — a thin stroked outline traced around the same
-   letterforms, sitting on top of everything. Guarantees the pinned title
-   stays legible as a shape even when the photo showing through it
-   happens to land close in tone to `--wash-color` (see "Wash color"
-   below). It lives in its own title-sized fixed layer (`.title-outline`,
-   z-index 4, above `.page-content`) rather than inside the `.wash` SVG —
-   the wash fills the whole viewport so it could never be raised above
-   the scrolling content, but a title-sized layer can, which means the
-   outline now traces the letters over the text too. Unlike the other
-   layers, it doesn't animate alongside
-   the 2s rise: its `transform` has no transition at all (snaps straight
-   to the title's target position on every state flip, so the browser
-   isn't re-stroking it for 2s of motion it doesn't need to -- a stroke
-   repaints more expensively than a fill), and its opacity fade is
-   delayed via `transitionDelay` until that rise has actually finished.
-   Tying its opacity to the same trigger as `.wash` (both `2s`, both
-   starting together) made it visibly trail behind the moving letters
-   instead.
+4. **`#outlineGroup`** — an optional thin stroked outline around the
+   letterforms, controlled by the `SHOW_TITLE_OUTLINE` flag (default: `false`).
+   When off (default), the pinned title remains a clean, pure window onto the photo
+   without any added stroke outline appearing after landing. When enabled (`true`),
+   it lives in `.title-outline` (z-index 4, above `.page-content`) and fades in with
+   a 2s delay to ensure contrast on pale photos.
 
 ### Two renderers for the mask effect (`TITLE_RENDERER`)
 

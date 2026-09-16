@@ -885,6 +885,8 @@
         // deep-scroll legibility trade-off; flip to true to bring the
         // solid cap back.
         const SOLID_TITLE_CAP = false;
+        // Outline traced around the pinned title letters (false = clean mask without stroke, true = stroked)
+        const SHOW_TITLE_OUTLINE = false;
         // ---- Renderer flags (options A and B, both kept available) -----
         // TITLE_RENDERER picks how the photo-through-the-letters effect is
         // produced:
@@ -1020,6 +1022,10 @@
             titleWindow.style.display = 'none';
         }
 
+        if (!SHOW_TITLE_OUTLINE) {
+            outlineLayer.style.display = 'none';
+        }
+
         function layout() {
             const vw = document.documentElement.clientWidth;
             const vh = window.innerHeight;
@@ -1119,12 +1125,13 @@
             // (no transition on .title-outline) -- it's invisible during
             // the rise anyway (opacity 0 until the delay below), so
             // nothing is seen moving.
-            outlineLayer.style.transform = 'translate(-50%, ' + y + 'px)';
-            // Wait for the title's own rise to finish before fading in;
-            // hide immediately (no delay) when reversing. Keep in sync
-            // with the 2s transform duration used everywhere else above.
-            outlineGroup.style.transitionDelay = activated ? '2s' : '0s';
-            outlineGroup.style.opacity = activated ? 1 : 0;
+            if (SHOW_TITLE_OUTLINE) {
+                outlineLayer.style.transform = 'translate(-50%, ' + y + 'px)';
+                outlineGroup.style.transitionDelay = activated ? '2s' : '0s';
+                outlineGroup.style.opacity = activated ? 1 : 0;
+            } else {
+                outlineGroup.style.opacity = 0;
+            }
 
             // .title-cap's glyphs snap to the exact same transform as
             // #outlineGroup (same reasoning: no transition, since it's
