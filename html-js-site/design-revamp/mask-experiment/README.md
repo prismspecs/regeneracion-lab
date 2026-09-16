@@ -278,7 +278,7 @@ restoring it — so only scroll-triggered changes actually animate.
 | `IMAGE_POOL` | Candidate background photos (see below) |
 | `TITLE_MAX_WIDTH` / `TITLE_SIDE_MARGIN` | How large the title renders — `min(viewport width - 2 × side margin, max px)`. Side margin is a fixed 16px, not a vw-based fraction: a fraction leaves a gap that scales with viewport width, which read as an almost-but-not-quite-edge-to-edge mistake at some widths rather than a deliberate margin. The max-px cap only matters on ultra-wide monitors. |
 | `BOTTOM_MARGIN_FRACTION` | Gap from the bottom edge at rest (`0` = flush; the glyphs already reach the edge of their own viewBox, so no margin is needed to avoid clipping) |
-| `ACTIVATE_AT` / `DEACTIVATE_AT` | Scroll distance (px) that triggers the rise / the reverse (two different thresholds avoid flicker right at the boundary) |
+| `ACTIVATE_AT` / reverse threshold | Scroll distance (px) that triggers the rise. The reverse threshold is computed in `layout()` (`metrics.deactivateAt`: ~120px below the held first-area position) so scrolling back up from the intro returns the landing after about a notch and a half — with no dead band, since the fixed-position landing fills the viewport at any scroll in the spacer region the moment the reverse fires — while sub-notch drift at the hold can't trigger it by accident |
 | `INTRO_HOLD_MS` / `INTRO_HOLD_MAX_Y` | The intro hold: any scroll crossing `ACTIVATE_AT` while within `INTRO_HOLD_MAX_Y` (~5 wheel notches) of the top jumps to the computed first-area position (the content's first text just below the pinned title — derived in `layout()` from the spacer height, the content's 8vh top padding, and the title's rendered height) and holds there for `INTRO_HOLD_MS` (the 2s rise it protects) — one notch and five notches end in the same place. Excess wheel input during the hold is swallowed; scrolling back up stays live and clears the hold. Activation already past the max (browser-restored scroll, End key) skips the hold. See "The page below the hero" |
 | `CONTENT_REVEAL_DELAY_MS` | How long `.page-content` (and the drop cap) wait after the title starts rising before they fade in -- see "The page below the hero" |
 | `FAST_FILL` | Option A's timing tweak: fades the white title / photo-filled layer over 0.5s instead of 2s. Currently off -- see "Two renderers" |
@@ -543,14 +543,28 @@ One notch and five notches end in exactly the same place, with the text
 beginning right below the title, and only after the hold expires does
 scrolling continue. Excess wheel input during the hold is swallowed.
 Two deliberate limits: the clamp is upward-only (scrolling
-back up stays live, and reaching `DEACTIVATE_AT` clears the hold, so
-the reverse animation is never pinned), and activation that arrives
+back up stays live, and crossing the reverse threshold clears the hold,
+so the reverse animation is never pinned), and activation that arrives
 already past the max — a browser-restored reload deep into the page, an
 End-key jump — skips the hold rather than yanking the user back toward
 the top. (`activated` is also initialized from the actual scroll
 position now, so a deep restore renders the pinned end-state
 immediately instead of flashing the at-rest hero under scrolled-away
 copy.)
+
+**The reverse threshold rides on the hold.** With the hold parking the
+user at the first-area position, the old hardcoded reverse threshold
+(8px) left a dead band: scrolling up from the hold meant ~340px of
+pinned title over a blank white wash before the landing finally
+returned. The threshold is now computed (`metrics.deactivateAt`, about
+a notch and a half below the held position), so the hero owns its whole
+first stretch of scroll: above the line the intro scene is live,
+below it the landing is what the viewport shows — and since every hero
+layer is fixed-positioned, the landing fills the screen at any scroll
+in that region the instant the reverse fires. The content fading out
+mid-screen as it crosses is the scene reversing, symmetric to the
+reveal. The 120px margin below the held position keeps sub-notch drift
+from triggering the reverse by accident.
 
 `.page-content` now holds the live homepage's first three paragraphs (WP
 page ID 7, pulled via `wp post get 7 --field=post_content`): the opening

@@ -845,7 +845,12 @@
         const TITLE_SIDE_MARGIN = 16;
         const BOTTOM_MARGIN_FRACTION = 0; // glyphs already reach the viewBox edge -- flush to the window
         const ACTIVATE_AT = 40;  // px scrolled before the rise-to-top animation triggers
-        const DEACTIVATE_AT = 8; // px scrolled below which it drops back down (small gap avoids flicker at the boundary)
+        // The reverse threshold is computed in layout() (metrics.deactivateAt):
+        // ~120px below the held first-area position, so scrolling back up from
+        // the intro returns the landing after about a notch and a half -- with
+        // no dead band, since the fixed-position landing fills the viewport at
+        // any scroll in the spacer region the moment the reverse fires -- while
+        // sub-notch drift at the hold can't trigger it by accident.
         // How long .page-content and the drop cap wait before appearing,
         // once the title starts rising. Not 0: the title's ease-out curve
         // is front-loaded (most of its motion happens in the first ~1s of
@@ -1063,7 +1068,16 @@
             // title is nearly zero-height.
             const introHoldY = Math.max(ACTIVATE_AT, spacerH + vh * 0.08 - scaledHeight - 40);
 
-            return { vw, vh, xOffset, scale, yBottom, yTop, introHoldY };
+            // The reverse threshold (see the tunables note above): about
+            // a notch and a half below the held first-area position, so
+            // the hero owns its whole first stretch of scroll -- above
+            // this line the intro scene is live, below it the landing
+            // image is what the viewport shows. Floor at ACTIVATE_AT + 1
+            // keeps the hysteresis sane on tiny viewports where
+            // introHoldY collapses toward the activation point.
+            const deactivateAt = Math.max(ACTIVATE_AT + 1, introHoldY - 120);
+
+            return { vw, vh, xOffset, scale, yBottom, yTop, introHoldY, deactivateAt };
         }
 
         let metrics = layout();
@@ -1206,7 +1220,7 @@
         // beginning right below the title, and only after the hold
         // expires does scrolling continue. Excess wheel input during
         // the hold is swallowed (the clamp is upward-only: scrolling
-        // back up stays live, and reaching DEACTIVATE_AT clears the
+        // back up stays live, and crossing the reverse threshold clears the
         // hold in the flip branch, so the reverse animation is never
         // pinned). Activation that arrives already past INTRO_HOLD_MAX_Y
         // -- browser-restored scroll, an End-key jump -- skips the hold
@@ -1218,7 +1232,7 @@
 
         function onScroll() {
             const y = window.scrollY;
-            const next = activated ? y > DEACTIVATE_AT : y > ACTIVATE_AT;
+            const next = activated ? y > metrics.deactivateAt : y > ACTIVATE_AT;
             if (next !== activated) {
                 activated = next;
                 if (activated && y <= INTRO_HOLD_MAX_Y) {
