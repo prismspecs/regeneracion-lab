@@ -278,13 +278,13 @@ restoring it — so only scroll-triggered changes actually animate.
 | `IMAGE_POOL` | Candidate background photos (see below) |
 | `TITLE_MAX_WIDTH` / `TITLE_SIDE_MARGIN` | How large the title renders — `min(viewport width - 2 × side margin, max px)`. Side margin is a fixed 16px, not a vw-based fraction: a fraction leaves a gap that scales with viewport width, which read as an almost-but-not-quite-edge-to-edge mistake at some widths rather than a deliberate margin. The max-px cap only matters on ultra-wide monitors. |
 | `BOTTOM_MARGIN_FRACTION` | Gap from the bottom edge at rest (`0` = flush; the glyphs already reach the edge of their own viewBox, so no margin is needed to avoid clipping) |
-| `ACTIVATE_AT` / reverse threshold | Scroll distance (px) that triggers the rise. The reverse threshold is computed in `layout()` (`metrics.deactivateAt`: ~one notch below the first-area position) so scrolling back up from the intro returns the landing after a single upward notch — with no dead band, since the fixed-position landing fills the viewport at any scroll in the spacer region the moment the reverse fires — while sub-notch drift can't trigger it by accident |
-| `FIRST_AREA_MAX_Y` / `FIRST_AREA_EXIT_GAP` | The intro jump: activation crossing `ACTIVATE_AT` **downward** while within `FIRST_AREA_MAX_Y` (~5 wheel notches) of the top jumps once to the computed first-area position (the content's first text just below the pinned title — derived in `layout()` from the spacer height, the content's 8vh top padding, and the title's rendered height) — one notch and five notches begin in the same place. No timer, no clamp, no swallowed input: scrolling is never hijacked. The reverse threshold sits `FIRST_AREA_EXIT_GAP` (~one notch) below the first area, so a real upward notch returns the landing while sub-notch drift doesn't. Activation already past the max (browser-restored scroll, End key, anchor links) skips the jump. See "The page below the hero" |
+| `ACTIVATE_AT` / `DEACTIVATE_AT` | Scroll distance (px) that triggers the rise / the reverse (two different thresholds avoid flicker right at the boundary) |
+| `LANDING_SCROLL_Y` / `GATE_DURATION_MS` | The first-scroll gate: docking position (60px) and gate duration (1200ms) that absorbs runaway multi-notch wheel momentum on initial scroll so the content lands cleanly below the title without overshooting |
 | `CONTENT_REVEAL_DELAY_MS` | How long `.page-content` (and the drop cap) wait after the title starts rising before they fade in -- see "The page below the hero" |
 | `FAST_FILL` | Option A's timing tweak: fades the white title / photo-filled layer over 0.5s instead of 2s. Currently off -- see "Two renderers" |
 | `SOLID_TITLE_CAP` | The "title turns totally black at the top" feature, on a switch. `true` fades `.title-cap` (an opaque solid duplicate of the pinned title) in over the mask window 2s after activation, for deep-scroll legibility (see "The page below the hero"); `false` (current preference) never shows it, so the pinned title stays the live photo-through-the-letters mask with `#outlineGroup`'s edge stroke instead. |
 | `TITLE_RENDERER` | `'window'` (default, option B) or `'mask'` (option A's architecture, kept as a fallback) — how the photo-through-the-letters effect is produced; see "Two renderers" under "How it's built" |
-| `.hero-spacer` height, set in `layout()` | `max(ACTIVATE_AT * 6, 425)` — enough scroll room to cross `ACTIVATE_AT`, confirm the pin holds, and leave the first paragraph clear of the title at a realistic scroll gesture, deliberately *not* padded with an extra viewport on top (see "The page below the hero" for the history of this number -- three different floors were tried and reported back wrong in both directions before landing here: `vh + 300` read as a dead scroll stretch with no content, `300` alone read as the paragraph crowding the title, `550` read as too much gap). Was `vh * 2.2` even earlier still, a leftover from a version that scrubbed the whole animation across the scroll distance. |
+| `.hero-spacer` height, set in `layout()` | `Math.round(scaledHeight + 130)` — sized dynamically with title height so docking at `LANDING_SCROLL_Y` leaves a tight, elegant ~100px gap below the pinned title to the tagline and menu |
 | the `2s cubic-bezier(0.16, 1, 0.3, 1)` in each `transition` rule | Animation duration/easing — all the position-animated layers (image, wash, title, wash's title group) plus the quote's opacity share this so they stay in sync; `.title-white`'s opacity (0.5s — see "How it's built" bullet 3, hides the compositor/raster pipeline gap between the two glyph layers), `.page-content`, and `.title-cap` fade on their own shorter timers instead (see "The page below the hero") |
 | `--title-height`, set in `layout()` | The title's own rendered height, in px -- the one thing that reads it is `.title-cap`'s `height` (clips it to exactly the title's row, see "The page below the hero" for why that element exists) |
 
@@ -526,57 +526,6 @@ the comment above `notifyDropcap()` in the code for the fix (an
 `.page-content` is real document flow) if that visible growth turns out
 to matter more than keeping one single trigger for everything tied to the
 hero.
-
-**The intro jump (not a hold).** Wheel momentum doesn't know the title
-takes 2s to rise: a two-notch flick crosses `ACTIVATE_AT` and keeps
-going, so by the time the title lands, the content has already scrolled
-up into (or past) the title's row — the user never sees the arrival. So
-activation that crosses `ACTIVATE_AT` **downward** while still within
-`FIRST_AREA_MAX_Y` (~5 wheel notches) of the top jumps once to the
-computed **first-area position** — where the content's first text (the
-tagline, after `.page-content`'s 8vh top padding) sits a fixed 40px
-below the pinned title, derived in `layout()` so it tracks viewport
-size and title height. The jump fires at the crossing event, while the
-content is still invisible (its fade starts 900ms in), so it reads as
-part of the choreography rather than a snap. One notch and five
-notches begin in exactly the same place, with the text beginning right
-below the title.
-
-That is all it does — **no timer, no clamp, no swallowed input**. An
-earlier iteration held the position for 2s and re-pinned every scroll
-event past it; combined with a direction-blind state machine that was
-a lock (scrolling up re-activated and jumped you back down — the page
-was impossible to leave upward) and got cut. Scrolling is never
-hijacked: keep scrolling and you simply move on from the first area;
-scroll back up and the reverse threshold just below it returns the
-landing. Activation already past the max — a browser-restored reload
-deep into the page, an End-key jump, an anchor link — skips the jump
-rather than yanking the user from deep in the page. (`activated` is
-also initialized from the actual scroll position, so a deep restore
-renders the pinned end-state immediately instead of flashing the
-at-rest hero under scrolled-away copy.)
-
-Two state-machine details keep the exits clean: **activation requires
-downward motion** (deactivating from the first area leaves you at
-~150px, still above `ACTIVATE_AT` — if a deactivated scroll event
-there could re-activate, the very next upward tick would jump you back
-down; that trap shipped in the previous iteration), and **the reverse
-threshold sits `FIRST_AREA_EXIT_GAP` (~one notch) below the first
-area**, so sub-notch drift doesn't flip the scene while a real upward
-notch does.
-
-**The reverse threshold rides on the first area.** With the jump
-landing the user at the first-area position, the old hardcoded reverse
-threshold (8px) left a dead band: scrolling up from there meant ~340px
-of pinned title over a blank white wash before the landing finally
-returned. The threshold is computed (`metrics.deactivateAt`, about a
-notch below the first area), so the hero owns its whole first stretch
-of scroll: above the line the intro scene is live, below it the
-landing is what the viewport shows — and since every hero layer is
-fixed-positioned, the landing fills the screen at any scroll in that
-region the instant the reverse fires. The content fading out
-mid-screen as it crosses is the scene reversing, symmetric to the
-reveal.
 
 `.page-content` now holds the live homepage's first three paragraphs (WP
 page ID 7, pulled via `wp post get 7 --field=post_content`): the opening

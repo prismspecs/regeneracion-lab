@@ -117,7 +117,7 @@
             z-index: 2;
             opacity: 0;
             color: var(--page-text);
-            padding: 8vh 20px 20vh;
+            padding: 30px 20px 20vh;
             transition: opacity 0.5s ease;
         }
 
@@ -845,12 +845,10 @@
         const TITLE_SIDE_MARGIN = 16;
         const BOTTOM_MARGIN_FRACTION = 0; // glyphs already reach the viewBox edge -- flush to the window
         const ACTIVATE_AT = 40;  // px scrolled before the rise-to-top animation triggers
-        // The reverse threshold is computed in layout() (metrics.deactivateAt):
-        // ~120px below the held first-area position, so scrolling back up from
-        // the intro returns the landing after about a notch and a half -- with
-        // no dead band, since the fixed-position landing fills the viewport at
-        // any scroll in the spacer region the moment the reverse fires -- while
-        // sub-notch drift at the hold can't trigger it by accident.
+        const DEACTIVATE_AT = 8; // px scrolled below which it drops back down (small gap avoids flicker at the boundary)
+        // First-scroll gate: absorbs runaway wheel delta on initial entrance from rest
+        const LANDING_SCROLL_Y = 60; // px: scroll position where hero docks and content rests cleanly
+        const GATE_DURATION_MS = 1200; // ms: duration to absorb multi-notch wheel impulses during entrance rise
         // How long .page-content and the drop cap wait before appearing,
         // once the title starts rising. Not 0: the title's ease-out curve
         // is front-loaded (most of its motion happens in the first ~1s of
@@ -1030,14 +1028,11 @@
             // so that extra viewport bought nothing but a dead stretch of
             // scrolling with no content at all on screen.
             //
-            // The floor below has moved twice already, in opposite
-            // directions: 300 (close to `ACTIVATE_AT * 6`) read as the
-            // paragraph crowding the title at a realistic scroll gesture;
-            // 550 overcorrected into feeling too far below it. 425 splits
-            // the difference -- see "The page below the hero" in the
-            // README for the numbers this was checked against.
-            const spacerH = Math.max(ACTIVATE_AT * 6, 425);
-            heroSpacer.style.height = spacerH + 'px';
+            // .hero-spacer reserves scroll room for the hero interaction.
+            // Sized so that docking at LANDING_SCROLL_Y positions the
+            // tagline and menu cleanly below the pinned title (matching
+            // the tight editorial spacing without a huge blank void).
+            heroSpacer.style.height = Math.round(scaledHeight + 130) + 'px';
 
             titleWhite.style.width = renderedWidth + 'px';
 
@@ -1057,35 +1052,11 @@
             // normal document flow and doesn't need it for positioning.
             document.documentElement.style.setProperty('--title-height', scaledHeight + 'px');
 
-            // The "first area" the intro jump lands on (see the jump
-            // block below onScroll): the scroll position where the
-            // content's first TEXT -- the tagline, which sits spacerH +
-            // .page-content's 8vh top padding into the document -- lands
-            // a comfortable fixed gap below the pinned title. Computed
-            // from the live layout rather than hardcoded, so it tracks
-            // viewport size and the title's rendered height. The floor
-            // at ACTIVATE_AT keeps it sane on tiny viewports where the
-            // title is nearly zero-height.
-            const firstAreaY = Math.max(ACTIVATE_AT, spacerH + vh * 0.08 - scaledHeight - 40);
-
-            // The reverse threshold (see the tunables note above): about
-            // a notch below the first area, so the hero owns its whole
-            // first stretch of scroll -- above this line the intro scene
-            // is live, below it the landing image is what the viewport
-            // shows. Floor at ACTIVATE_AT + 1 keeps the hysteresis sane
-            // on tiny viewports where firstAreaY collapses toward the
-            // activation point.
-            const deactivateAt = Math.max(ACTIVATE_AT + 1, firstAreaY - 80);
-
-            return { vw, vh, xOffset, scale, yBottom, yTop, firstAreaY, deactivateAt };
+            return { vw, vh, xOffset, scale, yBottom, yTop };
         }
 
         let metrics = layout();
-        // Initialized from the actual scroll position, not hardcoded
-        // false: a browser-restored reload deep into the page (scroll
-        // 3000, say) should render the pinned end-state immediately,
-        // not flash the at-rest hero while scrolled into the content.
-        let activated = window.scrollY > ACTIVATE_AT;
+        let activated = false;
 
         const ANIMATED_ELS = [titleWhite, titleWindow, titleWindowPhoto, wash, washTitleGroup, outlineGroup, heroImage, quote, pageContent, titleCap];
 
@@ -1203,54 +1174,32 @@
             }
         }
 
-        // The intro jump (not a hold). Problem it solves: wheel
-        // momentum doesn't know the title takes 2s to rise. A
-        // two-notch flick crosses ACTIVATE_AT and keeps going, so by
-        // the time the title lands, .page-content has already
-        // scrolled up into (or past) the title's row -- the user
-        // never sees the arrival, and the whole choreography reads as
-        // already-over. So: activation while still within
-        // FIRST_AREA_MAX_Y of the top jumps once to metrics.firstAreaY
-        // -- the computed position where the content's first text
-        // sits just below the pinned title. The jump happens at the
-        // crossing event, while .page-content is still invisible
-        // (its fade starts CONTENT_REVEAL_DELAY_MS in), so it reads
-        // as part of the choreography rather than a snap. That is all
-        // it does -- no timer, no clamp, no swallowed input; scrolling
-        // is never hijacked. Keep scrolling and you simply move on
-        // from the first area; scroll back up and the reverse
-        // threshold just below it returns the landing. Activation
-        // already past FIRST_AREA_MAX_Y -- a browser-restored scroll,
-        // an End-key jump, an anchor link deeper in the page -- skips
-        // the jump rather than yanking the user from deep in the page.
-        //
-        // Two state-machine details keep the exits clean:
-        //  - Activation requires DOWNWARD motion (y past lastY).
-        //    Deactivating from the first area leaves you at ~150px,
-        //    still above ACTIVATE_AT -- if a deactivated scroll event
-        //    there could re-activate, the very next upward tick would
-        //    jump you back down to the first area, and the page would
-        //    be impossible to leave upward. (That trap shipped in the
-        //    previous iteration; this direction gate is its fix.)
-        //  - The reverse threshold sits FIRST_AREA_EXIT_GAP (~one
-        //    notch) below the first area, so sub-notch drift there
-        //    doesn't flip the scene, while a real upward notch does.
-        const FIRST_AREA_MAX_Y = 600;   // ~5 wheel notches; beyond this, no jump
-        const FIRST_AREA_EXIT_GAP = 80; // ~one notch below the first area
-        let lastY = window.scrollY;
+        let isGated = false;
+        let gateTimer = null;
+
+        function triggerEntrance() {
+            if (activated) return;
+            activated = true;
+            applyState();
+            notifyDropcap();
+
+            isGated = true;
+            window.scrollTo(0, LANDING_SCROLL_Y);
+
+            clearTimeout(gateTimer);
+            gateTimer = setTimeout(() => {
+                isGated = false;
+            }, GATE_DURATION_MS);
+        }
 
         function onScroll() {
+            // While gated during the initial entrance, ignore intermediate scroll events
+            if (isGated) return;
+
             const y = window.scrollY;
-            const goingDown = y > lastY;
-            lastY = y;
-            const next = activated
-                ? y > metrics.deactivateAt
-                : goingDown && y > ACTIVATE_AT;
+            const next = activated ? y > DEACTIVATE_AT : y > ACTIVATE_AT;
             if (next !== activated) {
                 activated = next;
-                if (activated && y <= FIRST_AREA_MAX_Y && y !== metrics.firstAreaY) {
-                    window.scrollTo(0, metrics.firstAreaY);
-                }
                 applyState();
                 notifyDropcap();
             }
@@ -1260,6 +1209,27 @@
             metrics = layout();
             applyState(true);
         }
+
+        // Intercept wheel events on the first entrance to prevent 2+ notches from overshooting
+        window.addEventListener('wheel', (e) => {
+            if (!activated && window.scrollY <= ACTIVATE_AT && e.deltaY > 0) {
+                e.preventDefault();
+                triggerEntrance();
+            } else if (isGated) {
+                if (e.deltaY > 0) {
+                    // Absorb extra downward notches while the hero entrance is completing
+                    e.preventDefault();
+                } else if (e.deltaY < 0) {
+                    // User reversed direction -- immediately unlock and return to rest
+                    isGated = false;
+                    clearTimeout(gateTimer);
+                    activated = false;
+                    applyState();
+                    notifyDropcap();
+                    window.scrollTo(0, 0);
+                }
+            }
+        }, { passive: false });
 
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onResize);
