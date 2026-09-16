@@ -279,7 +279,7 @@ restoring it — so only scroll-triggered changes actually animate.
 | `TITLE_MAX_WIDTH` / `TITLE_SIDE_MARGIN` | How large the title renders — `min(viewport width - 2 × side margin, max px)`. Side margin is a fixed 16px, not a vw-based fraction: a fraction leaves a gap that scales with viewport width, which read as an almost-but-not-quite-edge-to-edge mistake at some widths rather than a deliberate margin. The max-px cap only matters on ultra-wide monitors. |
 | `BOTTOM_MARGIN_FRACTION` | Gap from the bottom edge at rest (`0` = flush; the glyphs already reach the edge of their own viewBox, so no margin is needed to avoid clipping) |
 | `ACTIVATE_AT` / `DEACTIVATE_AT` | Scroll distance (px) that triggers the rise / the reverse (two different thresholds avoid flicker right at the boundary) |
-| `INTRO_HOLD_MS` / `INTRO_HOLD_Y` / `INTRO_HOLD_MAX_Y` | The intro hold: any scroll crossing `ACTIVATE_AT` while within `INTRO_HOLD_MAX_Y` (~5 wheel notches) of the top is held at up to `INTRO_HOLD_Y` for `INTRO_HOLD_MS` (the 2s rise it protects) — one notch and five notches end in the same place, content waiting just below the title. Excess wheel input during the hold is swallowed; scrolling back up stays live and clears the hold. Activation already past the max (browser-restored scroll, End key) skips the hold. See "The page below the hero" |
+| `INTRO_HOLD_MS` / `INTRO_HOLD_MAX_Y` | The intro hold: any scroll crossing `ACTIVATE_AT` while within `INTRO_HOLD_MAX_Y` (~5 wheel notches) of the top jumps to the computed first-area position (the content's first text just below the pinned title — derived in `layout()` from the spacer height, the content's 8vh top padding, and the title's rendered height) and holds there for `INTRO_HOLD_MS` (the 2s rise it protects) — one notch and five notches end in the same place. Excess wheel input during the hold is swallowed; scrolling back up stays live and clears the hold. Activation already past the max (browser-restored scroll, End key) skips the hold. See "The page below the hero" |
 | `CONTENT_REVEAL_DELAY_MS` | How long `.page-content` (and the drop cap) wait after the title starts rising before they fade in -- see "The page below the hero" |
 | `FAST_FILL` | Option A's timing tweak: fades the white title / photo-filled layer over 0.5s instead of 2s. Currently off -- see "Two renderers" |
 | `SOLID_TITLE_CAP` | The "title turns totally black at the top" feature, on a switch. `true` fades `.title-cap` (an opaque solid duplicate of the pinned title) in over the mask window 2s after activation, for deep-scroll legibility (see "The page below the hero"); `false` (current preference) never shows it, so the pinned title stays the live photo-through-the-letters mask with `#outlineGroup`'s edge stroke instead. |
@@ -532,11 +532,17 @@ rise: a two-notch flick crosses `ACTIVATE_AT` and keeps going, so by the
 time the title lands, the content has already scrolled up into (or past)
 the title's row — the user never sees the arrival. So any scroll that
 crosses `ACTIVATE_AT` while still within `INTRO_HOLD_MAX_Y` (~5 wheel
-notches) of the top is *held* at up to `INTRO_HOLD_Y` for
-`INTRO_HOLD_MS` (the 2s the rise runs): one notch and five notches end
-in the same place, with the content waiting just below the title, and
-only then does scrolling continue. Excess wheel input during the hold
-is swallowed. Two deliberate limits: the clamp is upward-only (scrolling
+notches) of the top jumps to the computed **first-area position** —
+where the content's first text (the tagline, after `.page-content`'s
+8vh top padding) sits a fixed 40px below the pinned title, derived in
+`layout()` so it tracks viewport size and title height — and *holds*
+there for `INTRO_HOLD_MS` (the 2s the rise runs). The jump fires at the
+crossing event, while the content is still invisible (its fade starts
+900ms in), so it reads as part of the choreography rather than a snap.
+One notch and five notches end in exactly the same place, with the text
+beginning right below the title, and only after the hold expires does
+scrolling continue. Excess wheel input during the hold is swallowed.
+Two deliberate limits: the clamp is upward-only (scrolling
 back up stays live, and reaching `DEACTIVATE_AT` clears the hold, so
 the reverse animation is never pinned), and activation that arrives
 already past the max — a browser-restored reload deep into the page, an
