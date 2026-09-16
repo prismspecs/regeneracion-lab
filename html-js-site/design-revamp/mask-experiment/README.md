@@ -68,14 +68,20 @@ container that fills the viewport for the whole page:
    letterforms, sitting on top of everything. Guarantees the pinned title
    stays legible as a shape even when the photo showing through it
    happens to land close in tone to `--wash-color` (see "Wash color"
-   below). Unlike the other three layers, it doesn't animate alongside
+   below). It lives in its own title-sized fixed layer (`.title-outline`,
+   z-index 4, above `.page-content`) rather than inside the `.wash` SVG —
+   the wash fills the whole viewport so it could never be raised above
+   the scrolling content, but a title-sized layer can, which means the
+   outline now traces the letters over the text too. Unlike the other
+   layers, it doesn't animate alongside
    the 2s rise: its `transform` has no transition at all (snaps straight
-   to the title's current position every frame, so the browser isn't
-   re-stroking it for 2s of motion it doesn't need to -- a stroke repaints
-   more expensively than a fill), and its opacity fade is delayed via
-   `transitionDelay` until that rise has actually finished. Tying its
-   opacity to the same trigger as `.wash` (both `2s`, both starting
-   together) made it visibly trail behind the moving letters instead.
+   to the title's target position on every state flip, so the browser
+   isn't re-stroking it for 2s of motion it doesn't need to -- a stroke
+   repaints more expensively than a fill), and its opacity fade is
+   delayed via `transitionDelay` until that rise has actually finished.
+   Tying its opacity to the same trigger as `.wash` (both `2s`, both
+   starting together) made it visibly trail behind the moving letters
+   instead.
 
 ### Two renderers for the mask effect (`TITLE_RENDERER`)
 
@@ -99,7 +105,13 @@ to be the whole story behind a visible lag.
   same center. Every moving part is a composited element transform and
   the mask is static relative to its own layer, so the fill can never
   shear away from the glyphs — the two can't run on different clocks
-  because there is only one clock.
+  because there is only one clock. Layering: `.title-window` (z-index 3)
+  and `.title-outline` (4) are top-level fixed layers ABOVE
+  `.page-content` (2) — `.hero` forms its own stacking context, so a
+  title inside it could never be raised above the content — so scrolling
+  text passes UNDER the letters, visible only in the gaps between them,
+  never double-exposed over the glyph fills. The "title on top, content
+  underneath" rule, without the solid cap.
 - **`'mask'` (option A's architecture, kept working as a fallback).**
   The original three-layer design described in the numbered list above:
   the SVG mask punches a title-shaped hole out of the wash rect, and

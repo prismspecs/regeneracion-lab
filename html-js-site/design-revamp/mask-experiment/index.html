@@ -90,13 +90,16 @@
            to what was behind it, because that's exactly what it was.
 
            Back to normal document flow instead: this sits right after
-           .hero-spacer, one single document scrollbar for the whole page,
-           and it's this element's own z-index (above .hero, which has
-           none) that lets it visually scroll up and over the fixed title
-           as you keep going -- covering it, the same way any ordinary
-           fixed header gets covered by content scrolling over it. No
-           special top offset needed to avoid the title: covering it is
-           now the point, not something to prevent.
+           .hero-spacer, one single document scrollbar for the whole page.
+           Its z-index (2) puts it above .hero's own children (the wash,
+           the at-rest white title -- neither has a z-index), so content
+           scrolls up over those as you keep going. It deliberately does
+           NOT cover the title itself: .title-window (z-index 3) and the
+           outline (.title-outline, 4) are top-level fixed layers above
+           this element, so the photo-filled letters float on top and
+           text passes beneath them, visible only in the gaps between
+           letters -- the "title on top, content underneath" rule, now
+           without needing the solid cap (see .title-cap below).
 
            No background color here -- .hero's own wash (the SVG rect a
            few blocks up, faded in by the same `activated` state on the
@@ -329,13 +332,21 @@
            relative to its own layer, so nothing re-rasterizes per frame
            and the fill can never trail the glyphs the way the 'mask'
            renderer's CPU-rasterized hole does under load. Hidden
-           entirely in 'mask' mode. */
+           entirely in 'mask' mode. Sits OUTSIDE .hero as a top-level
+           fixed layer (see the markup comment at the element for why):
+           .hero forms its own stacking context, so a title inside it can
+           never be raised above .page-content -- and raising .hero
+           wholesale would raise the full-viewport photo with it. This
+           element is title-sized, so raising just it (z-index 3) is
+           safe: scrolling text passes UNDER the letters. */
         .title-window {
-            position: absolute;
+            position: fixed;
             left: 50%;
             top: 0;
             /* width + height set by JS */
             transform: translate(-50%, 0);
+            z-index: 3; /* above .page-content (2): text scrolls under the letters */
+            pointer-events: none; /* never block clicks/selection on the content beneath */
             overflow: hidden; /* clip the viewport-sized photo to the title box; the mask then shapes it */
             opacity: 0;
             mask-repeat: no-repeat;
@@ -380,17 +391,36 @@
             transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* No transform transition on purpose: it snaps straight to the
-           title's current position every frame instead of easing there,
-           so the browser isn't re-stroking this shape for 2s of motion it
-           doesn't need to (a stroke is pricier to repaint than a fill).
-           Opacity only fades in -- and JS delays that fade until the
-           title's own 2s rise has actually finished (transitionDelay set
-           in applyState()), so the outline doesn't visibly trail behind
-           the moving letters. */
+        /* Carries only the delayed opacity fade now -- the transform
+           lives on the .title-outline root (below). No transform
+           transition on either, on purpose: JS snaps the layer straight
+           to the title's target position on every state flip, and the
+           group is invisible during the rise anyway (opacity 0 until the
+           delay below), so the browser isn't re-stroking this shape for
+           2s of motion it doesn't need to (a stroke is pricier to
+           repaint than a fill). The fade is delayed via transitionDelay
+           set in applyState() until the title's own 2s rise has actually
+           finished, so the outline doesn't visibly trail behind the
+           moving letters. */
         #outlineGroup {
             opacity: 0;
             transition: opacity 0.4s ease;
+        }
+
+        /* The outline's own top-level layer (see the markup comment at
+           the .title-outline SVG for why it moved out of the .wash SVG).
+           Title-sized, z-index 4 -- one above .title-window, so the full
+           stroke (inner AND outer half) traces the letters over the
+           photo fill and over the scrolling content. */
+        .title-outline {
+            position: fixed;
+            left: 50%;
+            top: 0;
+            /* width + height set by JS */
+            transform: translate(-50%, 0);
+            z-index: 4;
+            overflow: visible; /* half the stroke sits outside the viewBox edges -- let it show */
+            pointer-events: none;
         }
 
         /* A second, independent copy of the pinned title -- solid
@@ -424,7 +454,7 @@
             right: 0;
             height: var(--title-height, 0px);
             overflow: hidden;
-            z-index: 3;
+            z-index: 5; /* above .title-window (3) and #outlineLayer (4): the solid version, when enabled, always wins */
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.4s ease;
@@ -540,40 +570,7 @@
             </defs>
 
             <rect class="wash-rect" width="100%" height="100%" mask="url(#titleHoleMask)" />
-
-            <!-- Traces the letter edges on top of everything, so the
-                 pinned title stays visible as a shape even when the photo
-                 showing through it is pale (see BOTTOM_MARGIN_FRACTION
-                 note above re: only the photo's top strip ever shows here).
-                 References the same paths the mask hole uses via <use>,
-                 so there's a single source of truth for the letterforms. -->
-            <g id="outlineGroup">
-                <use href="#glyph0" />
-                <use href="#glyph1" />
-                <use href="#glyph2" />
-                <use href="#glyph3" />
-                <use href="#glyph4" />
-                <use href="#glyph5" />
-                <use href="#glyph6" />
-                <use href="#glyph7" />
-                <use href="#glyph8" />
-                <use href="#glyph9" />
-                <use href="#glyph10" />
-                <use href="#glyph11" />
-                <use href="#glyph12" />
-                <use href="#glyph13" />
-                <use href="#glyph14" />
-            </g>
         </svg>
-
-        <!-- Option B's mask title (TITLE_RENDERER = 'window'): the glyph
-             shapes come from an element-local mask-image built at startup
-             from the same paths the SVG mask holds; the photo inside is
-             counter-translated so it stays viewport-registered while this
-             element rises. See the .title-window CSS above. -->
-        <div class="title-window" id="titleWindow">
-            <img class="title-window-photo" id="titleWindowPhoto" alt="">
-        </div>
 
         <svg class="title-white" id="titleWhite" viewBox="0 0 1281.50 97.00" preserveAspectRatio="xMidYMid meet">
             <path fill="white" d="M66 38.30L66 38.30Q66 46.60 61.20 52.20Q56.40 57.80 45.90 59.70L45.90 59.70L69.10 86.30Q71.50 89.10 74.80 90.55Q78.10 92 81.50 92L81.50 92L81.50 96L57.80 96L33 65.60Q31.40 63.60 30 62.50Q28.60 61.40 27.45 60.95Q26.30 60.50 25.20 60.50L25.20 60.50L25.20 80.10Q25.20 85 26.20 87.60Q27.20 90.20 30.30 91.10Q33.40 92 39.70 92L39.70 92L39.70 96L0 96L0 92Q4.40 92 6.65 91.10Q8.90 90.20 9.70 87.75Q10.50 85.30 10.50 80.60L10.50 80.60L10.50 34.40Q10.50 29.70 9.85 27.35Q9.20 25 7.20 24.10Q5.20 23.20 1.10 23L1.10 23L1.10 19L35.70 19Q50.10 19 58.05 24.10Q66 29.20 66 38.30ZM25.20 26.30L25.20 26.30L25.20 54.50L31.70 54.50Q41.10 54.50 45.75 50.80Q50.40 47.10 50.40 38.80L50.40 38.80Q50.40 32.40 46.50 28.50Q42.60 24.60 35.70 24.60L35.70 24.60L27 24.60Q25.20 24.60 25.20 26.30Z" />
@@ -598,6 +595,51 @@
             <footer>&mdash; Mexican revolutionary dicho, circa 1910</footer>
         </blockquote>
     </div>
+
+    <!-- Option B's mask title (TITLE_RENDERER = 'window'), as a
+         top-level fixed layer rather than a child of .hero: .hero forms
+         its own stacking context (position: fixed always creates one),
+         so a title INSIDE it -- however high its z-index -- paints below
+         .page-content (z-index 2) and gets scrolled over. Out here, the
+         window's own z-index (3) puts the photo-filled letters above the
+         content: text passes UNDER the title, visible only in the gaps
+         between letters, instead of double-exposing over the glyph
+         fills. Same mask story as before: element-local mask-image built
+         at startup from the same paths the SVG mask holds; the photo
+         inside is counter-translated so it stays viewport-registered
+         while this element rises. See the .title-window CSS above. -->
+    <div class="title-window" id="titleWindow">
+        <img class="title-window-photo" id="titleWindowPhoto" alt="">
+    </div>
+
+    <!-- The outline, as its own title-sized fixed layer (z-index 4, one
+         above .title-window) so the full stroke -- inner AND outer half
+         -- traces the letters above the photo fill and above the page
+         content too. It used to live inside the full-viewport .wash SVG,
+         which could never be raised above .page-content (raising it
+         would raise the whole wash with it); a title-sized layer has no
+         such problem. References the same glyph paths as everything else
+         via <use>; its <g> keeps the snap/delay fade behavior the old
+         in-SVG group had. -->
+    <svg class="title-outline" id="outlineLayer" viewBox="0 0 1281.50 97.00" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <g id="outlineGroup">
+            <use href="#glyph0" />
+            <use href="#glyph1" />
+            <use href="#glyph2" />
+            <use href="#glyph3" />
+            <use href="#glyph4" />
+            <use href="#glyph5" />
+            <use href="#glyph6" />
+            <use href="#glyph7" />
+            <use href="#glyph8" />
+            <use href="#glyph9" />
+            <use href="#glyph10" />
+            <use href="#glyph11" />
+            <use href="#glyph12" />
+            <use href="#glyph13" />
+            <use href="#glyph14" />
+        </g>
+    </svg>
 
     <!-- Sits above .page-content (see .title-cap CSS above for why this
          is a whole separate element, not just a z-index change on .hero)
@@ -832,6 +874,7 @@
         const wash = document.getElementById('wash');
         const washTitleGroup = document.getElementById('washTitleGroup');
         const outlineGroup = document.getElementById('outlineGroup');
+        const outlineLayer = document.getElementById('outlineLayer');
         const titleWhite = document.getElementById('titleWhite');
         const pageContent = document.getElementById('pageContent');
         const titleCap = document.getElementById('titleCap');
@@ -916,6 +959,8 @@
             titleWindow.style.height = scaledHeight + 'px';
             titleWindowPhoto.style.width = vw + 'px';
             titleWindowPhoto.style.height = vh + 'px';
+            outlineLayer.style.width = renderedWidth + 'px';
+            outlineLayer.style.height = scaledHeight + 'px';
 
             // .title-cap (see its CSS/markup comments) reads this to clip
             // itself to exactly the title's own rendered height -- the one
@@ -966,7 +1011,11 @@
                 'translate(' + metrics.xOffset + 'px, ' + y + 'px) scale(' + metrics.scale + ')';
             wash.style.opacity = activated ? 1 : 0;
 
-            outlineGroup.style.transform = washTitleGroup.style.transform; // no transition -- snaps instantly
+            // Snap the outline layer to the target position instantly
+            // (no transition on .title-outline) -- it's invisible during
+            // the rise anyway (opacity 0 until the delay below), so
+            // nothing is seen moving.
+            outlineLayer.style.transform = 'translate(-50%, ' + y + 'px)';
             // Wait for the title's own rise to finish before fading in;
             // hide immediately (no delay) when reversing. Keep in sync
             // with the 2s transform duration used everywhere else above.
