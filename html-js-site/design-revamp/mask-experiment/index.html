@@ -1057,8 +1057,8 @@
             // normal document flow and doesn't need it for positioning.
             document.documentElement.style.setProperty('--title-height', scaledHeight + 'px');
 
-            // The "first area" the intro hold returns to (see the intro
-            // hold block below onScroll): the scroll position where the
+            // The "first area" the intro jump lands on (see the jump
+            // block below onScroll): the scroll position where the
             // content's first TEXT -- the tagline, which sits spacerH +
             // .page-content's 8vh top padding into the document -- lands
             // a comfortable fixed gap below the pinned title. Computed
@@ -1066,18 +1066,18 @@
             // viewport size and the title's rendered height. The floor
             // at ACTIVATE_AT keeps it sane on tiny viewports where the
             // title is nearly zero-height.
-            const introHoldY = Math.max(ACTIVATE_AT, spacerH + vh * 0.08 - scaledHeight - 40);
+            const firstAreaY = Math.max(ACTIVATE_AT, spacerH + vh * 0.08 - scaledHeight - 40);
 
             // The reverse threshold (see the tunables note above): about
-            // a notch and a half below the held first-area position, so
-            // the hero owns its whole first stretch of scroll -- above
-            // this line the intro scene is live, below it the landing
-            // image is what the viewport shows. Floor at ACTIVATE_AT + 1
-            // keeps the hysteresis sane on tiny viewports where
-            // introHoldY collapses toward the activation point.
-            const deactivateAt = Math.max(ACTIVATE_AT + 1, introHoldY - 120);
+            // a notch below the first area, so the hero owns its whole
+            // first stretch of scroll -- above this line the intro scene
+            // is live, below it the landing image is what the viewport
+            // shows. Floor at ACTIVATE_AT + 1 keeps the hysteresis sane
+            // on tiny viewports where firstAreaY collapses toward the
+            // activation point.
+            const deactivateAt = Math.max(ACTIVATE_AT + 1, firstAreaY - 80);
 
-            return { vw, vh, xOffset, scale, yBottom, yTop, introHoldY, deactivateAt };
+            return { vw, vh, xOffset, scale, yBottom, yTop, firstAreaY, deactivateAt };
         }
 
         let metrics = layout();
@@ -1203,52 +1203,56 @@
             }
         }
 
-        // The intro hold. Problem it solves: wheel momentum doesn't
-        // know the title takes 2s to rise. A two-notch flick crosses
-        // ACTIVATE_AT and keeps going, so by the time the title lands,
-        // .page-content has already scrolled up into (or past) the
-        // title's row -- the user never sees the arrival, and the whole
-        // choreography reads as already-over. So: any scroll that
-        // crosses ACTIVATE_AT while still within INTRO_HOLD_MAX_Y of
-        // the top jumps to metrics.introHoldY -- the computed position
-        // where the content's first text sits just below the pinned
-        // title -- and HOLDS there for INTRO_HOLD_MS. The jump happens
-        // at the crossing event, while .page-content is still invisible
-        // (its fade starts CONTENT_REVEAL_DELAY_MS in), so it reads as
-        // part of the choreography rather than a snap; one notch and
-        // five notches end in exactly the same place, with the text
-        // beginning right below the title, and only after the hold
-        // expires does scrolling continue. Excess wheel input during
-        // the hold is swallowed (the clamp is upward-only: scrolling
-        // back up stays live, and crossing the reverse threshold clears the
-        // hold in the flip branch, so the reverse animation is never
-        // pinned). Activation that arrives already past INTRO_HOLD_MAX_Y
-        // -- browser-restored scroll, an End-key jump -- skips the hold
-        // entirely rather than yanking the user from deep in the page.
-        const INTRO_HOLD_MS = 2000;   // matches the 2s rise it protects
-        const INTRO_HOLD_MAX_Y = 600; // ~5 wheel notches; beyond this, no hold
-        let introLockUntil = 0;
-        let introClampY = 0;
+        // The intro jump (not a hold). Problem it solves: wheel
+        // momentum doesn't know the title takes 2s to rise. A
+        // two-notch flick crosses ACTIVATE_AT and keeps going, so by
+        // the time the title lands, .page-content has already
+        // scrolled up into (or past) the title's row -- the user
+        // never sees the arrival, and the whole choreography reads as
+        // already-over. So: activation while still within
+        // FIRST_AREA_MAX_Y of the top jumps once to metrics.firstAreaY
+        // -- the computed position where the content's first text
+        // sits just below the pinned title. The jump happens at the
+        // crossing event, while .page-content is still invisible
+        // (its fade starts CONTENT_REVEAL_DELAY_MS in), so it reads
+        // as part of the choreography rather than a snap. That is all
+        // it does -- no timer, no clamp, no swallowed input; scrolling
+        // is never hijacked. Keep scrolling and you simply move on
+        // from the first area; scroll back up and the reverse
+        // threshold just below it returns the landing. Activation
+        // already past FIRST_AREA_MAX_Y -- a browser-restored scroll,
+        // an End-key jump, an anchor link deeper in the page -- skips
+        // the jump rather than yanking the user from deep in the page.
+        //
+        // Two state-machine details keep the exits clean:
+        //  - Activation requires DOWNWARD motion (y past lastY).
+        //    Deactivating from the first area leaves you at ~150px,
+        //    still above ACTIVATE_AT -- if a deactivated scroll event
+        //    there could re-activate, the very next upward tick would
+        //    jump you back down to the first area, and the page would
+        //    be impossible to leave upward. (That trap shipped in the
+        //    previous iteration; this direction gate is its fix.)
+        //  - The reverse threshold sits FIRST_AREA_EXIT_GAP (~one
+        //    notch) below the first area, so sub-notch drift there
+        //    doesn't flip the scene, while a real upward notch does.
+        const FIRST_AREA_MAX_Y = 600;   // ~5 wheel notches; beyond this, no jump
+        const FIRST_AREA_EXIT_GAP = 80; // ~one notch below the first area
+        let lastY = window.scrollY;
 
         function onScroll() {
             const y = window.scrollY;
-            const next = activated ? y > metrics.deactivateAt : y > ACTIVATE_AT;
+            const goingDown = y > lastY;
+            lastY = y;
+            const next = activated
+                ? y > metrics.deactivateAt
+                : goingDown && y > ACTIVATE_AT;
             if (next !== activated) {
                 activated = next;
-                if (activated && y <= INTRO_HOLD_MAX_Y) {
-                    introLockUntil = performance.now() + INTRO_HOLD_MS;
-                    introClampY = metrics.introHoldY;
-                    if (y !== introClampY) window.scrollTo(0, introClampY);
-                } else {
-                    introLockUntil = 0;
+                if (activated && y <= FIRST_AREA_MAX_Y && y !== metrics.firstAreaY) {
+                    window.scrollTo(0, metrics.firstAreaY);
                 }
                 applyState();
                 notifyDropcap();
-            }
-            // Upward-only clamp during the hold: momentum and extra
-            // notches get re-pinned to the held position every event.
-            if (introLockUntil && performance.now() < introLockUntil && y > introClampY) {
-                window.scrollTo(0, introClampY);
             }
         }
 
