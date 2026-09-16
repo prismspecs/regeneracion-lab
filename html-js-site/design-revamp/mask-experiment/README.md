@@ -152,17 +152,12 @@ background this page needs, anywhere below the title.
    on top of that. Two independent white fades stacked on the same spot,
    on two different timings, read as the background visibly sweeping in
    twice. Fixed by deleting `.page-content`'s `background` entirely.
-2. That wasn't the whole bug: the drop-cap `<canvas>` (inside
-   `.page-content`, see "The page below the hero") was *also* painting
-   its own opaque rectangle every frame (`ctx.fillRect` with `--page-bg`,
-   needed to clear the previous frame's text) -- on a context created
-   with `{ alpha: false }`, so it was never capable of showing anything
-   behind it no matter what color that fill used. Same mistake, just in
-   canvas pixels instead of CSS. Fixed by dropping `{ alpha: false }` (so
-   the canvas can genuinely be transparent) and swapping the colored
-   `fillRect` for a plain `clearRect` -- it now paints only the drop cap
-   and text, nothing else, and the wash shows through everywhere else on
-   the canvas exactly like it does everywhere off the canvas.
+2. The drop-cap `<canvas>` (which previously drew into an HTML5
+   canvas via `@chenglou/pretext`) has since been completely replaced
+   with a native semantic HTML `<p class="dropcap-paragraph">` and
+   `<span class="dropcap-letter">R</span>`. This ensures that all text
+   is natively selectable and copyable, screen-reader accessible, and
+   responsive without needing an opaque canvas buffer.
 
 `--page-bg` and `--page-text` are what's left: `--page-text` for the
 paragraph's actual ink color, `--page-bg`... isn't used anywhere anymore
@@ -529,64 +524,24 @@ hero.
 
 `.page-content` now holds the live homepage's first three paragraphs (WP
 page ID 7, pulled via `wp post get 7 --field=post_content`): the opening
-paragraph gets a growing drop-cap effect, reused from
-`design-revamp/pretext-experiment/index.html` (one level up) almost
-unchanged — same `@chenglou/pretext` canvas-layout library (loaded from
-`esm.sh`, this page's second external dependency alongside Google Fonts),
-same grow animation, same `layoutNextLine` reflow-without-DOM-thrash
-technique. The other two paragraphs are plain HTML in a `.page-copy` div
-right after `dropcap-container` — no drop cap or per-frame reflow needed
-once the opening paragraph has already settled, so there's no reason to
-route them through the canvas too. Four changes from the original demo
-(all in the drop-cap paragraph specifically):
+paragraph features an editorial drop-cap effect on the opening letter "R".
+Originally prototyped on an HTML5 `<canvas>` using `@chenglou/pretext`, this
+has been refactored into clean, semantic HTML:
+`<p class="dropcap-paragraph" id="dropcapContainer"><span class="dropcap-letter">R</span>egeneration...</p>`
+with CSS float and cubic-bezier transitions.
 
-- **Real copy.** The demo's paragraph described the effect itself; this one
-  is the actual opening paragraph of the live site's homepage, so the
-  effect can be judged against real lab copy instead of filler text.
-- **No accent color.** The original animates the drop cap from dark gray
-  to an amber accent (`#d2691e`) as it grows. Here it stays `--page-text`
-  (the same color as the surrounding paragraph) throughout — asked for
-  explicitly, so the effect could be judged on its own without also
-  introducing a new accent color to the page.
-- **Typefaces.** Drop cap: **Instrument Serif** (already loaded above for
-  the quote/byline — reusing it here rather than adding a fourth
-  typeface). Body copy: **Georgia** — a serif specifically drawn by
-  Matthew Carter for legibility on screens at small sizes, and already
-  present as a fallback everywhere else on this page, so it needed no
-  additional font load. The pairing follows ordinary editorial practice:
-  a display face for the one big letter, a dedicated text face for actual
-  reading, rather than stretching one face to do both jobs.
-- **Trigger mechanism.** The original demo watches its own container with
-  an `IntersectionObserver`, which made sense when the container scrolled
-  into view. Once `.page-content` became a fixed overlay (see above), that
-  signal broke silently: the container sits within the viewport's bounds
-  geometrically from the very first frame, opacity aside, so the observer
-  fired immediately on page load and the drop cap finished growing to
-  full size *before the paragraph was ever visible* — the whole effect
-  was happening, just invisibly, with nothing left to animate by the time
-  you could actually see it. Replaced with an explicit `hero-activated`
-  custom event, dispatched from `notifyDropcap()` in the hero's own
-  `onScroll()` after the same `CONTENT_REVEAL_DELAY_MS` delay
-  `.page-content`'s own fade uses (see "The page below the hero" for the
-  full history of that timing), and listened for here instead of
-  observing anything geometrically. The drop cap now starts growing right
-  as the paragraph fades in, rather than before or long after it.
+Key advantages of this semantic HTML approach:
+- **100% Selectable & Copyable:** Users and assistive technologies can select, copy, and search all paragraph copy naturally without being blocked by a canvas element.
+- **Zero Heavy Dependencies:** Eliminates external canvas-layout script bundles (`@chenglou/pretext`) while preserving smooth typography animation.
+- **Fully Responsive:** Uses media queries (130px on desktop, 96px on mobile) and native browser text reflow.
+- **Trigger Mechanism:** Listens for the `hero-activated` custom event to toggle the `.dropcap-grown` CSS class with smooth cubic-bezier easing.
 
-One thing not carried over from the original demo: real content-based
-height measurement, at the canvas level. `dropcap-container`'s canvas
-still draws into a fixed-size buffer (`CANVAS_HEIGHT`, 420px, sized by eye
-generously enough for a few paragraph lengths) rather than measuring text
-before drawing it. But once `.page-copy`'s plain paragraphs started
-sitting right after it, that fixed buffer's unused space at the bottom
-showed up as a visible gap before "However, the Spanish term..." — so
-`render()` now also computes the actual drawn content's height each frame
-(text bottom, or the drop cap's own visual bottom if that's taller) and
-sets `dropcap-container`'s own CSS height to match; `overflow: hidden` on
-the container then crops the canvas's unused buffer space away without
-touching its draw resolution. If the drop-cap paragraph's copy changes
-meaningfully in length, the crop still tracks it automatically — only
-`CANVAS_HEIGHT` itself (the draw buffer's ceiling) would need revisiting,
-and only if a much longer paragraph actually exceeded it.
+### Mobile and Touch Support
+
+Mobile browsers don't emit `wheel` events, and touch flicks carry substantial inertia that could fling the viewport past the hero and tagline. The site features dedicated touch handling:
+- **Swipe-up Gate:** On mobile devices, an initial swipe-up gesture (`touchmove` with `diffY > 12`) triggers `triggerEntrance()`, docking smoothly at `LANDING_SCROLL_Y = 60px` with momentum absorption during the entrance duration (`GATE_DURATION_MS = 1200ms`).
+- **Direction Reversal:** Swiping back down during entrance cancels the gate and returns immediately to the resting state at `scrollY = 0`.
+- **Manual Scroll Restoration:** Sets `history.scrollRestoration = 'manual'` to guarantee clean page starts and reloads from the hero screen.
 
 ### Projects grid
 

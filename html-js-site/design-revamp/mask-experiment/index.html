@@ -187,30 +187,48 @@
            content's height every frame. Without this, whatever blank
            buffer room CANVAS_HEIGHT leaves below the real text would
            show up as a gap before .page-copy's paragraphs beneath it. */
-        .dropcap-container {
-            max-width: 640px;
-            margin: 0 auto;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .dropcap-container canvas {
-            display: block;
-            width: 100%;
-        }
-
-        /* Plain continuation paragraphs after the drop-cap opener -- same
-           type settings as the canvas-drawn text (18px/28px Georgia,
-           --page-text) so the handoff from canvas to real DOM text is
-           invisible, just regular HTML since there's no drop cap or
-           reflow-around-a-shape need past the first paragraph. */
+        /* Semantic, fully selectable drop-cap paragraph -- replaces the
+           canvas prototype so that all text is natively selectable,
+           accessible, searchable, and responsive across all screens.
+           The drop cap letter smoothly grows on hero activation. */
         .page-copy {
             max-width: 640px;
-            margin: 28px auto 0;
+            margin: 0 auto;
             font-family: Georgia, serif;
             font-size: 18px;
             line-height: 28px;
             color: var(--page-text);
+        }
+
+        .dropcap-paragraph {
+            margin: 0 auto;
+        }
+
+        .dropcap-letter {
+            float: left;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 18px;
+            line-height: 0.72;
+            margin-right: 6px;
+            margin-top: 0;
+            color: var(--page-text);
+            user-select: text;
+            -webkit-user-select: text;
+            transition: font-size 1s cubic-bezier(0.16, 1, 0.3, 1), margin-right 1s cubic-bezier(0.16, 1, 0.3, 1), margin-top 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dropcap-grown .dropcap-letter {
+            font-size: 130px;
+            margin-right: 18px;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 640px) {
+            .dropcap-grown .dropcap-letter {
+                font-size: 96px;
+                margin-right: 14px;
+                margin-top: 4px;
+            }
         }
 
         .page-copy p + p {
@@ -789,10 +807,8 @@
                 </ul>
             </nav>
         </header>
-        <div class="dropcap-container" id="dropcapContainer">
-            <canvas id="dropcapCanvas"></canvas>
-        </div>
         <div class="page-copy">
+            <p class="dropcap-paragraph" id="dropcapContainer"><span class="dropcap-letter" id="dropcapLetter">R</span>egeneration has become one of the most commercialized and co-opted terms of the 21st century. It is commonly used to market a plethora of ventures that greenwash extractive and colonial land relations, sell products and settler ways of life, and envision alternatives that may delink from one system but reproduce others.</p>
             <p>However, the Spanish term regeneraci&oacute;n has been a rebellious political concept, philosophy, and battle cry for over a hundred years. In this context, regeneraci&oacute;n developed as a rejection of eugenics that connected movements engaged in anti-racism, abolition of slavery and mass incarceration, and decolonial resistances rooted in Indigenous and fugitive land relations.</p>
             <p>The Regeneraci&oacute;n Lab is grounded in this older, otherwise meaning of the term that emerged in the late nineteenth century and inspired the 1910 Mexican revolution. Our regenerative work centers community-based research justice, creative-critical practices, and decolonial praxis.</p>
         </div>
@@ -1055,8 +1071,12 @@
             return { vw, vh, xOffset, scale, yBottom, yTop };
         }
 
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
         let metrics = layout();
-        let activated = false;
+        let activated = window.scrollY > ACTIVATE_AT;
 
         const ANIMATED_ELS = [titleWhite, titleWindow, titleWindowPhoto, wash, washTitleGroup, outlineGroup, heroImage, quote, pageContent, titleCap];
 
@@ -1231,207 +1251,58 @@
             }
         }, { passive: false });
 
+        // Touch support for mobile devices: gate entrance on first swipe-up
+        let touchStartY = 0;
+
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                touchStartY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length !== 1) return;
+            const currentY = e.touches[0].clientY;
+            const diffY = touchStartY - currentY; // positive = swipe up = scroll down
+
+            if (!activated && window.scrollY <= ACTIVATE_AT && diffY > 12) {
+                if (e.cancelable) e.preventDefault();
+                triggerEntrance();
+            } else if (isGated) {
+                if (diffY > 0) {
+                    // Absorb extra downward swipe momentum while entrance animation is running
+                    if (e.cancelable) e.preventDefault();
+                } else if (diffY < -12) {
+                    // User swiped down (scroll up) -- reverse entrance immediately
+                    isGated = false;
+                    clearTimeout(gateTimer);
+                    activated = false;
+                    applyState();
+                    notifyDropcap();
+                    window.scrollTo(0, 0);
+                }
+            }
+        }, { passive: false });
+
+        // Smoothly grow drop cap letter when hero activates
+        window.addEventListener('hero-activated', (e) => {
+            const container = document.getElementById('dropcapContainer');
+            if (container) {
+                if (e.detail.activated) {
+                    container.classList.add('dropcap-grown');
+                } else {
+                    container.classList.remove('dropcap-grown');
+                }
+            }
+        });
+
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onResize);
         applyState(true);
-    </script>
-
-    <!-- ---------------------------------------------------------------
-         Growing drop-cap paragraph, reused from
-         design-revamp/pretext-experiment/index.html one level up (same
-         @chenglou/pretext canvas-layout technique -- it reflows the
-         surrounding text around the drop cap every frame without any DOM
-         reflow). Changes from the original demo:
-           - real copy (the live homepage's opening paragraph) instead of
-             the demo's own text about the effect itself
-           - drop cap stays --page-text the whole time, no color-mix to
-             an accent color
-           - drop cap font is Instrument Serif (already loaded above for
-             the quote/byline) instead of Georgia bold, so the one big
-             display letter on this part of the page matches the site's
-             existing display voice; body copy is Georgia, a serif
-             specifically drawn for on-screen text at small sizes, needing
-             no extra font load
-         See the README for more on this pairing. --------------------- -->
-    <script type="module">
-        import { prepareWithSegments, layoutNextLine } from 'https://esm.sh/@chenglou/pretext@0.0.4';
-
-        // Real copy now, not filler: the opening paragraph of the live
-        // site's actual homepage content (WP page ID 7, "Home" --
-        // `wp post get 7 --field=post_content`). Only this first
-        // paragraph gets the canvas drop-cap treatment -- the other two
-        // paragraphs of the same source content are plain HTML right
-        // below it in the markup (see .page-copy).
-        const text = "Regeneration has become one of the most commercialized and co-opted terms of the 21st century. It is commonly used to market a plethora of ventures that greenwash extractive and colonial land relations, sell products and settler ways of life, and envision alternatives that may delink from one system but reproduce others.";
-
-        const firstLetter = text[0];
-        const restText = text.slice(1).trimStart();
-
-        const pageTextColor = getComputedStyle(document.body).getPropertyValue('--page-text').trim() || '#1a1a1a';
-
-        const fontSize = 18;
-        const lineHeight = 28;
-        const fontString = `${fontSize}px Georgia, serif`;
-
-        const prepared = prepareWithSegments(restText, fontString);
-
-        const canvas = document.getElementById('dropcapCanvas');
-        const container = document.getElementById('dropcapContainer');
-        // alpha: true (the default -- not passing { alpha: false } like the
-        // original demo did) so this canvas can actually be transparent.
-        // It paints only the drop cap and body text; the wash behind
-        // .page-content is the only background (see "Wash color" in the
-        // README), so this has nothing of its own to fill in.
-        const ctx = canvas.getContext('2d');
-
-        let dpr = window.devicePixelRatio || 1;
-        let cWidth, cHeight;
-
-        // Generous fixed height for this paragraph's length at the target
-        // drop-cap size -- not auto-measured. If it's swapped for a
-        // longer or shorter paragraph, this will need adjusting (or a
-        // two-pass layout that measures total height before drawing).
-        const CANVAS_HEIGHT = 420;
-
-        function resizeCanvas() {
-            const rect = container.getBoundingClientRect();
-            cWidth = rect.width;
-            cHeight = CANVAS_HEIGHT;
-            canvas.width = cWidth * dpr;
-            canvas.height = cHeight * dpr;
-            canvas.style.height = cHeight + 'px';
-            ctx.scale(dpr, dpr);
-            render(progress);
+        if (activated) {
+            const container = document.getElementById('dropcapContainer');
+            if (container) container.classList.add('dropcap-grown');
         }
-
-        window.addEventListener('resize', resizeCanvas);
-
-        let progress = 0;
-        let animationFrameId = null;
-
-        function easeOutQuart(t) {
-            return 1 - (--t) * t * t * t;
-        }
-
-        function render(animationVal) {
-            // Erase the previous frame's text without painting a color --
-            // this canvas has no background of its own (see the ctx
-            // comment above).
-            ctx.clearRect(0, 0, cWidth, cHeight);
-
-            const baseSize = fontSize;
-            const targetSize = 140;
-            const dropCapSize = baseSize + (targetSize - baseSize) * animationVal;
-
-            ctx.font = `${dropCapSize}px 'Instrument Serif', Georgia, serif`;
-            ctx.textBaseline = 'top';
-
-            const dropCapWidth = ctx.measureText(firstLetter).width;
-            const dropCapHeight = dropCapSize * 0.75; // optical height estimation
-
-            ctx.fillStyle = pageTextColor; // constant -- no accent-color animation
-            ctx.fillText(firstLetter, 0, -(dropCapSize * 0.05));
-
-            ctx.font = fontString;
-            ctx.fillStyle = pageTextColor;
-            ctx.textBaseline = 'top';
-
-            let cursor = { segmentIndex: 0, graphemeIndex: 0 };
-            let y = 0;
-
-            const paddingBase = 0;
-            const paddingTarget = 20;
-            const currentPadding = paddingBase + (paddingTarget - paddingBase) * animationVal;
-
-            while (true) {
-                const isBeside = y + (lineHeight * 0.4) < dropCapHeight;
-
-                let availableWidth = cWidth;
-                let xOffset = 0;
-
-                if (isBeside && dropCapWidth > 0 && animationVal > 0.01) {
-                    xOffset = dropCapWidth + currentPadding;
-                    availableWidth = cWidth - xOffset;
-                }
-
-                if (availableWidth < 30) availableWidth = 30;
-
-                const line = layoutNextLine(prepared, cursor, availableWidth);
-                if (line === null) break;
-
-                ctx.fillText(line.text, xOffset, y);
-                cursor = line.end;
-                y += lineHeight;
-
-                if (y > cHeight) break;
-            }
-
-            // Crop the container down to what actually got drawn (text
-            // bottom, or the drop cap's own visual bottom if that's
-            // taller) instead of leaving CANVAS_HEIGHT's full blank
-            // buffer showing beneath the real content -- see the
-            // .dropcap-container CSS comment for why this container can
-            // be shrunk without touching the canvas's own draw buffer.
-            const dropCapVisualBottom = dropCapSize * 0.95;
-            container.style.height = Math.ceil(Math.max(y, dropCapVisualBottom)) + 'px';
-        }
-
-        document.fonts.ready.then(() => {
-            resizeCanvas();
-            render(0);
-        });
-
-        let startProgress = 0;
-        let targetProgress = 0;
-        let currentProgress = 0;
-        let startTime = 0;
-        const DURATION = 1000;
-
-        function animate(time) {
-            if (!startTime) startTime = time;
-            const elapsed = time - startTime;
-            let t = Math.min(elapsed / DURATION, 1);
-            t = easeOutQuart(t);
-
-            currentProgress = startProgress + (targetProgress - startProgress) * t;
-            progress = currentProgress;
-
-            render(progress);
-
-            if (elapsed < DURATION) {
-                animationFrameId = requestAnimationFrame(animate);
-            } else {
-                currentProgress = targetProgress;
-                render(currentProgress);
-                animationFrameId = null;
-            }
-        }
-
-        // Not an IntersectionObserver (the original demo's approach): this
-        // container used to live inside .page-content back when that was a
-        // fixed overlay covering the whole viewport at all times --
-        // geometrically "in view" from the moment the page loads,
-        // regardless of its opacity, which triggered the grow animation
-        // immediately on load, finishing invisibly before .page-content
-        // ever faded in. .page-content is normal document flow again now
-        // (see its CSS comment), so an IntersectionObserver on this
-        // container would be meaningful again -- but this still listens
-        // for the hero's own early activation event instead, to keep one
-        // single trigger for everything tied to the hero. Trade-off: with
-        // .hero-spacer as short as it is, the drop cap typically finishes
-        // growing before this container has even scrolled into view (see
-        // "The page below the hero" in the README) -- an
-        // IntersectionObserver here would fix that, if the visible growth
-        // turns out to matter more than the single-trigger simplicity.
-        window.addEventListener('hero-activated', (e) => {
-            const next = e.detail.activated ? 1 : 0;
-            if (targetProgress !== next) {
-                startProgress = currentProgress;
-                targetProgress = next;
-                startTime = 0;
-                if (!animationFrameId) animationFrameId = requestAnimationFrame(animate);
-            }
-        });
     </script>
 </body>
 
