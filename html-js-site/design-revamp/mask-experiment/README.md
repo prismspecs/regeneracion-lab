@@ -345,6 +345,22 @@ come out the other way (dark ink).
 
 ## The page below the hero
 
+The content column opens with the live site's header content: the
+blogdescription tagline ("Laboratory for community-based and research
+justice orientated media, creative-critical research, and decolonial
+praxis.") and the primary menu (Home / About / Projects / Residents /
+Students / Support, in WP menu order), pulled from the local install
+(`wp option get blogdescription`, `wp menu item list 2`) to keep the
+prototype honest to the real thing. Translated into this page's
+two-typeface system rather than copied: the tagline keeps the live
+tagline's italic-serif-in-accent-green look (Instrument Serif standing
+in for Libre Baskerville, #1e4a26 verbatim), and the nav borrows the
+project-meta's tracked-uppercase Georgia voice since Inter is banned
+here (see the .page-projects comment). The giant pinned title IS this
+page's site-title, so only tagline + nav are needed. Links are href="#"
+-- their real targets are WP permalinks this static prototype doesn't
+have.
+
 `.hero` is `position: fixed`, so it takes up no space in normal document
 flow — the actual scroll room for its own interaction comes from
 `.hero-spacer`, a plain empty div right after it whose height is set by

@@ -121,6 +121,62 @@
             transition: opacity 0.5s ease;
         }
 
+        /* The live site's header content (regen_wp/header.php + the
+           primary menu from the DB), translated into this page's
+           two-typeface system. On the real site the tagline is italic
+           serif in --color-accent-green and the nav is a centered sans
+           row -- Inter is banned here (see the .page-projects comment
+           about typefaces), so the nav borrows the project-meta's
+           tracked-uppercase Georgia voice instead. The giant pinned
+           title IS this page's site-title, so only tagline + nav live
+           here, at the top of the content column, riding .page-content's
+           fade-in and scrolling under the floating title like everything
+           else. */
+        .page-header {
+            margin: 0 auto 64px;
+            text-align: center;
+            /* No max-width here on purpose: the live nav centers across
+               the full page width, and confining six tracked-uppercase
+               items to the 640px copy column just wraps them. The tagline
+               keeps the column for itself below. */
+        }
+
+        .page-tagline {
+            max-width: 640px;
+            margin: 0 auto;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-size: 1.2em;
+            line-height: 1.45;
+            color: #1e4a26; /* regen_wp --color-accent-green: the live tagline's exact color */
+        }
+
+        .page-nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px 45px; /* column-gap matches the live nav's 45px */
+            margin: 26px 0 0;
+            padding: 0;
+        }
+
+        .page-nav a {
+            font-family: Georgia, serif;
+            font-size: 0.82em;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--page-text);
+            text-decoration: none;
+            border-bottom: 1px solid transparent; /* reserves the underline space; hover flips it green like the live site's accent */
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .page-nav a:hover {
+            color: #1e4a26;
+            border-bottom-color: #1e4a26;
+        }
+
         /* The growing-drop-cap paragraph, reused from
            design-revamp/pretext-experiment/ -- see the script at the
            bottom for how it works and what changed.
@@ -196,6 +252,14 @@
         @media (max-width: 640px) {
             .project-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .page-tagline {
+                font-size: 1.05em;
+            }
+
+            .page-nav ul {
+                gap: 10px 22px;
             }
         }
 
@@ -706,6 +770,25 @@
          nowhere (href="#") since their real target is a WordPress
          permalink this static prototype doesn't have. -->
     <main class="page-content" id="pageContent">
+        <!-- The live site's tagline (blogdescription) + primary menu
+             (Home / About / Projects / Residents / Students / Support, in
+             WP menu order), pulled from the local install for reference.
+             Links are href="#" -- their real targets are WP permalinks
+             this static prototype doesn't have, same as the project
+             cards' Explore links below. -->
+        <header class="page-header">
+            <p class="page-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+            <nav class="page-nav" aria-label="Primary">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Projects</a></li>
+                    <li><a href="#">Residents</a></li>
+                    <li><a href="#">Students</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </nav>
+        </header>
         <div class="dropcap-container" id="dropcapContainer">
             <canvas id="dropcapCanvas"></canvas>
         </div>
