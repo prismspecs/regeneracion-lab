@@ -596,24 +596,9 @@ Black Arts & Radicalism Archive, `#30` Museum of Us Exhibit), pulled via
 picked for range: one with no `project_style` set (defaults to
 turquoise), one `brown`, one with an external `project_link_url` instead
 of an internal permalink. Testing a structurally different kind of
-content than body paragraphs — headings, short meta lines, datelines —
-against the same wash/photo treatment was the point of adding it.
-
-Styling is deliberately NOT the floating accent-barred card (the
-colored left-border-plus-soft-shadow default that reads as AI slop
-everywhere). The namesake is a turn-of-the-century anarchist newspaper
-(see PRODUCT.md), so the cards are boxed stories in that paper's own
-language instead: hairline-ruled boxes (`--ink-rule`, the same warm-ink
-family as `#outlineGroup`'s stroke) on aged stock (`--paper #fbf9f4`,
-which reads as paper against the white wash without going
-sepia-costume), no shadows, sharp corners. The section header is a
-newspaper section divider — tracked caps held between double rules —
-the badge became a kicker (tracked caps centered between two short
-hairlines), the meta line a dateline over a soft rule that separates
-each card's head from its body, and the body copy is justified with
-hyphenation — the strongest single newspaper signal there is, and safe
-at this column width. Brand accents survive only as small typographic
-doses: kicker, dateline, and the tracked EXPLORE link.
+content than body paragraphs — headings, short meta lines, colored card
+backgrounds — against the same wash/photo treatment was the point of
+adding it.
 
 Colors are the live theme's own accent variables
 (`regen_wp/style.css` → `--color-secondary-green` `#2a9d8f`,

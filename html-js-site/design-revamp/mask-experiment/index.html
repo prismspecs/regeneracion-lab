@@ -229,37 +229,18 @@
            the live theme's Inter/IBM Plex Mono -- reintroducing that
            would be exactly the "too many typefaces" problem this page
            already solved once. */
-        /* Newspaper treatment for the projects section (the site's
-           namesake is the turn-of-the-century anarchist paper
-           Regeneracion -- see PRODUCT.md): boxed stories with hairline
-           rules on aged paper. No floating-card shadows, no colored
-           edge bars; the brand accents survive only as small typographic
-           doses (kicker, dateline, link). --ink-rule is the same warm
-           ink family as #outlineGroup's stroke; --paper reads as aged
-           stock against the white wash without going sepia-costume. */
         .page-projects {
-            --ink-rule: rgba(20, 16, 12, 0.4);
-            --ink-rule-soft: rgba(20, 16, 12, 0.18);
-            --paper: #fbf9f4;
             max-width: 880px;
-            margin: 72px auto 0;
+            margin: 64px auto 0;
         }
 
-        /* Section header as a newspaper section divider: tracked caps
-           held between double rules. */
         .page-projects h2 {
             font-family: 'Instrument Serif', Georgia, serif;
-            font-style: normal;
+            font-style: italic;
             font-weight: 400;
-            font-size: 1.6em;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            text-align: center;
+            font-size: 2em;
+            margin-bottom: 28px;
             color: var(--page-text);
-            border-top: 3px double var(--ink-rule);
-            border-bottom: 3px double var(--ink-rule);
-            padding: 16px 0;
-            margin-bottom: 40px;
         }
 
         .project-grid {
@@ -283,9 +264,10 @@
         }
 
         .project-card {
-            background: var(--paper);
-            border: 1px solid var(--ink-rule);
-            padding: 26px 28px;
+            background: #fff;
+            border-left: 3px solid var(--project-accent, #2a9d8f);
+            padding: 28px 30px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
         }
 
         .project-card--turquoise {
@@ -294,81 +276,58 @@
 
         .project-card--brown {
             --project-accent: #9c5424;
+            background: #f9f6f3;
         }
 
-        /* Kicker: tracked caps centered between two short hairlines --
-           the old-paper move that replaces the bordered pill. */
         .project-card .project-badge {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            display: inline-block;
             font-family: Georgia, serif;
-            font-size: 0.78em;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
+            font-style: italic;
+            font-size: 0.8em;
             color: var(--project-accent);
-            margin-bottom: 16px;
-        }
-
-        .project-card .project-badge::before,
-        .project-card .project-badge::after {
-            content: '';
-            flex: 1;
-            border-top: 1px solid currentColor;
-            opacity: 0.45;
+            border: 1px solid var(--project-accent);
+            padding: 3px 10px;
+            margin-bottom: 14px;
         }
 
         .project-card h3 {
             font-family: 'Instrument Serif', Georgia, serif;
             font-weight: 400;
-            font-size: 1.5em;
-            line-height: 1.15;
-            margin-bottom: 8px;
+            font-size: 1.4em;
+            line-height: 1.2;
+            margin-bottom: 10px;
             color: var(--page-text);
         }
 
-        /* Dateline: tracked caps over a hairline that separates the
-           card's head from its body -- the paper's own structure, not
-           decoration. */
         .project-card .project-meta {
             font-family: Georgia, serif;
             font-style: italic;
-            font-size: 0.82em;
-            letter-spacing: 0.08em;
+            font-size: 0.85em;
+            letter-spacing: 0.02em;
             text-transform: uppercase;
             color: var(--project-accent);
-            padding-bottom: 14px;
-            margin-bottom: 16px;
-            border-bottom: 1px solid var(--ink-rule-soft);
+            margin-bottom: 14px;
         }
 
-        /* Body copy: justified with hyphenation -- the strongest single
-           newspaper signal there is, and safe at this column width. */
         .project-card p {
             font-family: Georgia, serif;
-            font-size: 15.5px;
+            font-size: 16px;
             line-height: 24px;
-            color: rgba(26, 26, 26, 0.88);
-            margin-bottom: 18px;
-            text-align: justify;
-            hyphens: auto;
-            -webkit-hyphens: auto;
+            color: var(--page-text);
+            margin-bottom: 16px;
         }
 
         .project-card a {
             font-family: Georgia, serif;
-            font-size: 0.78em;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
+            font-style: italic;
+            font-size: 15px;
             color: var(--project-accent);
             text-decoration: none;
             border-bottom: 1px solid currentColor;
-            padding-bottom: 1px;
         }
 
         .project-card a:hover {
-            color: var(--page-text);
-            border-bottom-color: var(--page-text);
+            opacity: 0.7;
         }
 
         .hero-image {
@@ -809,11 +768,7 @@
          #17 and #20 both have project_badge "NEW" that never actually
          renders on the live site); and #17/#20's "Explore" links go
          nowhere (href="#") since their real target is a WordPress
-         permalink this static prototype doesn't have. Styling note:
-         the cards are deliberately not floating accent-barred boxes --
-         boxed hairline-rule stories on aged paper, which is the
-         namesake newspaper's own visual language; the brand accents
-         survive only in the kicker, dateline, and link. -->
+         permalink this static prototype doesn't have. -->
     <main class="page-content" id="pageContent">
         <!-- The live site's tagline (blogdescription) + primary menu
              (Home / About / Projects / Residents / Students / Support, in
