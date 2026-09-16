@@ -1055,7 +1055,11 @@
         }
 
         let metrics = layout();
-        let activated = false;
+        // Initialized from the actual scroll position, not hardcoded
+        // false: a browser-restored reload deep into the page (scroll
+        // 3000, say) should render the pinned end-state immediately,
+        // not flash the at-rest hero while scrolled into the content.
+        let activated = window.scrollY > ACTIVATE_AT;
 
         const ANIMATED_ELS = [titleWhite, titleWindow, titleWindowPhoto, wash, washTitleGroup, outlineGroup, heroImage, quote, pageContent, titleCap];
 
@@ -1173,13 +1177,48 @@
             }
         }
 
+        // The intro hold. Problem it solves: wheel momentum doesn't
+        // know the title takes 2s to rise. A two-notch flick crosses
+        // ACTIVATE_AT and keeps going, so by the time the title lands,
+        // .page-content has already scrolled up into (or past) the
+        // title's row -- the user never sees the arrival, and the whole
+        // choreography reads as already-over. So: any scroll that
+        // crosses ACTIVATE_AT while still within INTRO_HOLD_MAX_Y of
+        // the top is HELD at (up to) INTRO_HOLD_Y until the rise
+        // finishes -- one notch and five notches end in the same place,
+        // with the content waiting just below the title. Excess wheel
+        // input during the hold is swallowed (the clamp is upward-only:
+        // scrolling back up stays live, and reaching DEACTIVATE_AT
+        // clears the hold in onScroll's flip branch, so the reverse
+        // animation is never pinned). Activation that arrives already
+        // past INTRO_HOLD_MAX_Y -- browser-restored scroll, an End-key
+        // jump -- skips the hold entirely rather than yanking the user
+        // back to the top from deep in the page.
+        const INTRO_HOLD_MS = 2000;   // matches the 2s rise it protects
+        const INTRO_HOLD_Y = 100;     // the held position: content top lands ~325px down, just below the title
+        const INTRO_HOLD_MAX_Y = 600; // ~5 wheel notches; beyond this, no hold
+        let introLockUntil = 0;
+        let introClampY = 0;
+
         function onScroll() {
             const y = window.scrollY;
             const next = activated ? y > DEACTIVATE_AT : y > ACTIVATE_AT;
             if (next !== activated) {
                 activated = next;
+                if (activated && y <= INTRO_HOLD_MAX_Y) {
+                    introLockUntil = performance.now() + INTRO_HOLD_MS;
+                    introClampY = Math.min(y, INTRO_HOLD_Y);
+                    if (y > introClampY) window.scrollTo(0, introClampY);
+                } else {
+                    introLockUntil = 0;
+                }
                 applyState();
                 notifyDropcap();
+            }
+            // Upward-only clamp during the hold: momentum and extra
+            // notches get re-pinned to the held position every event.
+            if (introLockUntil && performance.now() < introLockUntil && y > introClampY) {
+                window.scrollTo(0, introClampY);
             }
         }
 
