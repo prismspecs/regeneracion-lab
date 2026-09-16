@@ -299,8 +299,11 @@
         }
 
         /* Plain white title glyph — this is literally what "the title in
-           white" is. No mask, just a filled path. Fades out as .wash fades
-           in, so the crossfade reads as the letters "filling" with image. */
+           white" is. No mask, just a filled path. Fades out while the
+           photo-filled layer fades in, so the letters read as "filling"
+           with the photo. Fade timing is flag-controlled: 2s (the shared
+           ease) by default, 0.5s under .fast-fill -- the FAST_FILL flag,
+           see the renderer flags in the script for both options' story. */
         .title-white {
             position: absolute;
             left: 50%;
@@ -310,6 +313,57 @@
             display: block;
             filter: drop-shadow(0 2px 18px rgba(0, 0, 0, 0.35));
             transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ---- Option B: the 'window' title renderer (TITLE_RENDERER) ----
+           A title-sized div clipped to the letterforms by an element-local
+           mask-image (built at startup from the same DOM paths the SVG
+           mask holds -- the letterforms still have one source of truth),
+           with a full-viewport copy of the hero photo inside it,
+           counter-translated by the exact inverse of this element's own
+           transform. That keeps the photo registered to the viewport
+           while the glyphs rise -- the same "window" semantics as the SVG
+           mask hole -- and it mirrors the hero image's 1.06 activation
+           zoom with a matching scale about the same (viewport) center.
+           Both transforms are GPU-composited and the mask is static
+           relative to its own layer, so nothing re-rasterizes per frame
+           and the fill can never trail the glyphs the way the 'mask'
+           renderer's CPU-rasterized hole does under load. Hidden
+           entirely in 'mask' mode. */
+        .title-window {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            /* width + height set by JS */
+            transform: translate(-50%, 0);
+            overflow: hidden; /* clip the viewport-sized photo to the title box; the mask then shapes it */
+            opacity: 0;
+            mask-repeat: no-repeat;
+            -webkit-mask-repeat: no-repeat;
+            mask-size: 100% 100%;
+            -webkit-mask-size: 100% 100%;
+            will-change: transform, opacity;
+            transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .title-window-photo {
+            position: absolute;
+            left: 0;
+            top: 0;
+            /* width/height = viewport, set by JS */
+            object-fit: cover; /* identical to .hero-image */
+            transform-origin: center center;
+            filter: contrast(1.05) saturate(1.1) brightness(0.95); /* identical to .hero-image, so letter content matches the backdrop tone-for-tone */
+            will-change: transform;
+            transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* FAST_FILL (option A): the quick in-place fade, as a class on
+           <html> set once at startup from the flag, so both glyph layers
+           switch timing together. */
+        .fast-fill .title-white,
+        .fast-fill .title-window {
+            transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
         }
 
         /* SVG transform is a CSS property in modern browsers, so it
@@ -512,6 +566,15 @@
             </g>
         </svg>
 
+        <!-- Option B's mask title (TITLE_RENDERER = 'window'): the glyph
+             shapes come from an element-local mask-image built at startup
+             from the same paths the SVG mask holds; the photo inside is
+             counter-translated so it stays viewport-registered while this
+             element rises. See the .title-window CSS above. -->
+        <div class="title-window" id="titleWindow">
+            <img class="title-window-photo" id="titleWindowPhoto" alt="">
+        </div>
+
         <svg class="title-white" id="titleWhite" viewBox="0 0 1281.50 97.00" preserveAspectRatio="xMidYMid meet">
             <path fill="white" d="M66 38.30L66 38.30Q66 46.60 61.20 52.20Q56.40 57.80 45.90 59.70L45.90 59.70L69.10 86.30Q71.50 89.10 74.80 90.55Q78.10 92 81.50 92L81.50 92L81.50 96L57.80 96L33 65.60Q31.40 63.60 30 62.50Q28.60 61.40 27.45 60.95Q26.30 60.50 25.20 60.50L25.20 60.50L25.20 80.10Q25.20 85 26.20 87.60Q27.20 90.20 30.30 91.10Q33.40 92 39.70 92L39.70 92L39.70 96L0 96L0 92Q4.40 92 6.65 91.10Q8.90 90.20 9.70 87.75Q10.50 85.30 10.50 80.60L10.50 80.60L10.50 34.40Q10.50 29.70 9.85 27.35Q9.20 25 7.20 24.10Q5.20 23.20 1.10 23L1.10 23L1.10 19L35.70 19Q50.10 19 58.05 24.10Q66 29.20 66 38.30ZM25.20 26.30L25.20 26.30L25.20 54.50L31.70 54.50Q41.10 54.50 45.75 50.80Q50.40 47.10 50.40 38.80L50.40 38.80Q50.40 32.40 46.50 28.50Q42.60 24.60 35.70 24.60L35.70 24.60L27 24.60Q25.20 24.60 25.20 26.30Z" />
             <path fill="white" d="M106.70 28L106.70 28L106.70 53.40Q113.10 53.40 117 53Q120.90 52.60 123.05 51.35Q125.20 50.10 126.15 47.65Q127.10 45.20 127.50 41.20L127.50 41.20L131.20 41.20L131.20 70.50L127.50 70.50Q126.90 66.40 125.85 64Q124.80 61.60 122.70 60.45Q120.60 59.30 116.80 58.90Q113 58.50 106.70 58.50L106.70 58.50L106.70 79.10Q106.70 83.40 108.30 85.90Q109.90 88.40 113.65 89.45Q117.40 90.50 123.80 90.50L123.80 90.50Q131.40 90.50 135.95 89Q140.50 87.50 143 83.70Q145.50 79.90 146.90 73.10L146.90 73.10L150.90 73.10L149.30 96L81.50 96L81.50 92Q86 91.80 88.25 90.95Q90.50 90.10 91.25 87.70Q92 85.30 92 80.60L92 80.60L92 34.40Q92 29.70 91.30 27.35Q90.60 25 88.60 24.10Q86.60 23.20 82.60 23L82.60 23L82.60 19L145.80 19L146.50 38.60L142.20 38.60Q141.40 33 139.30 29.90Q137.20 26.80 133.05 25.55Q128.90 24.30 121.80 24.30L121.80 24.30L110.50 24.30Q108 24.30 107.35 24.95Q106.70 25.60 106.70 28Z" transform="translate(6, 0)" />
@@ -665,6 +728,47 @@
         // it to have visually reached its safe top zone first. Short
         // enough to read as "arriving with the title," not after it.
         const CONTENT_REVEAL_DELAY_MS = 900;
+        // The "title turns totally black at the top" feature, on a
+        // switch. .title-cap is a solid duplicate of the pinned title
+        // (opaque --wash-color backdrop + solid --page-text glyphs)
+        // layered above .page-content -- added so paragraph text
+        // scrolling up into the title's row can't double-expose over
+        // the letters. The cost: while it's faded in it covers the
+        // real mask window outright, so the photo-through-the-letters
+        // effect AND the outline traced around it both vanish the
+        // moment the title pins. false (current preference) keeps the
+        // mask + outline live at the pinned state and accepts the
+        // deep-scroll legibility trade-off; flip to true to bring the
+        // solid cap back.
+        const SOLID_TITLE_CAP = false;
+        // ---- Renderer flags (options A and B, both kept available) -----
+        // TITLE_RENDERER picks how the photo-through-the-letters effect is
+        // produced:
+        //   'window' -- option B (default). .wash's rect loses its mask
+        //     attribute at startup (plain solid wash, nothing rasterized
+        //     per frame) and .title-window draws the letters instead: a
+        //     title-sized div masked by an element-local glyph mask, with
+        //     a viewport-sized copy of the hero photo inside it
+        //     counter-translated to stay viewport-registered. Every
+        //     moving part is a composited element transform, so the fill
+        //     can't trail the glyphs the way the 'mask' renderer's hole
+        //     does under load.
+        //   'mask' -- option A's original architecture, kept working as a
+        //     fallback: the SVG mask punches the title-shaped hole out of
+        //     the wash rect and #washTitleGroup carries the hole's
+        //     transform. The hole is mask *content*, so the full-viewport
+        //     mask re-rasterizes on the CPU every frame of the rise --
+        //     under load it trails the composited white title, visible
+        //     mid-crossfade as one title lagging behind the other (worse
+        //     in Firefox than Chrome in testing).
+        const TITLE_RENDERER = 'window';
+        // FAST_FILL -- option A: fade the white title out / the window
+        // layer in over 0.5s instead of the full 2s, so the "fill" beat
+        // happens in place at the bottom rather than spread across the
+        // rise. Built as a cheaper lag mitigation for 'mask' mode;
+        // harmless but unnecessary in 'window' mode (both layers there
+        // are composited and stay pixel-aligned even mid-crossfade).
+        const FAST_FILL = false;
 
         const chosenImage = IMAGE_POOL[Math.floor(Math.random() * IMAGE_POOL.length)];
         const heroImage = document.getElementById('heroImage');
@@ -732,6 +836,44 @@
         const pageContent = document.getElementById('pageContent');
         const titleCap = document.getElementById('titleCap');
         const titleCapGlyphs = document.getElementById('titleCapGlyphs');
+        const washRect = wash.querySelector('.wash-rect');
+        const titleWindow = document.getElementById('titleWindow');
+        const titleWindowPhoto = document.getElementById('titleWindowPhoto');
+
+        // One-time renderer setup (see the flags above; they're consts by
+        // design -- changing them needs a reload, not a runtime toggle).
+        if (FAST_FILL) document.documentElement.classList.add('fast-fill');
+
+        if (TITLE_RENDERER === 'window') {
+            // Solid wash: the hole is .title-window's job now. Dropping
+            // the attribute outright (rather than CSS-overriding it)
+            // leaves nothing for the browser to keep re-rasterizing.
+            washRect.removeAttribute('mask');
+            // The window's fill must be the hero photo itself -- same
+            // src, resolved to the same URL, decoded once.
+            titleWindowPhoto.src = heroImage.src;
+            // Element-local glyph mask, generated from the live mask
+            // paths -- one source of truth for the letterforms, the same
+            // trick #outlineGroup and #titleCapGlyphs achieve via <use>
+            // (which can't be used here: CSS mask-image needs a URL, not
+            // a same-document node). White fills + the default luminance
+            // mask keep this maximally compatible; the paths carry their
+            // own per-glyph kerning transforms.
+            const glyphPaths = Array.from(washTitleGroup.querySelectorAll('path'))
+                .map(function (p) {
+                    const t = p.getAttribute('transform');
+                    return '<path fill="#fff" d="' + p.getAttribute('d') + '"' +
+                        (t ? ' transform="' + t + '"' : '') + '/>';
+                })
+                .join('');
+            const glyphSVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + VB_W + ' ' + VB_H + '">' + glyphPaths + '</svg>';
+            const glyphMaskURL = 'url("data:image/svg+xml,' + encodeURIComponent(glyphSVG) + '")';
+            titleWindow.style.maskImage = glyphMaskURL;
+            titleWindow.style.webkitMaskImage = glyphMaskURL;
+        } else {
+            // 'mask' mode: the window layer never paints.
+            titleWindow.style.display = 'none';
+        }
 
         function layout() {
             const vw = document.documentElement.clientWidth;
@@ -767,6 +909,14 @@
 
             titleWhite.style.width = renderedWidth + 'px';
 
+            // .title-window matches .title-white's box exactly; the photo
+            // inside is viewport-sized, and object-fit: cover makes it
+            // render identically to .hero-image at that size.
+            titleWindow.style.width = renderedWidth + 'px';
+            titleWindow.style.height = scaledHeight + 'px';
+            titleWindowPhoto.style.width = vw + 'px';
+            titleWindowPhoto.style.height = vh + 'px';
+
             // .title-cap (see its CSS/markup comments) reads this to clip
             // itself to exactly the title's own rendered height -- the one
             // remaining use of this variable now that .page-content is
@@ -779,7 +929,7 @@
         let metrics = layout();
         let activated = false;
 
-        const ANIMATED_ELS = [titleWhite, wash, washTitleGroup, outlineGroup, heroImage, quote, pageContent, titleCap];
+        const ANIMATED_ELS = [titleWhite, titleWindow, titleWindowPhoto, wash, washTitleGroup, outlineGroup, heroImage, quote, pageContent, titleCap];
 
         // The animation itself is a plain CSS transition (see the
         // `transition` rules on .hero-image / .wash / .title-white /
@@ -799,6 +949,19 @@
             titleWhite.style.transform = 'translate(-50%, ' + y + 'px)';
             titleWhite.style.opacity = activated ? 0 : 1;
 
+            // .title-window rides the exact same transform as
+            // .title-white (the compositor handles both), while its photo
+            // child counter-translates by the exact inverse so the fill
+            // stays viewport-registered -- its scale mirrors the hero
+            // image's activation zoom about the same (viewport) center,
+            // so letter content and backdrop stay in lockstep there too.
+            if (TITLE_RENDERER === 'window') {
+                titleWindow.style.transform = 'translate(-50%, ' + y + 'px)';
+                titleWindow.style.opacity = activated ? 1 : 0;
+                titleWindowPhoto.style.transform =
+                    'translate(' + (-metrics.xOffset) + 'px, ' + (-y) + 'px) scale(' + (activated ? 1.06 : 1) + ')';
+            }
+
             washTitleGroup.style.transform =
                 'translate(' + metrics.xOffset + 'px, ' + y + 'px) scale(' + metrics.scale + ')';
             wash.style.opacity = activated ? 1 : 0;
@@ -813,13 +976,14 @@
             // .title-cap's glyphs snap to the exact same transform as
             // #outlineGroup (same reasoning: no transition, since it's
             // one SVG group mirroring another frame-for-frame) so the two
-            // stay in perfect registration -- from the viewer's side,
-            // .title-cap is invisible whenever .page-content hasn't
-            // reached this row yet, so it only actually matters once both
-            // are already settled at the pinned position anyway.
+            // stay in perfect registration if the cap is ever enabled.
+            // The cap itself is gated on SOLID_TITLE_CAP (see the
+            // tunables above): when off it never fades in, and the
+            // pinned title stays the live mask window + outline instead
+            // of going solid.
             titleCapGlyphs.style.transform = washTitleGroup.style.transform;
             titleCap.style.transitionDelay = activated ? '2s' : '0s';
-            titleCap.style.opacity = activated ? 1 : 0;
+            titleCap.style.opacity = (activated && SOLID_TITLE_CAP) ? 1 : 0;
 
             heroImage.style.transform = 'scale(' + (activated ? 1.06 : 1) + ')';
 

@@ -59,9 +59,11 @@ container that fills the viewport for the whole page:
    is where the photo peeks through.
 3. **`.title-white`** — the same title glyphs again, but drawn as plain
    solid white shapes (no mask), sitting on top of `.wash`. This is what
-   you actually see at rest. It fades to `opacity: 0` exactly as `.wash`
-   fades to `opacity: 1`, so the crossfade reads as the white letters
-   "filling in" with the photo.
+   you actually see at rest. It fades to `opacity: 0` while the
+   photo-filled layer fades in, so the letters read as "filling in" with
+   the photo. Fade timing is flag-controlled: 2s (the shared ease) by
+   default, or `0.5s` under `FAST_FILL` — see "Two renderers" below for
+   why that option exists.
 4. **`#outlineGroup`** — a thin stroked outline traced around the same
    letterforms, sitting on top of everything. Guarantees the pinned title
    stays legible as a shape even when the photo showing through it
@@ -74,6 +76,50 @@ container that fills the viewport for the whole page:
    `transitionDelay` until that rise has actually finished. Tying its
    opacity to the same trigger as `.wash` (both `2s`, both starting
    together) made it visibly trail behind the moving letters instead.
+
+### Two renderers for the mask effect (`TITLE_RENDERER`)
+
+The photo-through-the-letters effect ships with two implementations,
+switchable with `TITLE_RENDERER` at the top of the `<script>` block.
+Both produce the same four states; they differ in *how* the pinned
+title's window onto the photo is drawn, and that difference turned out
+to be the whole story behind a visible lag.
+
+- **`'window'` (option B, default).** The wash rect loses its SVG
+  `mask` attribute at startup — it becomes a plain solid rectangle whose
+  opacity fade is GPU-composited, with nothing re-rasterized per frame.
+  The title-shaped window is `.title-window` instead: a title-sized div
+  clipped to the letterforms by an element-local `mask-image`
+  (generated at startup from the same DOM paths the SVG mask holds, so
+  the letterforms still have exactly one source of truth). Inside it, a
+  full-viewport copy of the hero photo is counter-translated by the
+  exact inverse of the title's own transform, keeping the photo
+  registered to the viewport while the glyphs rise, and it mirrors the
+  hero image's `1.06` activation zoom with a matching scale about the
+  same center. Every moving part is a composited element transform and
+  the mask is static relative to its own layer, so the fill can never
+  shear away from the glyphs — the two can't run on different clocks
+  because there is only one clock.
+- **`'mask'` (option A's architecture, kept working as a fallback).**
+  The original three-layer design described in the numbered list above:
+  the SVG mask punches a title-shaped hole out of the wash rect, and
+  `#washTitleGroup` carries the hole's transform. The catch: the hole is
+  mask *content*, so the full-viewport mask re-rasterizes on the CPU
+  every frame of the rise while `.title-white` animates on the GPU
+  compositor. Under load the rasterized side trails by a few frames,
+  and mid-crossfade — when both glyph layers are visible — that reads
+  as one title lagging behind the other (worse in Firefox than Chrome
+  in testing, and unresponsive to the `FAST_FILL` mitigation in
+  practice). This is the mode to fall back to if `'window'` ever
+  misbehaves in some browser; it is exactly the pre-option-B behavior.
+
+`FAST_FILL` (option A's timing tweak) works in either renderer: it
+swaps the 2s crossfade between `.title-white` and the photo-filled
+layer for a 0.5s in-place fade (a `.fast-fill` class on `<html>`, set
+once at startup). It was the first, cheaper attempt at hiding the
+`'mask'` renderer's pipeline lag; in `'window'` mode there is no lag to
+hide, so it defaults to off — but it's a one-word change if the faster
+"fill" beat is ever preferred on its own merits.
 
 ### Wash color
 
@@ -222,8 +268,11 @@ restoring it — so only scroll-triggered changes actually animate.
 | `BOTTOM_MARGIN_FRACTION` | Gap from the bottom edge at rest (`0` = flush; the glyphs already reach the edge of their own viewBox, so no margin is needed to avoid clipping) |
 | `ACTIVATE_AT` / `DEACTIVATE_AT` | Scroll distance (px) that triggers the rise / the reverse (two different thresholds avoid flicker right at the boundary) |
 | `CONTENT_REVEAL_DELAY_MS` | How long `.page-content` (and the drop cap) wait after the title starts rising before they fade in -- see "The page below the hero" |
+| `FAST_FILL` | Option A's timing tweak: fades the white title / photo-filled layer over 0.5s instead of 2s. Currently off -- see "Two renderers" |
+| `SOLID_TITLE_CAP` | The "title turns totally black at the top" feature, on a switch. `true` fades `.title-cap` (an opaque solid duplicate of the pinned title) in over the mask window 2s after activation, for deep-scroll legibility (see "The page below the hero"); `false` (current preference) never shows it, so the pinned title stays the live photo-through-the-letters mask with `#outlineGroup`'s edge stroke instead. |
+| `TITLE_RENDERER` | `'window'` (default, option B) or `'mask'` (option A's architecture, kept as a fallback) — how the photo-through-the-letters effect is produced; see "Two renderers" under "How it's built" |
 | `.hero-spacer` height, set in `layout()` | `max(ACTIVATE_AT * 6, 425)` — enough scroll room to cross `ACTIVATE_AT`, confirm the pin holds, and leave the first paragraph clear of the title at a realistic scroll gesture, deliberately *not* padded with an extra viewport on top (see "The page below the hero" for the history of this number -- three different floors were tried and reported back wrong in both directions before landing here: `vh + 300` read as a dead scroll stretch with no content, `300` alone read as the paragraph crowding the title, `550` read as too much gap). Was `vh * 2.2` even earlier still, a leftover from a version that scrubbed the whole animation across the scroll distance. |
-| the `2s cubic-bezier(0.16, 1, 0.3, 1)` in each `transition` rule | Animation duration/easing — all the position/opacity-animated layers (image, wash, title, wash's title group, quote) share this so they stay in sync; `.page-content` and `.title-cap` fade on their own shorter timers instead (see "The page below the hero") |
+| the `2s cubic-bezier(0.16, 1, 0.3, 1)` in each `transition` rule | Animation duration/easing — all the position-animated layers (image, wash, title, wash's title group) plus the quote's opacity share this so they stay in sync; `.title-white`'s opacity (0.5s — see "How it's built" bullet 3, hides the compositor/raster pipeline gap between the two glyph layers), `.page-content`, and `.title-cap` fade on their own shorter timers instead (see "The page below the hero") |
 | `--title-height`, set in `layout()` | The title's own rendered height, in px -- the one thing that reads it is `.title-cap`'s `height` (clips it to exactly the title's row, see "The page below the hero" for why that element exists) |
 
 Two more tunables live as CSS custom properties on `:root` instead, since
@@ -404,13 +453,27 @@ is the point, not something to prevent.
   `#outlineGroup` still do the real thing exactly as before. Solid and
   legible beat "technically still the photo effect, but illegible" here.
 
+  **Update -- now on a switch:** `SOLID_TITLE_CAP` (see Tunables),
+  default `false`. The cap turned out not to wait for deep scrolling at
+  all: it faded in 2s after the title *pinned*, covering the mask
+  window outright (the "title turns totally black at the top" report)
+  and hiding `#outlineGroup` behind its opaque backdrop at the same
+  moment -- two regressions from one layer. With the flag off, the cap
+  never fades in: the photo-through-the-letters effect and the outline
+  persist at the pinned state, which is the current preference, at the
+  accepted cost of the deep-scroll double-exposure described above.
+  Flip the flag to `true` to restore the solid-cap behavior exactly as
+  written here.
+
 `.page-content` no longer needs `pointer-events: none` while invisible,
 either -- that was specifically for the fixed-overlay era, when it
 covered the whole remaining viewport at all times regardless of opacity.
 Back in normal flow, it's off-screen (below the fold) until scrolled to,
 same as any other page content.
 
-One consequence worth knowing, now resolved by `.title-cap`: `.page-content`
+One consequence worth knowing, resolved by `.title-cap` while it's
+enabled (`SOLID_TITLE_CAP`; off by default, so currently an accepted
+trade-off rather than a resolved one): `.page-content`
 still has no background of its own (see "Wash color" above for why), and
 its actual content — the paragraphs, the projects grid — sits in a
 centered column narrower than the full viewport. Before `.title-cap`
