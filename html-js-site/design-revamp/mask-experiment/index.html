@@ -177,6 +177,112 @@
             border-bottom-color: #1e4a26;
         }
 
+        /* Slim Top Bar: sleek, slim sticky navigation that glides down
+           when the giant title scrolls off the top of the screen. */
+        .slim-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 52px;
+            z-index: 100;
+            background: rgba(250, 248, 245, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(33, 26, 18, 0.09);
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        }
+
+        .slim-topbar.is-visible {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .slim-topbar-inner {
+            max-width: 1200px;
+            height: 100%;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slim-topbar-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1.45rem;
+            color: var(--page-text);
+            text-decoration: none;
+            line-height: 1;
+            letter-spacing: 0.01em;
+            transition: opacity 0.2s ease;
+        }
+
+        .slim-topbar-title:hover {
+            opacity: 0.7;
+        }
+
+        .slim-topbar-nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .slim-topbar-nav a {
+            font-family: Georgia, serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--page-text);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .slim-topbar-nav a:hover {
+            color: #1e4a26;
+            border-bottom-color: #1e4a26;
+        }
+
+        @media (max-width: 768px) {
+            .slim-topbar {
+                height: 48px;
+            }
+
+            .slim-topbar-inner {
+                padding: 0 16px;
+            }
+
+            .slim-topbar-title {
+                font-size: 1.25rem;
+            }
+
+            .slim-topbar-nav ul {
+                gap: 16px;
+                overflow-x: auto;
+                white-space: nowrap;
+                scrollbar-width: none;
+            }
+
+            .slim-topbar-nav ul::-webkit-scrollbar {
+                display: none;
+            }
+
+            .slim-topbar-nav a {
+                font-size: 0.68rem;
+                letter-spacing: 0.1em;
+            }
+        }
+
         /* The growing-drop-cap paragraph, reused from
            design-revamp/pretext-experiment/ -- see the script at the
            bottom for how it works and what changed.
@@ -634,6 +740,26 @@
 
 <body>
 
+    <!-- Slim top bar: glides down when scrolling deep into the page,
+         replacing the giant title that scrolled off the top. Features
+         the site title on the left in Instrument Serif italic (matching
+         the Projects heading style) and the primary nav on the right. -->
+    <header class="slim-topbar" id="slimTopbar" aria-label="Site Navigation">
+        <div class="slim-topbar-inner">
+            <a href="#" class="slim-topbar-title">Regeneraci&oacute;n Lab</a>
+            <nav class="slim-topbar-nav" aria-label="Main Menu">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Projects</a></li>
+                    <li><a href="#">Residents</a></li>
+                    <li><a href="#">Students</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
     <div class="hero" id="hero">
         <!-- src is picked at random from IMAGE_POOL below on every load.
              Note: since these photos are wider than the viewport (not
@@ -1015,6 +1141,7 @@
         const washRect = wash.querySelector('.wash-rect');
         const titleWindow = document.getElementById('titleWindow');
         const titleWindowPhoto = document.getElementById('titleWindowPhoto');
+        const slimTopbar = document.getElementById('slimTopbar');
 
         // One-time renderer setup (see the flags above; they're consts by
         // design -- changing them needs a reload, not a runtime toggle).
@@ -1103,7 +1230,7 @@
             // normal document flow and doesn't need it for positioning.
             document.documentElement.style.setProperty('--title-height', scaledHeight + 'px');
 
-            return { vw, vh, xOffset, scale, yBottom, yTop };
+            return { vw, vh, xOffset, scale, yBottom, yTop, scaledHeight };
         }
 
         if ('scrollRestoration' in history) {
@@ -1128,7 +1255,10 @@
         function applyState(instant) {
             if (instant) ANIMATED_ELS.forEach(el => { el.style.transitionDuration = '0s'; });
 
-            const y = activated ? metrics.yTop : metrics.yBottom;
+            let y = activated ? metrics.yTop : metrics.yBottom;
+            if (activated && window.scrollY > LANDING_SCROLL_Y) {
+                y = -(window.scrollY - LANDING_SCROLL_Y);
+            }
 
             titleWhite.style.transform = 'translate(-50%, ' + y + 'px)';
             titleWhite.style.opacity = activated ? 0 : 1;
@@ -1191,9 +1321,65 @@
             pageContent.style.transitionDelay = activated ? (CONTENT_REVEAL_DELAY_MS / 1000) + 's' : '0s';
             pageContent.style.opacity = activated ? 1 : 0;
 
+            const titleOffY = LANDING_SCROLL_Y + (metrics.scaledHeight || 95);
+            if (activated && window.scrollY >= titleOffY) {
+                slimTopbar.classList.add('is-visible');
+            } else {
+                slimTopbar.classList.remove('is-visible');
+            }
+
             if (instant) {
                 ANIMATED_ELS.forEach(el => void el.offsetHeight); // force layout before re-enabling
                 ANIMATED_ELS.forEach(el => { el.style.transitionDuration = ''; });
+            }
+        }
+
+        // Real-time scroll tracking for deep scrolling (scrollY > LANDING_SCROLL_Y):
+        // Scrolls the giant title off the top 1:1 like natural document content,
+        // and glides down the slim top bar once the giant title has cleared.
+        function updateScrollTracking() {
+            if (!activated) return;
+            const y = window.scrollY;
+            const titleOffY = LANDING_SCROLL_Y + (metrics.scaledHeight || 95);
+
+            if (y > LANDING_SCROLL_Y) {
+                const scrollOff = y - LANDING_SCROLL_Y;
+                const negScroll = -scrollOff;
+                titleWindow.style.transitionDuration = '0s';
+                titleWindow.style.transform = 'translate(-50%, ' + negScroll + 'px)';
+                titleWindowPhoto.style.transitionDuration = '0s';
+                titleWindowPhoto.style.transform =
+                    'translate(' + (-metrics.xOffset) + 'px, ' + scrollOff + 'px) scale(1.06)';
+                washTitleGroup.style.transitionDuration = '0s';
+                washTitleGroup.style.transform =
+                    'translate(' + metrics.xOffset + 'px, ' + negScroll + 'px) scale(' + metrics.scale + ')';
+                titleWhite.style.transitionDuration = '0s';
+                titleWhite.style.transform = 'translate(-50%, ' + negScroll + 'px)';
+                if (SHOW_TITLE_OUTLINE) {
+                    outlineLayer.style.transform = 'translate(-50%, ' + negScroll + 'px)';
+                }
+                titleCapGlyphs.style.transform = washTitleGroup.style.transform;
+            } else {
+                titleWindow.style.transitionDuration = '';
+                titleWindow.style.transform = 'translate(-50%, 0px)';
+                titleWindowPhoto.style.transitionDuration = '';
+                titleWindowPhoto.style.transform =
+                    'translate(' + (-metrics.xOffset) + 'px, 0px) scale(1.06)';
+                washTitleGroup.style.transitionDuration = '';
+                washTitleGroup.style.transform =
+                    'translate(' + metrics.xOffset + 'px, 0px) scale(' + metrics.scale + ')';
+                titleWhite.style.transitionDuration = '';
+                titleWhite.style.transform = 'translate(-50%, 0px)';
+                if (SHOW_TITLE_OUTLINE) {
+                    outlineLayer.style.transform = 'translate(-50%, 0px)';
+                }
+                titleCapGlyphs.style.transform = washTitleGroup.style.transform;
+            }
+
+            if (y >= titleOffY) {
+                slimTopbar.classList.add('is-visible');
+            } else {
+                slimTopbar.classList.remove('is-visible');
             }
         }
 
@@ -1253,6 +1439,11 @@
         function triggerExit() {
             if (!activated) return;
             activated = false;
+            slimTopbar.classList.remove('is-visible');
+            titleWindow.style.transitionDuration = '';
+            titleWindowPhoto.style.transitionDuration = '';
+            washTitleGroup.style.transitionDuration = '';
+            titleWhite.style.transitionDuration = '';
             applyState();
             notifyDropcap();
 
@@ -1285,6 +1476,8 @@
                     applyState();
                     notifyDropcap();
                 }
+            } else {
+                updateScrollTracking();
             }
         }
 
