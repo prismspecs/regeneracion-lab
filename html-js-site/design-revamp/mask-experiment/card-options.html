@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGENERACIÓN LAB — Card Design Exploration (5 Options)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #faf8f5;
+            --page-text: #211a12;
+            --wash-color: #faf8f5;
+            --accent-turquoise: #2a9d8f;
+            --accent-brown: #9c5424;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--page-bg);
+            color: var(--page-text);
+            font-family: Georgia, 'Times New Roman', serif;
+            line-height: 1.6;
+            padding: 40px 24px 120px;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        header.preview-header {
+            margin-bottom: 50px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(33, 26, 18, 0.15);
+        }
+
+        h1.preview-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 2.8rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        p.preview-subtitle {
+            font-size: 1.05rem;
+            color: rgba(33, 26, 18, 0.7);
+            max-width: 720px;
+        }
+
+        .option-section {
+            margin-bottom: 70px;
+            padding-bottom: 50px;
+            border-bottom: 1px dashed rgba(33, 26, 18, 0.2);
+        }
+
+        .option-header {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .option-number {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.8rem;
+            color: var(--accent-brown);
+        }
+
+        .option-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+        }
+
+        .option-desc {
+            font-size: 0.95rem;
+            color: rgba(33, 26, 18, 0.75);
+            margin-bottom: 24px;
+            max-width: 780px;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
+        }
+
+        /* -----------------------------------------------------------------
+           OPTION 1: THE EDITORIAL BROADSIDE / INDEX LEDGER
+           No box, no shadow. Hairline rule separator, pure typography.
+           ----------------------------------------------------------------- */
+        .card-opt1 {
+            border-top: 1px solid rgba(33, 26, 18, 0.25);
+            padding-top: 20px;
+            transition: border-color 0.2s ease;
+        }
+        .card-opt1:hover {
+            border-top-color: var(--project-accent);
+        }
+        .card-opt1--turquoise { --project-accent: var(--accent-turquoise); }
+        .card-opt1--brown { --project-accent: var(--accent-brown); }
+
+        .card-opt1 .ledger-kicker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--project-accent);
+            margin-bottom: 12px;
+        }
+        .card-opt1 .badge-pill {
+            font-style: italic;
+            font-weight: 600;
+            padding: 1px 6px;
+            border: 1px solid currentColor;
+            border-radius: 2px;
+            font-size: 0.7rem;
+            letter-spacing: 0.04em;
+        }
+        .card-opt1 h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.55rem;
+            font-weight: 400;
+            line-height: 1.25;
+            margin-bottom: 10px;
+            color: var(--page-text);
+        }
+        .card-opt1 p.copy {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: rgba(33, 26, 18, 0.82);
+            margin-bottom: 16px;
+        }
+        .card-opt1 a.cta {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--project-accent);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .card-opt1 a.cta:hover {
+            border-bottom-color: currentColor;
+            gap: 8px;
+        }
+
+        /* -----------------------------------------------------------------
+           OPTION 2: THE ARCHIVAL SPECIMEN SLIP
+           Subtle full-surface tint wash + delicate hairline frame.
+           ----------------------------------------------------------------- */
+        .card-opt2 {
+            padding: 26px 28px;
+            border-radius: 2px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-opt2--turquoise {
+            --project-accent: var(--accent-turquoise);
+            background: rgba(42, 157, 143, 0.05);
+            border: 1px solid rgba(42, 157, 143, 0.22);
+        }
+        .card-opt2--brown {
+            --project-accent: var(--accent-brown);
+            background: rgba(156, 84, 36, 0.055);
+            border: 1px solid rgba(156, 84, 36, 0.22);
+        }
+        .card-opt2:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(33, 26, 18, 0.05);
+        }
+        .card-opt2 .stamp-badge {
+            display: inline-block;
+            background: var(--project-accent);
+            color: #fff;
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 1px;
+            margin-bottom: 12px;
+        }
+        .card-opt2 h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            line-height: 1.25;
+            margin-bottom: 6px;
+            color: var(--page-text);
+        }
+        .card-opt2 .date-meta {
+            font-style: italic;
+            font-size: 0.8rem;
+            color: var(--project-accent);
+            letter-spacing: 0.03em;
+            margin-bottom: 14px;
+        }
+        .card-opt2 p.copy {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: rgba(33, 26, 18, 0.85);
+            margin-bottom: 18px;
+        }
+        .card-opt2 a.cta {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--project-accent);
+            text-decoration: none;
+            border-bottom: 1px solid currentColor;
+        }
+        .card-opt2 a.cta:hover {
+            opacity: 0.75;
+        }
+
+        /* -----------------------------------------------------------------
+           OPTION 3: THE EXHIBITION PLACARD (TOP ANCHOR LINE)
+           Crisp perimeter border with a delicate top accent band.
+           ----------------------------------------------------------------- */
+        .card-opt3 {
+            background: #fff;
+            border: 1px solid rgba(33, 26, 18, 0.15);
+            border-top: 3px solid var(--project-accent);
+            padding: 26px 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s ease;
+        }
+        .card-opt3:hover {
+            border-color: rgba(33, 26, 18, 0.3);
+            border-top-color: var(--project-accent);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        }
+        .card-opt3--turquoise { --project-accent: var(--accent-turquoise); }
+        .card-opt3--brown { --project-accent: var(--accent-brown); }
+
+        .card-opt3 .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-opt3 .tag-badge {
+            font-style: italic;
+            font-size: 0.78rem;
+            color: var(--project-accent);
+            letter-spacing: 0.02em;
+        }
+        .card-opt3 .meta-status {
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(33, 26, 18, 0.6);
+        }
+        .card-opt3 h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            line-height: 1.25;
+            margin-bottom: 12px;
+            color: var(--page-text);
+        }
+        .card-opt3 p.copy {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: rgba(33, 26, 18, 0.85);
+            margin-bottom: 18px;
+        }
+        .card-opt3 a.cta {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--project-accent);
+            text-decoration: none;
+            border-bottom: 1px solid currentColor;
+        }
+        .card-opt3 a.cta:hover {
+            opacity: 0.75;
+        }
+
+        /* -----------------------------------------------------------------
+           OPTION 4: THE MINIMALIST TYPOGRAPHIC SPECIMEN
+           Zero card containers. Organic whitespace with archival marks.
+           ----------------------------------------------------------------- */
+        .card-opt4 {
+            padding: 10px 4px;
+        }
+        .card-opt4--turquoise { --project-accent: var(--accent-turquoise); }
+        .card-opt4--brown { --project-accent: var(--accent-brown); }
+
+        .card-opt4 .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--project-accent);
+            margin-bottom: 12px;
+        }
+        .card-opt4 .eyebrow-mark {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--project-accent);
+            border-radius: 50%;
+        }
+        .card-opt4 h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.7rem;
+            font-weight: 400;
+            line-height: 1.2;
+            margin-bottom: 12px;
+            color: var(--page-text);
+        }
+        .card-opt4 p.copy {
+            font-size: 0.92rem;
+            line-height: 1.58;
+            color: rgba(33, 26, 18, 0.85);
+            margin-bottom: 16px;
+        }
+        .card-opt4 a.cta {
+            font-style: italic;
+            font-size: 1rem;
+            color: var(--project-accent);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.2s ease;
+        }
+        .card-opt4 a.cta:hover {
+            gap: 10px;
+        }
+
+        /* -----------------------------------------------------------------
+           OPTION 5: THE ARCHIVAL DOSSIER TAB
+           Two-tone catalog folder: structured index header bar + clean body.
+           ----------------------------------------------------------------- */
+        .card-opt5 {
+            background: #fff;
+            border: 1px solid rgba(33, 26, 18, 0.14);
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(33, 26, 18, 0.04);
+            transition: all 0.2s ease;
+        }
+        .card-opt5:hover {
+            border-color: rgba(33, 26, 18, 0.28);
+            box-shadow: 0 6px 20px rgba(33, 26, 18, 0.07);
+        }
+        .card-opt5--turquoise { --project-accent: var(--accent-turquoise); }
+        .card-opt5--brown { --project-accent: var(--accent-brown); }
+
+        .card-opt5 .dossier-header {
+            background: rgba(33, 26, 18, 0.03);
+            border-bottom: 1px solid rgba(33, 26, 18, 0.1);
+            padding: 10px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-opt5 .dossier-tag {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--project-accent);
+        }
+        .card-opt5 .dossier-date {
+            font-style: italic;
+            font-size: 0.8rem;
+            color: rgba(33, 26, 18, 0.6);
+        }
+        .card-opt5 .dossier-body {
+            padding: 22px;
+        }
+        .card-opt5 h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.45rem;
+            font-weight: 400;
+            line-height: 1.25;
+            margin-bottom: 10px;
+            color: var(--page-text);
+        }
+        .card-opt5 p.copy {
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: rgba(33, 26, 18, 0.85);
+            margin-bottom: 16px;
+        }
+        .card-opt5 a.cta {
+            font-style: italic;
+            font-size: 0.92rem;
+            color: var(--project-accent);
+            text-decoration: none;
+            border-bottom: 1px solid currentColor;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="preview-header">
+            <h1 class="preview-title">Project Card Redesign Exploration</h1>
+            <p class="preview-subtitle">Replacing the generic AI left-border stripe with 5 distinct editorial approaches tailored for REGENERACIÓN LAB's archival typography and brand palette.</p>
+        </header>
+
+        <!-- OPTION 1 -->
+        <section class="option-section">
+            <div class="option-header">
+                <span class="option-number">01</span>
+                <h2 class="option-title">The Editorial Broadside / Index Ledger</h2>
+            </div>
+            <p class="option-desc"><strong>Philosophy:</strong> Rejects the "floating box" card metaphor entirely. Treats projects as archival entries separated by hair-thin horizontal ledger lines. Color is carried purely through typography and understated bracketed meta kickers. Very clean, scholarly, and print-inspired.</p>
+            
+            <div class="project-grid">
+                <div class="card-opt1 card-opt1--turquoise">
+                    <div class="ledger-kicker">
+                        <span class="badge-pill">New</span>
+                        <span>Ongoing</span>
+                    </div>
+                    <h3>Indigenous Border Studies</h3>
+                    <p class="copy">A popular education platform offering thematic modules, scholarly research, readings, films, and community dialogue centering Indigenous perspectives on borders, sovereignty, and movement.</p>
+                    <a class="cta" href="#">Explore &rarr;</a>
+                </div>
+
+                <div class="card-opt1 card-opt1--brown">
+                    <div class="ledger-kicker">
+                        <span class="badge-pill">New</span>
+                        <span>2025&ndash;2026</span>
+                    </div>
+                    <h3>Safiya Henderson Holmes<br>Black Arts &amp; Radicalism Archive</h3>
+                    <p class="copy">A research justice and critical archival praxis collaboration with the family of acclaimed Black Arts Movement poet Safiya Henderson Holmes to preserve and digitize her manuscripts, papers, and ephemera.</p>
+                    <a class="cta" href="#">Explore &rarr;</a>
+                </div>
+
+                <div class="card-opt1 card-opt1--turquoise">
+                    <div class="ledger-kicker">
+                        <span>2021&ndash;Current</span>
+                    </div>
+                    <h3>Museum of Us Exhibit</h3>
+                    <p class="copy">A response to the impacts of border militarization and deaths of migrants in the Sonoran desert with O&rsquo;odham perspectives and Indigenous histories of colonial occupation and partition.</p>
+                    <a class="cta" href="#">Visit Exhibit &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- OPTION 2 -->
+        <section class="option-section">
+            <div class="option-header">
+                <span class="option-number">02</span>
+                <h2 class="option-title">The Archival Specimen Slip</h2>
+            </div>
+            <p class="option-desc"><strong>Philosophy:</strong> Replaces the harsh stripe with a full, whisper-light tinted wash (5% tint of the brand palette) and a matching delicate perimeter hairline. Features an inverted solid accession stamp for new entries. Warm, physical, and artifact-like.</p>
+            
+            <div class="project-grid">
+                <div class="card-opt2 card-opt2--turquoise">
+                    <span class="stamp-badge">New</span>
+                    <h3>Indigenous Border Studies</h3>
+                    <p class="date-meta">Ongoing</p>
+                    <p class="copy">A popular education platform offering thematic modules, scholarly research, readings, films, and community dialogue centering Indigenous perspectives on borders, sovereignty, and movement.</p>
+                    <a class="cta" href="#">Explore</a>
+                </div>
+
+                <div class="card-opt2 card-opt2--brown">
+                    <span class="stamp-badge">New</span>
+                    <h3>Safiya Henderson Holmes<br>Black Arts &amp; Radicalism Archive</h3>
+                    <p class="date-meta">2025&ndash;2026</p>
+                    <p class="copy">A research justice and critical archival praxis collaboration with the family of acclaimed Black Arts Movement poet Safiya Henderson Holmes to preserve and digitize her manuscripts, papers, and ephemera.</p>
+                    <a class="cta" href="#">Explore</a>
+                </div>
+
+                <div class="card-opt2 card-opt2--turquoise">
+                    <h3>Museum of Us Exhibit</h3>
+                    <p class="date-meta">2021&ndash;Current</p>
+                    <p class="copy">A response to the impacts of border militarization and deaths of migrants in the Sonoran desert with O&rsquo;odham perspectives and Indigenous histories of colonial occupation and partition.</p>
+                    <a class="cta" href="#">Visit Exhibit</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- OPTION 3 -->
+        <section class="option-section">
+            <div class="option-header">
+                <span class="option-number">03</span>
+                <h2 class="option-title">The Exhibition Placard (Top Anchor Line)</h2>
+            </div>
+            <p class="option-desc"><strong>Philosophy:</strong> Moves the color anchor from the side to the top edge (a 3px full-width horizon line), framing the card with a clean 1px neutral enclosure. Aligns the badge and timeline into a balanced top utility row. Architectural, balanced, and authoritative.</p>
+            
+            <div class="project-grid">
+                <div class="card-opt3 card-opt3--turquoise">
+                    <div class="top-row">
+                        <span class="tag-badge">New</span>
+                        <span class="meta-status">Ongoing</span>
+                    </div>
+                    <h3>Indigenous Border Studies</h3>
+                    <p class="copy">A popular education platform offering thematic modules, scholarly research, readings, films, and community dialogue centering Indigenous perspectives on borders, sovereignty, and movement.</p>
+                    <a class="cta" href="#">Explore</a>
+                </div>
+
+                <div class="card-opt3 card-opt3--brown">
+                    <div class="top-row">
+                        <span class="tag-badge">New</span>
+                        <span class="meta-status">2025&ndash;2026</span>
+                    </div>
+                    <h3>Safiya Henderson Holmes<br>Black Arts &amp; Radicalism Archive</h3>
+                    <p class="copy">A research justice and critical archival praxis collaboration with the family of acclaimed Black Arts Movement poet Safiya Henderson Holmes to preserve and digitize her manuscripts, papers, and ephemera.</p>
+                    <a class="cta" href="#">Explore</a>
+                </div>
+
+                <div class="card-opt3 card-opt3--turquoise">
+                    <div class="top-row">
+                        <span class="meta-status" style="margin-left:auto;">2021&ndash;Current</span>
+                    </div>
+                    <h3>Museum of Us Exhibit</h3>
+                    <p class="copy">A response to the impacts of border militarization and deaths of migrants in the Sonoran desert with O&rsquo;odham perspectives and Indigenous histories of colonial occupation and partition.</p>
+                    <a class="cta" href="#">Visit Exhibit</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- OPTION 4 -->
+        <section class="option-section">
+            <div class="option-header">
+                <span class="option-number">04</span>
+                <h2 class="option-title">The Minimalist Typographic Column</h2>
+            </div>
+            <p class="option-desc"><strong>Philosophy:</strong> Absolute reduction. Zero cards, zero frames, zero drop shadows. Projects breathe freely directly on the wash background, anchored by an understated bullet kicker and larger display titles. Ultra-modern editorial magazine aesthetic.</p>
+            
+            <div class="project-grid">
+                <div class="card-opt4 card-opt4--turquoise">
+                    <div class="eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        <span>New &bull; Ongoing</span>
+                    </div>
+                    <h3>Indigenous Border Studies</h3>
+                    <p class="copy">A popular education platform offering thematic modules, scholarly research, readings, films, and community dialogue centering Indigenous perspectives on borders, sovereignty, and movement.</p>
+                    <a class="cta" href="#">Explore &rarr;</a>
+                </div>
+
+                <div class="card-opt4 card-opt4--brown">
+                    <div class="eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        <span>New &bull; 2025&ndash;2026</span>
+                    </div>
+                    <h3>Safiya Henderson Holmes<br>Black Arts &amp; Radicalism Archive</h3>
+                    <p class="copy">A research justice and critical archival praxis collaboration with the family of acclaimed Black Arts Movement poet Safiya Henderson Holmes to preserve and digitize her manuscripts, papers, and ephemera.</p>
+                    <a class="cta" href="#">Explore &rarr;</a>
+                </div>
+
+                <div class="card-opt4 card-opt4--turquoise">
+                    <div class="eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        <span>2021&ndash;Current</span>
+                    </div>
+                    <h3>Museum of Us Exhibit</h3>
+                    <p class="copy">A response to the impacts of border militarization and deaths of migrants in the Sonoran desert with O&rsquo;odham perspectives and Indigenous histories of colonial occupation and partition.</p>
+                    <a class="cta" href="#">Visit Exhibit &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- OPTION 5 -->
+        <section class="option-section">
+            <div class="option-header">
+                <span class="option-number">05</span>
+                <h2 class="option-title">The Archival Dossier Folder (Tabbed Index Header)</h2>
+            </div>
+            <p class="option-desc"><strong>Philosophy:</strong> Inspired by physical field dossiers and library catalog folders. Introduces a subtle two-tier card with a contrasting index header holding accession metadata, separated by an engraved hairline from the research abstract below.</p>
+            
+            <div class="project-grid">
+                <div class="card-opt5 card-opt5--turquoise">
+                    <div class="dossier-header">
+                        <span class="dossier-tag">New Project</span>
+                        <span class="dossier-date">Ongoing</span>
+                    </div>
+                    <div class="dossier-body">
+                        <h3>Indigenous Border Studies</h3>
+                        <p class="copy">A popular education platform offering thematic modules, scholarly research, readings, films, and community dialogue centering Indigenous perspectives on borders, sovereignty, and movement.</p>
+                        <a class="cta" href="#">Explore</a>
+                    </div>
+                </div>
+
+                <div class="card-opt5 card-opt5--brown">
+                    <div class="dossier-header">
+                        <span class="dossier-tag">New Project</span>
+                        <span class="dossier-date">2025&ndash;2026</span>
+                    </div>
+                    <div class="dossier-body">
+                        <h3>Safiya Henderson Holmes<br>Black Arts &amp; Radicalism Archive</h3>
+                        <p class="copy">A research justice and critical archival praxis collaboration with the family of acclaimed Black Arts Movement poet Safiya Henderson Holmes to preserve and digitize her manuscripts, papers, and ephemera.</p>
+                        <a class="cta" href="#">Explore</a>
+                    </div>
+                </div>
+
+                <div class="card-opt5 card-opt5--turquoise">
+                    <div class="dossier-header">
+                        <span class="dossier-tag" style="color: var(--page-text);">Archived</span>
+                        <span class="dossier-date">2021&ndash;Current</span>
+                    </div>
+                    <div class="dossier-body">
+                        <h3>Museum of Us Exhibit</h3>
+                        <p class="copy">A response to the impacts of border militarization and deaths of migrants in the Sonoran desert with O&rsquo;odham perspectives and Indigenous histories of colonial occupation and partition.</p>
+                        <a class="cta" href="#">Visit Exhibit</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
