@@ -253,33 +253,200 @@
             border-bottom-color: #1e4a26;
         }
 
+        /* Mobile Hamburger Button: sleek, sexy, minimal hairline mark */
+        .slim-topbar-burger {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            margin-right: -12px; /* optical alignment with 20px edge margin */
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--page-text);
+            -webkit-tap-highlight-color: transparent;
+            z-index: 101;
+            transition: color 0.2s ease;
+        }
+
+        .slim-topbar-burger:hover,
+        .slim-topbar-burger:focus-visible {
+            color: #1e4a26;
+        }
+
+        .burger-box {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
+        .burger-bar {
+            position: absolute;
+            left: 1px;
+            width: 18px;
+            height: 1.4px;
+            background-color: currentColor;
+            border-radius: 1px;
+            transform-origin: center center;
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+        }
+
+        .burger-bar--top {
+            top: 5.3px;
+        }
+
+        .burger-bar--bot {
+            bottom: 5.3px;
+        }
+
+        /* Seamless morph into a delicate, perfectly symmetrical 'X' when open */
+        .slim-topbar-burger.is-open .burger-bar--top {
+            transform: translateY(4px) rotate(45deg);
+        }
+
+        .slim-topbar-burger.is-open .burger-bar--bot {
+            transform: translateY(-4px) rotate(-45deg);
+        }
+
+        /* Mobile Navigation Overlay Drawer */
+        .mobile-nav-drawer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            z-index: 95;
+            background: rgba(250, 248, 245, 0.97);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-sizing: border-box;
+        }
+
+        .mobile-nav-drawer.is-open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .mobile-nav-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            padding: calc(env(safe-area-inset-top, 0px) + 68px) 32px calc(env(safe-area-inset-bottom, 0px) + 36px);
+            box-sizing: border-box;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .mobile-nav-links li {
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.3s ease calc(var(--i, 0) * 0.04s + 0.06s),
+                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 0.04s + 0.06s);
+        }
+
+        .mobile-nav-drawer.is-open .mobile-nav-links li {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-nav-link {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 2.35rem;
+            line-height: 1.15;
+            color: var(--page-text);
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: 0.01em;
+            transition: color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-nav-link:active,
+        .mobile-nav-link:hover {
+            color: #1e4a26;
+            transform: translateX(6px);
+        }
+
+        .mobile-nav-footer {
+            border-top: 1px solid rgba(33, 26, 18, 0.09);
+            padding-top: 20px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.35s ease 0.28s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.28s;
+        }
+
+        .mobile-nav-drawer.is-open .mobile-nav-footer {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-nav-tagline {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: #1e4a26;
+            margin: 0;
+        }
+
+        body.menu-open {
+            overflow: hidden !important;
+        }
+
         @media (max-width: 768px) {
             .slim-topbar {
                 height: 48px;
             }
 
             .slim-topbar-inner {
-                padding: 0 16px;
+                padding: 0 20px;
             }
 
             .slim-topbar-title {
-                font-size: 1.25rem;
+                font-size: 1.3rem;
             }
 
-            .slim-topbar-nav ul {
-                gap: 16px;
-                overflow-x: auto;
-                white-space: nowrap;
-                scrollbar-width: none;
+            .slim-topbar-nav {
+                display: none !important;
             }
 
-            .slim-topbar-nav ul::-webkit-scrollbar {
-                display: none;
+            .slim-topbar-burger {
+                display: flex;
             }
 
-            .slim-topbar-nav a {
-                font-size: 0.68rem;
-                letter-spacing: 0.1em;
+            .mobile-nav-drawer {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mobile-nav-drawer,
+            .mobile-nav-links li,
+            .mobile-nav-footer,
+            .burger-bar {
+                transition: opacity 0.1s ease !important;
+                transform: none !important;
             }
         }
 
@@ -743,22 +910,48 @@
     <!-- Slim top bar: glides down when scrolling deep into the page,
          replacing the giant title that scrolled off the top. Features
          the site title on the left in Instrument Serif italic (matching
-         the Projects heading style) and the primary nav on the right. -->
+         the Projects heading style), desktop nav items on the right,
+         and a minimal 2-line hairline hamburger menu for mobile. -->
     <header class="slim-topbar" id="slimTopbar" aria-label="Site Navigation">
         <div class="slim-topbar-inner">
             <a href="#" class="slim-topbar-title">Regeneraci&oacute;n Lab</a>
             <nav class="slim-topbar-nav" aria-label="Main Menu">
                 <ul>
                     <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Projects</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#projects">Projects</a></li>
                     <li><a href="#">Residents</a></li>
                     <li><a href="#">Students</a></li>
                     <li><a href="#">Support</a></li>
                 </ul>
             </nav>
+            <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavDrawer">
+                <span class="burger-box">
+                    <span class="burger-bar burger-bar--top"></span>
+                    <span class="burger-bar burger-bar--bot"></span>
+                </span>
+            </button>
         </div>
     </header>
+
+    <!-- Mobile Navigation Overlay Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
+        <div class="mobile-nav-panel">
+            <nav class="mobile-nav-menu" aria-label="Mobile Menu">
+                <ul class="mobile-nav-links">
+                    <li style="--i: 0;"><a href="#" class="mobile-nav-link">Home</a></li>
+                    <li style="--i: 1;"><a href="#about" class="mobile-nav-link">About</a></li>
+                    <li style="--i: 2;"><a href="#projects" class="mobile-nav-link">Projects</a></li>
+                    <li style="--i: 3;"><a href="#" class="mobile-nav-link">Residents</a></li>
+                    <li style="--i: 4;"><a href="#" class="mobile-nav-link">Students</a></li>
+                    <li style="--i: 5;"><a href="#" class="mobile-nav-link">Support</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-nav-footer">
+                <p class="mobile-nav-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+            </div>
+        </div>
+    </div>
 
     <div class="hero" id="hero">
         <!-- src is picked at random from IMAGE_POOL below on every load.
@@ -951,12 +1144,12 @@
                 </ul>
             </nav>
         </header>
-        <div class="page-copy">
+        <div class="page-copy" id="about">
             <p class="dropcap-paragraph" id="dropcapContainer"><span class="dropcap-letter" id="dropcapLetter">R</span>egeneration has become one of the most commercialized and co-opted terms of the 21st century. It is commonly used to market a plethora of ventures that greenwash extractive and colonial land relations, sell products and settler ways of life, and envision alternatives that may delink from one system but reproduce others.</p>
             <p>However, the Spanish term regeneraci&oacute;n has been a rebellious political concept, philosophy, and battle cry for over a hundred years. In this context, regeneraci&oacute;n developed as a rejection of eugenics that connected movements engaged in anti-racism, abolition of slavery and mass incarceration, and decolonial resistances rooted in Indigenous and fugitive land relations.</p>
             <p>The Regeneraci&oacute;n Lab is grounded in this older, otherwise meaning of the term that emerged in the late nineteenth century and inspired the 1910 Mexican revolution. Our regenerative work centers community-based research justice, creative-critical practices, and decolonial praxis.</p>
         </div>
-        <section class="page-projects">
+        <section class="page-projects" id="projects">
             <h2>Projects</h2>
             <div class="project-grid">
                 <div class="project-card project-card--turquoise">
@@ -1142,6 +1335,27 @@
         const titleWindow = document.getElementById('titleWindow');
         const titleWindowPhoto = document.getElementById('titleWindowPhoto');
         const slimTopbar = document.getElementById('slimTopbar');
+        const slimTopbarBurger = document.getElementById('slimTopbarBurger');
+        const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+
+        function setMobileMenuOpen(open) {
+            if (!slimTopbarBurger || !mobileNavDrawer) return;
+            if (open) {
+                slimTopbarBurger.classList.add('is-open');
+                slimTopbarBurger.setAttribute('aria-expanded', 'true');
+                slimTopbarBurger.setAttribute('aria-label', 'Close menu');
+                mobileNavDrawer.classList.add('is-open');
+                mobileNavDrawer.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('menu-open');
+            } else {
+                slimTopbarBurger.classList.remove('is-open');
+                slimTopbarBurger.setAttribute('aria-expanded', 'false');
+                slimTopbarBurger.setAttribute('aria-label', 'Open menu');
+                mobileNavDrawer.classList.remove('is-open');
+                mobileNavDrawer.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('menu-open');
+            }
+        }
 
         // One-time renderer setup (see the flags above; they're consts by
         // design -- changing them needs a reload, not a runtime toggle).
@@ -1439,6 +1653,7 @@
         function triggerExit() {
             if (!activated) return;
             activated = false;
+            setMobileMenuOpen(false);
             slimTopbar.classList.remove('is-visible');
             titleWindow.style.transitionDuration = '';
             titleWindowPhoto.style.transitionDuration = '';
@@ -1484,6 +1699,9 @@
         function onResize() {
             metrics = layout();
             applyState(true);
+            if (window.innerWidth > 768) {
+                setMobileMenuOpen(false);
+            }
         }
 
         // Intercept wheel events: gate first entrance and symmetrical exit to prevent text shift
@@ -1550,6 +1768,29 @@
                 }
             }
         });
+
+        // Mobile hamburger menu toggle and drawer interactions
+        if (slimTopbarBurger && mobileNavDrawer) {
+            slimTopbarBurger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = slimTopbarBurger.classList.contains('is-open');
+                setMobileMenuOpen(!isOpen);
+            });
+
+            // Close drawer when any mobile nav link is tapped
+            mobileNavDrawer.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    setMobileMenuOpen(false);
+                });
+            });
+
+            // Close on Escape key
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && slimTopbarBurger.classList.contains('is-open')) {
+                    setMobileMenuOpen(false);
+                }
+            });
+        }
 
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onResize);
