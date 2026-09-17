@@ -861,7 +861,7 @@
         const TITLE_SIDE_MARGIN = 16;
         const BOTTOM_MARGIN_FRACTION = 0; // glyphs already reach the viewBox edge -- flush to the window
         const ACTIVATE_AT = 40;  // px scrolled before the rise-to-top animation triggers
-        const DEACTIVATE_AT = 8; // px scrolled below which it drops back down (small gap avoids flicker at the boundary)
+        const DEACTIVATE_AT = 50; // px scrolled below which it drops back down (close to LANDING_SCROLL_Y so reverse triggers cleanly)
         // First-scroll gate: absorbs runaway wheel delta on initial entrance from rest
         const LANDING_SCROLL_Y = 60; // px: scroll position where hero docks and content rests cleanly
         const GATE_DURATION_MS = 1200; // ms: duration to absorb multi-notch wheel impulses during entrance rise
@@ -1203,6 +1203,7 @@
 
         let isGated = false;
         let gateTimer = null;
+        let exitTimer = null;
 
         function triggerEntrance() {
             if (activated) return;
@@ -1213,22 +1214,48 @@
             isGated = true;
             window.scrollTo(0, LANDING_SCROLL_Y);
 
+            clearTimeout(exitTimer);
             clearTimeout(gateTimer);
             gateTimer = setTimeout(() => {
                 isGated = false;
             }, GATE_DURATION_MS);
         }
 
+        function triggerExit() {
+            if (!activated) return;
+            activated = false;
+            applyState();
+            notifyDropcap();
+
+            isGated = true;
+            clearTimeout(gateTimer);
+            clearTimeout(exitTimer);
+
+            // Hold scroll position steady at landing while page-content fades out cleanly (500ms).
+            // Once page-content is fully transparent (opacity: 0), reset scroll to 0 and ungate.
+            // This guarantees the body text NEVER shifts down on reverse.
+            exitTimer = setTimeout(() => {
+                window.scrollTo(0, 0);
+                requestAnimationFrame(() => {
+                    isGated = false;
+                });
+            }, 500);
+        }
+
         function onScroll() {
-            // While gated during the initial entrance, ignore intermediate scroll events
+            // While gated during initial entrance or exit, ignore intermediate scroll events
             if (isGated) return;
 
             const y = window.scrollY;
             const next = activated ? y > DEACTIVATE_AT : y > ACTIVATE_AT;
             if (next !== activated) {
-                activated = next;
-                applyState();
-                notifyDropcap();
+                if (!next) {
+                    triggerExit();
+                } else {
+                    activated = next;
+                    applyState();
+                    notifyDropcap();
+                }
             }
         }
 
@@ -1237,28 +1264,30 @@
             applyState(true);
         }
 
-        // Intercept wheel events on the first entrance to prevent 2+ notches from overshooting
+        // Intercept wheel events: gate first entrance and symmetrical exit to prevent text shift
         window.addEventListener('wheel', (e) => {
             if (!activated && window.scrollY <= ACTIVATE_AT && e.deltaY > 0) {
+                // First scroll down from rest triggers entrance
                 e.preventDefault();
                 triggerEntrance();
+            } else if (activated && window.scrollY <= LANDING_SCROLL_Y + 20 && e.deltaY < 0) {
+                // Scrolling back up from landing triggers exit without shifting body text
+                e.preventDefault();
+                triggerExit();
             } else if (isGated) {
-                if (e.deltaY > 0) {
-                    // Absorb extra downward notches while the hero entrance is completing
-                    e.preventDefault();
-                } else if (e.deltaY < 0) {
-                    // User reversed direction -- immediately unlock and return to rest
-                    isGated = false;
-                    clearTimeout(gateTimer);
-                    activated = false;
-                    applyState();
-                    notifyDropcap();
-                    window.scrollTo(0, 0);
+                // Absorb wheel impulses while entrance or exit animation is in progress
+                e.preventDefault();
+                if (!activated && e.deltaY > 0) {
+                    // Reversing direction back down during exit
+                    triggerEntrance();
+                } else if (activated && e.deltaY < 0) {
+                    // Reversing direction back up during entrance
+                    triggerExit();
                 }
             }
         }, { passive: false });
 
-        // Touch support for mobile devices: gate entrance on first swipe-up
+        // Touch support for mobile devices: gate entrance on first swipe-up and exit on swipe-down
         let touchStartY = 0;
 
         window.addEventListener('touchstart', (e) => {
@@ -1275,18 +1304,15 @@
             if (!activated && window.scrollY <= ACTIVATE_AT && diffY > 12) {
                 if (e.cancelable) e.preventDefault();
                 triggerEntrance();
+            } else if (activated && window.scrollY <= LANDING_SCROLL_Y + 20 && diffY < -12) {
+                if (e.cancelable) e.preventDefault();
+                triggerExit();
             } else if (isGated) {
-                if (diffY > 0) {
-                    // Absorb extra downward swipe momentum while entrance animation is running
-                    if (e.cancelable) e.preventDefault();
-                } else if (diffY < -12) {
-                    // User swiped down (scroll up) -- reverse entrance immediately
-                    isGated = false;
-                    clearTimeout(gateTimer);
-                    activated = false;
-                    applyState();
-                    notifyDropcap();
-                    window.scrollTo(0, 0);
+                if (e.cancelable) e.preventDefault();
+                if (!activated && diffY > 12) {
+                    triggerEntrance();
+                } else if (activated && diffY < -12) {
+                    triggerExit();
                 }
             }
         }, { passive: false });

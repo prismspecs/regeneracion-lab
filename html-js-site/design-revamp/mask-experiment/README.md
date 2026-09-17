@@ -524,11 +524,12 @@ Key advantages of this semantic HTML approach:
 - **Fully Responsive:** Uses media queries (130px on desktop, 96px on mobile) and native browser text reflow.
 - **Trigger Mechanism:** Listens for the `hero-activated` custom event to toggle the `.dropcap-grown` CSS class with smooth cubic-bezier easing.
 
-### Mobile and Touch Support
+### Scroll Gate and Symmetrical Reverse Handling
 
-Mobile browsers don't emit `wheel` events, and touch flicks carry substantial inertia that could fling the viewport past the hero and tagline. The site features dedicated touch handling:
-- **Swipe-up Gate:** On mobile devices, an initial swipe-up gesture (`touchmove` with `diffY > 12`) triggers `triggerEntrance()`, docking smoothly at `LANDING_SCROLL_Y = 60px` with momentum absorption during the entrance duration (`GATE_DURATION_MS = 1200ms`).
-- **Direction Reversal:** Swiping back down during entrance cancels the gate and returns immediately to the resting state at `scrollY = 0`.
+The site features dedicated scroll and touch gating to eliminate momentum overshoot and jitter:
+- **Entrance Gate:** On desktop wheel or mobile swipe-up (`touchmove` with `diffY > 12`), `triggerEntrance()` docks smoothly at `LANDING_SCROLL_Y = 60px` with momentum absorption (`GATE_DURATION_MS = 1200ms`).
+- **Symmetrical Exit Gate:** When scrolling back up from the landing position (`scrollY <= LANDING_SCROLL_Y + 20px`), `triggerExit()` intercepts the gesture (`e.preventDefault()`) to hold `window.scrollY` stationary while `.page-content` cleanly fades out (`opacity: 0` over 500ms). Once fully transparent, `window.scrollTo(0, 0)` resets scroll position invisibly without any downward visual shift of the body copy.
+- **Direction Reversal:** Reversing scroll direction during entrance or exit immediately cancels the active gate and reverses the transition seamlessly.
 - **Manual Scroll Restoration:** Sets `history.scrollRestoration = 'manual'` to guarantee clean page starts and reloads from the hero screen.
 
 ### Projects grid
