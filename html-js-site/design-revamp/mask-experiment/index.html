@@ -525,14 +525,21 @@
            the live theme's Inter/IBM Plex Mono -- reintroducing that
            would be exactly the "too many typefaces" problem this page
            already solved once. */
-        .page-projects {
+        .page-projects,
+        .page-section {
             max-width: 980px;
             margin: 72px auto 0;
             padding-top: 48px;
             border-top: 1px solid rgba(33, 26, 18, 0.12);
+            scroll-margin-top: 72px;
         }
 
-        .page-projects h2 {
+        #about {
+            scroll-margin-top: 72px;
+        }
+
+        .page-projects h2,
+        .page-section-header {
             font-family: 'Instrument Serif', Georgia, serif;
             font-style: italic;
             font-weight: 400;
@@ -574,6 +581,10 @@
 
         .project-card--brown {
             --project-accent: #9c5424;
+        }
+
+        .project-card--amber {
+            --project-accent: #c86a3d;
         }
 
         .project-card .project-eyebrow {
@@ -642,6 +653,343 @@
         .project-card a:hover {
             opacity: 0.75;
             gap: 10px;
+        }
+
+        /* 3-Column Layout for Collaborations & Updates */
+        .three-col-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 44px 48px;
+        }
+
+        @media (max-width: 860px) {
+            .three-col-grid {
+                grid-template-columns: 1fr;
+                gap: 36px;
+            }
+        }
+
+        .collab-card,
+        .update-card {
+            background: transparent;
+            padding: 4px 0 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .collab-card h3,
+        .update-card h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1.5em;
+            line-height: 1.25;
+            margin-bottom: 12px;
+            color: var(--page-text);
+        }
+
+        .collab-card p,
+        .update-card p {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 24px;
+            color: rgba(33, 26, 18, 0.85);
+            margin-bottom: 16px;
+            flex-grow: 1;
+        }
+
+        .collab-card a,
+        .update-card a {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 15.5px;
+            color: #1e4a26;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.2s ease, opacity 0.2s ease;
+        }
+
+        .collab-card a:hover,
+        .update-card a:hover {
+            opacity: 0.75;
+            gap: 10px;
+        }
+
+        .card-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            margin-top: auto;
+        }
+
+        /* Support Section */
+        .page-section--support {
+            text-align: center;
+            padding-bottom: 24px;
+        }
+
+        .support-content {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .support-description {
+            font-family: Georgia, serif;
+            font-size: 17px;
+            line-height: 27px;
+            color: rgba(33, 26, 18, 0.85);
+            margin-bottom: 32px;
+        }
+
+        .support-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .support-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 38px;
+            font-family: Georgia, serif;
+            font-size: 0.84rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--page-text);
+            background: transparent;
+            border: 1px solid rgba(33, 26, 18, 0.35);
+            border-radius: 2px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .support-button:hover {
+            background: #1e4a26;
+            border-color: #1e4a26;
+            color: #ffffff;
+            gap: 12px;
+        }
+
+        .support-note {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.88rem;
+            color: rgba(33, 26, 18, 0.65);
+            max-width: 480px;
+            line-height: 1.5;
+        }
+
+        .support-note em {
+            color: var(--page-text);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        /* Support Modal Popover */
+        .support-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .support-modal[hidden] {
+            display: none;
+        }
+
+        .support-modal.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .support-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(20, 16, 12, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .support-modal-dialog {
+            position: relative;
+            width: 100%;
+            max-width: 460px;
+            background: #faf8f5;
+            border: 1px solid rgba(33, 26, 18, 0.15);
+            border-radius: 3px;
+            padding: 36px 32px 28px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+            transform: translateY(12px) scale(0.98);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .support-modal.is-open .support-modal-dialog {
+            transform: translateY(0) scale(1);
+        }
+
+        .support-modal-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--page-text);
+            margin-bottom: 14px;
+        }
+
+        .support-modal-text {
+            font-family: Georgia, serif;
+            font-size: 15px;
+            line-height: 24px;
+            color: rgba(33, 26, 18, 0.85);
+            margin-bottom: 28px;
+        }
+
+        .support-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .support-modal-cancel {
+            background: transparent;
+            border: none;
+            font-family: Georgia, serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(33, 26, 18, 0.6);
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: color 0.2s ease;
+        }
+
+        .support-modal-cancel:hover {
+            color: var(--page-text);
+        }
+
+        .support-modal-continue {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 22px;
+            background: #1e4a26;
+            color: #ffffff;
+            font-family: Georgia, serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 2px;
+            transition: background 0.2s ease;
+        }
+
+        .support-modal-continue:hover {
+            background: #15341a;
+        }
+
+        /* Site Footer */
+        .site-footer {
+            max-width: 980px;
+            margin: 80px auto 0;
+            padding: 48px 0 64px;
+            border-top: 1px solid rgba(33, 26, 18, 0.12);
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        .footer-brand {
+            max-width: 480px;
+        }
+
+        .footer-logo {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-size: 1.45rem;
+            color: var(--page-text);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .footer-tagline {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #1e4a26;
+            margin: 0;
+        }
+
+        .footer-meta {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .footer-copy,
+        .footer-credit {
+            font-family: Georgia, serif;
+            font-size: 0.82rem;
+            color: rgba(33, 26, 18, 0.6);
+            margin: 0;
+        }
+
+        .footer-credit a {
+            color: var(--page-text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-credit a:hover {
+            color: #1e4a26;
+        }
+
+        .footer-back-to-top {
+            font-family: Georgia, serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--page-text);
+            text-decoration: none;
+            margin-top: 8px;
+            display: inline-block;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .footer-back-to-top:hover {
+            color: #1e4a26;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .footer-inner {
+                flex-direction: column;
+                gap: 28px;
+            }
+
+            .footer-meta {
+                text-align: left;
+            }
         }
 
         .hero-image {
@@ -919,15 +1267,15 @@
          and a minimal 2-line hairline hamburger menu for mobile. -->
     <header class="slim-topbar" id="slimTopbar" aria-label="Site Navigation">
         <div class="slim-topbar-inner">
-            <a href="#" class="slim-topbar-title">Regeneraci&oacute;n Lab</a>
+            <a href="#top" class="slim-topbar-title">Regeneraci&oacute;n Lab</a>
             <nav class="slim-topbar-nav" aria-label="Main Menu">
                 <ul>
-                    <li><a href="#">Home</a></li>
+                    <li><a href="#top">Home</a></li>
                     <li><a href="#about">About</a></li>
                     <li><a href="#projects">Projects</a></li>
-                    <li><a href="#">Residents</a></li>
-                    <li><a href="#">Students</a></li>
-                    <li><a href="#">Support</a></li>
+                    <li><a href="#residents">Residents</a></li>
+                    <li><a href="#students">Students</a></li>
+                    <li><a href="#support">Support</a></li>
                 </ul>
             </nav>
             <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavDrawer">
@@ -944,16 +1292,29 @@
         <div class="mobile-nav-panel">
             <nav class="mobile-nav-menu" aria-label="Mobile Menu">
                 <ul class="mobile-nav-links">
-                    <li style="--i: 0;"><a href="#" class="mobile-nav-link">Home</a></li>
+                    <li style="--i: 0;"><a href="#top" class="mobile-nav-link">Home</a></li>
                     <li style="--i: 1;"><a href="#about" class="mobile-nav-link">About</a></li>
                     <li style="--i: 2;"><a href="#projects" class="mobile-nav-link">Projects</a></li>
-                    <li style="--i: 3;"><a href="#" class="mobile-nav-link">Residents</a></li>
-                    <li style="--i: 4;"><a href="#" class="mobile-nav-link">Students</a></li>
-                    <li style="--i: 5;"><a href="#" class="mobile-nav-link">Support</a></li>
+                    <li style="--i: 3;"><a href="#residents" class="mobile-nav-link">Residents</a></li>
+                    <li style="--i: 4;"><a href="#students" class="mobile-nav-link">Students</a></li>
+                    <li style="--i: 5;"><a href="#support" class="mobile-nav-link">Support</a></li>
                 </ul>
             </nav>
             <div class="mobile-nav-footer">
                 <p class="mobile-nav-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Modal Popover -->
+    <div class="support-modal" id="supportModal" hidden>
+        <div class="support-modal-backdrop" data-support-close></div>
+        <div class="support-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="supportModalTitle">
+            <h3 id="supportModalTitle" class="support-modal-title">Support Our Work</h3>
+            <p class="support-modal-text">When you check out, please specify that the donation is for <strong>Regeneraci&oacute;n Lab</strong>.</p>
+            <div class="support-modal-actions">
+                <button type="button" class="support-modal-cancel" data-support-close>Cancel</button>
+                <a href="https://give.ucsb.edu/campaigns/58594/donations/new" target="_blank" rel="noopener" class="support-modal-continue" data-support-continue>Continue &rarr;</a>
             </div>
         </div>
     </div>
@@ -1140,12 +1501,12 @@
             <p class="page-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
             <nav class="page-nav" aria-label="Primary">
                 <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Projects</a></li>
-                    <li><a href="#">Residents</a></li>
-                    <li><a href="#">Students</a></li>
-                    <li><a href="#">Support</a></li>
+                    <li><a href="#top">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#residents">Residents</a></li>
+                    <li><a href="#students">Students</a></li>
+                    <li><a href="#support">Support</a></li>
                 </ul>
             </nav>
         </header>
@@ -1179,17 +1540,124 @@
                     <p>A research justice and critical archival praxis collaboration with the family of acclaimed Black Arts Movement poet Safiya Henderson Holmes to preserve and digitize her manuscripts, papers, and a wide array of Black feminist, radical movement, and arts ephemera.</p>
                     <a href="#">Explore &rarr;</a>
                 </div>
+                <div class="project-card project-card--brown">
+                    <div class="project-eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        <span class="project-badge">Active</span>
+                        <span class="project-meta-sep">&bull;</span>
+                        <span class="project-meta">Ongoing</span>
+                    </div>
+                    <h3>O&rsquo;odham and Yoeme of the Colorado &amp; Gila River Confluence</h3>
+                    <p>A community-based research initiative with the descendants of O&rsquo;odham, Yoeme, and other lower Colorado River region Indigenous communities.</p>
+                    <a href="#">Explore &rarr;</a>
+                </div>
+                <div class="project-card project-card--turquoise">
+                    <div class="project-eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        <span class="project-badge">Active</span>
+                        <span class="project-meta-sep">&bull;</span>
+                        <span class="project-meta">Ongoing</span>
+                    </div>
+                    <h3>Research Justice</h3>
+                    <p>More information about our framework for community-based research praxis featuring a TEDx talk, scholarly publications, and links to resources.</p>
+                    <a href="#">Learn More &rarr;</a>
+                </div>
                 <div class="project-card project-card--turquoise">
                     <div class="project-eyebrow">
                         <span class="eyebrow-mark"></span>
                         <span class="project-meta">2021&ndash;Current</span>
                     </div>
-                    <h3>Museum of Us Exhibit</h3>
+                    <h3>Museum of Us Exhibit &ndash; O&rsquo;odham Land Acknowledgement</h3>
                     <p>A response to the impacts of border militarization and deaths of migrants in the Sonoran desert with O&rsquo;odham perspectives and Indigenous histories of colonial occupation and partition. Up now as part of the exhibit Hostile Terrain &lsquo;94 at the Museum of Us in San Diego, CA.</p>
                     <a href="https://museumofus.org/exhibits/hostile-terrain-94" target="_blank" rel="noopener">Visit Exhibit &rarr;</a>
                 </div>
+                <div class="project-card project-card--amber">
+                    <div class="project-eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        <span class="project-meta">2019</span>
+                    </div>
+                    <h3>Reclaiming Homelands: Indigenous North San Diego County</h3>
+                    <p>A collaborative project with Pay&oacute;mkawichum and Kumeyaay youth to recover the Indigenous place-names of the North San Diego County &ldquo;Mission Trail&rdquo;, part of the UC Critical Mission Studies Initiative.</p>
+                    <a href="https://storymaps.arcgis.com/stories/de868339c9a84afb920ead88bf65ccc3" target="_blank" rel="noopener">View Project &rarr;</a>
+                </div>
             </div>
         </section>
+
+        <section class="page-section" id="residents">
+            <h2 class="page-section-header">Collaborations</h2>
+            <div class="three-col-grid">
+                <div class="collab-card">
+                    <h3>Water Justice &amp; Technology</h3>
+                    <p>A gathering place for research, stories, art, and calls to action that critically confront the ways that technology intersects with water.</p>
+                    <a href="https://waterjustice-tech.org/" target="_blank" rel="noopener">Discover &rarr;</a>
+                </div>
+                <div class="collab-card">
+                    <h3>CIEJ: Center for Interdisciplinary Environmental Justice</h3>
+                    <p>A collective of scholars, artists, scientists, outdoors practitioners, and parents engaged in feminist decolonial science for climate justice.</p>
+                    <a href="http://www.the-ciej.org/" target="_blank" rel="noopener">Learn More &rarr;</a>
+                </div>
+                <div class="collab-card">
+                    <h3>Finding Ceremony</h3>
+                    <p>A descendant community-controlled reparationist process, restoring the lineages of care, reverence and spiritual memory to the work of caring for our dead and decolonizing museums.</p>
+                    <a href="https://findingceremony.com/" target="_blank" rel="noopener">Visit &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section" id="students">
+            <h2 class="page-section-header">Recent Updates</h2>
+            <div class="three-col-grid">
+                <div class="update-card">
+                    <h3>2025&ndash;2026 Reading Group:<br>Critical Temporalities</h3>
+                    <p>Join the Regeneraci&oacute;n Lab and the UCSB English Department Lit &amp; Environment research center for an interdisciplinary reading group on time, space, and environment.</p>
+                    <div class="card-links">
+                        <a href="#students">Join &rarr;</a>
+                    </div>
+                </div>
+                <div class="update-card">
+                    <h3>2025&ndash;2026 Scholar in Residence Announced</h3>
+                    <p>We're excited to welcome B.T. Werner as our 2025&ndash;2026 scholar in residence! B.T. (they / them) is a subversive physicist conducting transdisciplinary research into the ways that resistance movements affect relationships between societies and the More-Than-Human World.</p>
+                    <div class="card-links">
+                        <a href="#residents">Read More &rarr;</a>
+                    </div>
+                </div>
+                <div class="update-card">
+                    <h3>Indigenous Border Studies &ndash; American Quarterly Call for Papers</h3>
+                    <p>Special issue of American Quarterly centering Indigenous perspectives on borders, militarization, and decolonial futures.</p>
+                    <div class="card-links">
+                        <a href="#">View CFP &rarr;</a>
+                        <a href="https://www.americanquarterly.org/" target="_blank" rel="noopener">American Quarterly &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-section page-section--support" id="support">
+            <div class="support-content">
+                <h2 class="page-section-header">Support Our Work</h2>
+                <p class="support-description">Regeneraci&oacute;n Lab operates through community support and grant funding. Your contribution helps us maintain this platform, support resident scholars, and keep these resources freely accessible.</p>
+                <div class="support-actions">
+                    <button type="button" class="support-button" id="supportOpenBtn">
+                        Contribute &rarr;
+                    </button>
+                    <p class="support-note">When you check out, please specify that your donation is for <em>Regeneraci&oacute;n Lab</em>.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <span class="footer-logo">Regeneraci&oacute;n Lab</span>
+                    <p class="footer-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+                </div>
+                <div class="footer-meta">
+                    <p class="footer-copy">&copy; <span id="currentYear">2026</span> Regeneraci&oacute;n Lab. All rights reserved.</p>
+                    <p class="footer-credit">Website designed by <a href="https://hire.graysonearle.com" target="_blank" rel="noopener noreferrer">Grayson Earle</a></p>
+                    <a href="#top" class="footer-back-to-top" id="backToTopBtn">Back to top &uarr;</a>
+                </div>
+            </div>
+        </footer>
     </main>
 
     <script>
@@ -1796,6 +2264,71 @@
                 }
             });
         }
+
+        // Support modal open & close logic
+        const supportOpenBtn = document.getElementById('supportOpenBtn');
+        const supportModal = document.getElementById('supportModal');
+        if (supportOpenBtn && supportModal) {
+            const closeEls = supportModal.querySelectorAll('[data-support-close]');
+            const continueBtn = supportModal.querySelector('[data-support-continue]');
+            const supportUrl = 'https://give.ucsb.edu/campaigns/58594/donations/new';
+
+            const openModal = (e) => {
+                if (e) e.preventDefault();
+                supportModal.removeAttribute('hidden');
+                requestAnimationFrame(() => {
+                    supportModal.classList.add('is-open');
+                });
+            };
+
+            const closeModal = (e) => {
+                if (e) e.preventDefault();
+                supportModal.classList.remove('is-open');
+                setTimeout(() => {
+                    supportModal.setAttribute('hidden', 'hidden');
+                }, 250);
+            };
+
+            supportOpenBtn.addEventListener('click', openModal);
+            closeEls.forEach(el => el.addEventListener('click', closeModal));
+
+            if (continueBtn) {
+                continueBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    closeModal();
+                    window.open(supportUrl, '_blank', 'noopener');
+                });
+            }
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && supportModal.classList.contains('is-open')) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Dynamic footer year
+        const currentYearEl = document.getElementById('currentYear');
+        if (currentYearEl) {
+            currentYearEl.textContent = new Date().getFullYear();
+        }
+
+        // Smooth in-page anchor navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#' || targetId === '#top') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+                const targetEl = document.querySelector(targetId);
+                if (targetEl) {
+                    e.preventDefault();
+                    targetEl.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
 
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onResize);
