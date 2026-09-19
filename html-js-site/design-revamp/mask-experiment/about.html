@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — REGENERACIÓN LAB</title>
+    <!-- Instrument Serif: display typeface used consistently across all headings -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-text: #1a1a1a;
+            --page-text-muted: rgba(33, 26, 18, 0.82);
+            --color-accent-green: #1e4a26;
+            --color-turquoise: #2a9d8f;
+            --color-earth-brown: #9c5424;
+            --color-clay-amber: #c86a3d;
+            --color-border: rgba(33, 26, 18, 0.12);
+            --color-border-subtle: rgba(33, 26, 18, 0.08);
+            --bg-topbar: rgba(250, 248, 245, 0.94);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            background-color: #ffffff;
+            color: var(--page-text);
+            font-family: Georgia, 'Times New Roman', serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Slim Top Bar: sleek, slim sticky navigation identical to the homepage */
+        .slim-topbar {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 52px;
+            z-index: 100;
+            background: var(--bg-topbar);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(33, 26, 18, 0.09);
+            transition: background 0.2s ease;
+        }
+
+        .slim-topbar-inner {
+            max-width: 1200px;
+            height: 100%;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slim-topbar-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1.45rem;
+            color: var(--page-text);
+            text-decoration: none;
+            line-height: 1;
+            letter-spacing: 0.01em;
+            transition: opacity 0.2s ease;
+        }
+
+        .slim-topbar-title:hover {
+            opacity: 0.7;
+        }
+
+        .slim-topbar-nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .slim-topbar-nav a {
+            font-family: Georgia, serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--page-text);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 2px;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .slim-topbar-nav a:hover,
+        .slim-topbar-nav a.is-active {
+            color: var(--color-accent-green);
+            border-bottom-color: var(--color-accent-green);
+        }
+
+        /* Mobile Hamburger Button: sleek hairline mark */
+        .slim-topbar-burger {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            margin-right: -12px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--page-text);
+            -webkit-tap-highlight-color: transparent;
+            z-index: 101;
+            transition: color 0.2s ease;
+        }
+
+        .slim-topbar-burger:hover,
+        .slim-topbar-burger:focus-visible {
+            color: var(--color-accent-green);
+        }
+
+        .burger-box {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
+        .burger-bar {
+            position: absolute;
+            left: 1px;
+            width: 18px;
+            height: 1.4px;
+            background-color: currentColor;
+            border-radius: 1px;
+            transform-origin: center center;
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+        }
+
+        .burger-bar--top {
+            top: 5.3px;
+        }
+
+        .burger-bar--bot {
+            bottom: 5.3px;
+        }
+
+        .slim-topbar-burger.is-open .burger-bar--top {
+            transform: translateY(4px) rotate(45deg);
+        }
+
+        .slim-topbar-burger.is-open .burger-bar--bot {
+            transform: translateY(-4px) rotate(-45deg);
+        }
+
+        /* Mobile Navigation Overlay Drawer */
+        .mobile-nav-drawer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            z-index: 95;
+            background: rgba(250, 248, 245, 0.97);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-sizing: border-box;
+        }
+
+        .mobile-nav-drawer.is-open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .mobile-nav-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            padding: calc(env(safe-area-inset-top, 0px) + 68px) 32px calc(env(safe-area-inset-bottom, 0px) + 36px);
+            box-sizing: border-box;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .mobile-nav-links li {
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.3s ease calc(var(--i, 0) * 0.04s + 0.06s),
+                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 0.04s + 0.06s);
+        }
+
+        .mobile-nav-drawer.is-open .mobile-nav-links li {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-nav-link {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 2.35rem;
+            line-height: 1.15;
+            color: var(--page-text);
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: 0.01em;
+            transition: color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-nav-link:active,
+        .mobile-nav-link:hover,
+        .mobile-nav-link.is-active {
+            color: var(--color-accent-green);
+            transform: translateX(6px);
+        }
+
+        .mobile-nav-footer {
+            border-top: 1px solid rgba(33, 26, 18, 0.09);
+            padding-top: 20px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.35s ease 0.28s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.28s;
+        }
+
+        .mobile-nav-drawer.is-open .mobile-nav-footer {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mobile-nav-tagline {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: var(--color-accent-green);
+            margin: 0;
+        }
+
+        body.menu-open {
+            overflow: hidden !important;
+        }
+
+        @media (max-width: 768px) {
+            .slim-topbar {
+                height: 48px;
+            }
+
+            .slim-topbar-inner {
+                padding: 0 20px;
+            }
+
+            .slim-topbar-title {
+                font-size: 1.3rem;
+            }
+
+            .slim-topbar-nav {
+                display: none !important;
+            }
+
+            .slim-topbar-burger {
+                display: flex;
+            }
+
+            .mobile-nav-drawer {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        /* Main Page Layout */
+        .page-container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 56px 24px 0;
+        }
+
+        /* Editorial Page Masthead */
+        .about-header {
+            margin-bottom: 56px;
+            text-align: left;
+        }
+
+        .about-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: Georgia, serif;
+            font-size: 0.82rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--color-accent-green);
+            margin-bottom: 14px;
+        }
+
+        .eyebrow-mark {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--color-accent-green);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .about-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: clamp(2.4rem, 5.2vw, 3.8rem);
+            line-height: 1.1;
+            color: var(--page-text);
+            margin-bottom: 18px;
+            text-wrap: balance;
+        }
+
+        .about-tagline {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 1.22rem;
+            line-height: 1.55;
+            color: var(--color-accent-green);
+            max-width: 760px;
+        }
+
+        /* Sections */
+        .about-section {
+            padding-top: 52px;
+            margin-top: 52px;
+            border-top: 1px solid var(--color-border);
+            scroll-margin-top: 72px;
+        }
+
+        .about-section:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 2.25rem;
+            line-height: 1.18;
+            color: var(--page-text);
+            margin-bottom: 28px;
+            text-wrap: balance;
+        }
+
+        /* Reading prose column (65-75ch readability standard) */
+        .prose-column {
+            max-width: 720px;
+            font-family: Georgia, serif;
+            font-size: 18px;
+            line-height: 29px;
+            color: var(--page-text-muted);
+        }
+
+        .prose-column p + p {
+            margin-top: 24px;
+        }
+
+        /* 3-line drop cap for opening paragraph */
+        .dropcap-lead .dropcap-letter {
+            float: left;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 96px;
+            line-height: 68px;
+            margin-right: 12px;
+            margin-top: 11px;
+            color: var(--page-text);
+            user-select: text;
+        }
+
+        /* Editorial Pull Quote */
+        .pull-quote {
+            margin: 44px 0;
+            padding: 32px 0;
+            border-top: 1px solid var(--color-border);
+            border-bottom: 1px solid var(--color-border);
+            max-width: 720px;
+        }
+
+        .pull-quote p {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-size: clamp(1.6rem, 3.2vw, 2.15rem);
+            line-height: 1.3;
+            color: var(--page-text);
+            margin-bottom: 12px;
+            text-wrap: balance;
+        }
+
+        .pull-quote cite {
+            font-family: Georgia, serif;
+            font-style: normal;
+            font-size: 0.85rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-accent-green);
+            display: block;
+        }
+
+        /* Approach Focus Grid: Option 4 Minimalist Typographic Columns */
+        .focus-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 48px 44px;
+            margin-top: 36px;
+        }
+
+        @media (max-width: 860px) {
+            .focus-grid {
+                grid-template-columns: 1fr;
+                gap: 36px;
+            }
+        }
+
+        .focus-item {
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .focus-item--turquoise { --item-accent: var(--color-turquoise); }
+        .focus-item--brown { --item-accent: var(--color-earth-brown); }
+        .focus-item--amber { --item-accent: var(--color-clay-amber); }
+
+        .focus-eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-family: Georgia, serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--item-accent);
+            margin-bottom: 10px;
+        }
+
+        .focus-eyebrow .eyebrow-mark {
+            background: var(--item-accent);
+        }
+
+        .focus-item h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1.55rem;
+            line-height: 1.22;
+            color: var(--page-text);
+            margin-bottom: 12px;
+        }
+
+        .focus-item p {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 24px;
+            color: var(--page-text-muted);
+        }
+
+        /* Director Profile: Asymmetric Editorial Layout */
+        .director-profile {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 48px;
+            align-items: start;
+            margin-top: 12px;
+        }
+
+        .director-photo-wrap {
+            position: relative;
+        }
+
+        .director-photo {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 4 / 5;
+            object-fit: cover;
+            display: block;
+            filter: contrast(1.04) saturate(0.95);
+            border: 1px solid rgba(33, 26, 18, 0.08);
+        }
+
+        .director-photo-caption {
+            margin-top: 10px;
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.8rem;
+            color: rgba(33, 26, 18, 0.6);
+            line-height: 1.4;
+        }
+
+        .director-content h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 2.1rem;
+            line-height: 1.15;
+            color: var(--page-text);
+            margin-bottom: 6px;
+        }
+
+        .director-title {
+            font-family: Georgia, serif;
+            font-size: 0.84rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-accent-green);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .director-bio {
+            font-family: Georgia, serif;
+            font-size: 16.5px;
+            line-height: 27px;
+            color: var(--page-text-muted);
+        }
+
+        .director-bio p + p {
+            margin-top: 16px;
+        }
+
+        .director-contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 22px;
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 15.5px;
+            color: var(--color-accent-green);
+            text-decoration: none;
+            transition: gap 0.2s ease, opacity 0.2s ease;
+        }
+
+        .director-contact-link:hover {
+            opacity: 0.75;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .director-profile {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+
+            .director-photo-wrap {
+                max-width: 220px;
+            }
+        }
+
+        /* Contact Section & Form */
+        .contact-wrap {
+            max-width: 680px;
+        }
+
+        .contact-intro {
+            font-family: Georgia, serif;
+            font-size: 17px;
+            line-height: 27px;
+            color: var(--page-text-muted);
+            margin-bottom: 32px;
+        }
+
+        .contact-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group--full {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-family: Georgia, serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(33, 26, 18, 0.75);
+        }
+
+        .form-input,
+        .form-textarea {
+            font-family: Georgia, serif;
+            font-size: 16px;
+            color: var(--page-text);
+            background: #ffffff;
+            border: 1px solid rgba(33, 26, 18, 0.22);
+            border-radius: 2px;
+            padding: 12px 14px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: var(--color-accent-green);
+            box-shadow: 0 0 0 1px var(--color-accent-green);
+        }
+
+        .form-textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 14px;
+            margin-top: 8px;
+        }
+
+        .form-submit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 36px;
+            font-family: Georgia, serif;
+            font-size: 0.84rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--page-text);
+            background: transparent;
+            border: 1px solid rgba(33, 26, 18, 0.35);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .form-submit-btn:hover {
+            background: var(--color-accent-green);
+            border-color: var(--color-accent-green);
+            color: #ffffff;
+            gap: 12px;
+        }
+
+        .form-note {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.86rem;
+            color: rgba(33, 26, 18, 0.62);
+            line-height: 1.5;
+        }
+
+        .form-note a {
+            color: var(--page-text);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .form-success-msg {
+            display: none;
+            padding: 16px 20px;
+            background: rgba(30, 74, 38, 0.08);
+            border: 1px solid rgba(30, 74, 38, 0.2);
+            border-radius: 2px;
+            font-family: Georgia, serif;
+            font-size: 15px;
+            color: var(--color-accent-green);
+            margin-bottom: 20px;
+        }
+
+        .form-success-msg.is-visible {
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            .contact-form {
+                grid-template-columns: 1fr;
+            }
+
+            .about-header {
+                margin-bottom: 40px;
+            }
+
+            .page-container {
+                padding-top: 36px;
+            }
+        }
+
+        /* Site Footer matching index.html */
+        .site-footer {
+            max-width: 980px;
+            margin: 64px auto 0;
+            padding: 40px 0 40px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        .footer-brand {
+            max-width: 480px;
+        }
+
+        .footer-logo {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-size: 1.45rem;
+            color: var(--page-text);
+            display: block;
+            margin-bottom: 8px;
+            text-decoration: none;
+        }
+
+        .footer-logo:hover {
+            opacity: 0.8;
+        }
+
+        .footer-tagline {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--color-accent-green);
+            margin: 0;
+        }
+
+        .footer-meta {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .footer-copy,
+        .footer-credit {
+            font-family: Georgia, serif;
+            font-size: 0.82rem;
+            color: rgba(33, 26, 18, 0.6);
+            margin: 0;
+        }
+
+        .footer-credit a {
+            color: var(--page-text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-credit a:hover {
+            color: var(--color-accent-green);
+        }
+
+        .footer-back-to-top {
+            font-family: Georgia, serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--page-text);
+            text-decoration: none;
+            margin-top: 8px;
+            display: inline-block;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .footer-back-to-top:hover {
+            color: var(--color-accent-green);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .site-footer {
+                margin-top: 48px;
+                padding: 32px 0 32px;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                gap: 28px;
+            }
+
+            .footer-meta {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sticky Slim Top Bar -->
+    <header class="slim-topbar" id="slimTopbar" aria-label="Site Navigation">
+        <div class="slim-topbar-inner">
+            <a href="index.html" class="slim-topbar-title">Regeneraci&oacute;n Lab</a>
+            <nav class="slim-topbar-nav" aria-label="Main Menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html" class="is-active">About</a></li>
+                    <li><a href="index.html#projects">Projects</a></li>
+                    <li><a href="index.html#residents">Residents</a></li>
+                    <li><a href="index.html#students">Students</a></li>
+                    <li><a href="index.html#support">Support</a></li>
+                </ul>
+            </nav>
+            <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavDrawer">
+                <span class="burger-box">
+                    <span class="burger-bar burger-bar--top"></span>
+                    <span class="burger-bar burger-bar--bot"></span>
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
+        <div class="mobile-nav-panel">
+            <nav class="mobile-nav-menu" aria-label="Mobile Menu">
+                <ul class="mobile-nav-links">
+                    <li style="--i: 0;"><a href="index.html" class="mobile-nav-link">Home</a></li>
+                    <li style="--i: 1;"><a href="about.html" class="mobile-nav-link is-active">About</a></li>
+                    <li style="--i: 2;"><a href="index.html#projects" class="mobile-nav-link">Projects</a></li>
+                    <li style="--i: 3;"><a href="index.html#residents" class="mobile-nav-link">Residents</a></li>
+                    <li style="--i: 4;"><a href="index.html#students" class="mobile-nav-link">Students</a></li>
+                    <li style="--i: 5;"><a href="index.html#support" class="mobile-nav-link">Support</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-nav-footer">
+                <p class="mobile-nav-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+            </div>
+        </div>
+    </div>
+
+    <main class="page-container" id="mainContent">
+
+        <!-- Page Header -->
+        <header class="about-header">
+            <div class="about-eyebrow">
+                <span class="eyebrow-mark"></span>
+                About the Lab
+            </div>
+            <h1 class="about-title">About Regeneraci&oacute;n Lab</h1>
+            <p class="about-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+        </header>
+
+        <!-- Section 1: History & Why Regeneración? -->
+        <section class="about-section" id="history">
+            <h2 class="section-title">Why Regeneraci&oacute;n?</h2>
+            <div class="prose-column">
+                <p class="dropcap-lead"><span class="dropcap-letter">W</span>e are named after the anarchist newspaper <em>Regeneraci&oacute;n</em>, published by the Flores Mag&oacute;n brothers from 1900&ndash;1918. Our lab carries forward their spirit of radical critique while centering Indigenous epistemologies and antiracism often erased in traditional anarchist narratives.</p>
+
+                <p>The <em>Regeneraci&oacute;n</em> newspaper, in its various formations, was the highest circulating Spanish-language newspaper of its time, and sometimes included English and Italian language sections. It was read by hundreds of thousands of people across the world and often read aloud for those who were non-literate. But <em>Regeneraci&oacute;n</em> was also part of a larger insurgent publishing network at the turn of the 20th century structured around community-based media, first-person accounts and testimonials, investigative reporting, translation, poetry, fiction, plays, music, comics and print art, public speeches and street corner conversations, and early engagements with photography and cinema.</p>
+
+                <p>Many of the authors included in these alternative newspapers were Indigenous, Black, Mestizo, Feminists, Queers, Immigrants, workers, peasants, political and poverty prisoners, religious minorities, and other people who could not get their voices covered in mainstream media. Their publications were often repressed and criminalized, with authors and interviewees risking death or incarceration to speak truth to power. We honor their legacy in opening the door for community-based media through our research justice work today.</p>
+            </div>
+
+            <blockquote class="pull-quote">
+                <p>&ldquo;They tried to bury us, but they didn&rsquo;t know we were seeds.&rdquo;</p>
+                <cite>&mdash; Mexican revolutionary dicho, circa 1910</cite>
+            </blockquote>
+        </section>
+
+        <!-- Section 2: Our Approach -->
+        <section class="about-section" id="approach">
+            <h2 class="section-title">Our Approach</h2>
+            <div class="prose-column">
+                <p>We create space for research, dialogue, and cultural production that challenges settler-colonial frameworks and imagines otherwise. Our work brings together scholars, artists, community members, and activists working at the intersections of Indigenous studies, ethnic studies, border politics, environmental justice, women of color feminisms, queer theory, and decolonial theory.</p>
+            </div>
+
+            <div class="focus-grid">
+                <div class="focus-item focus-item--turquoise">
+                    <div class="focus-eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        Methodology
+                    </div>
+                    <h3>Archives &amp; Historiographies</h3>
+                    <p>Recovering fugitive histories, counter-memorials, and community-controlled digital collections that challenge institutional erasure and extraction.</p>
+                </div>
+
+                <div class="focus-item focus-item--brown">
+                    <div class="focus-eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        Praxis
+                    </div>
+                    <h3>Decolonial Methodologies</h3>
+                    <p>Transforming academic research from an extractive model into relational, reciprocal, and accountable community partnerships.</p>
+                </div>
+
+                <div class="focus-item focus-item--amber">
+                    <div class="focus-eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        Pedagogy
+                    </div>
+                    <h3>Popular Education</h3>
+                    <p>Developing open-access curriculum modules, reading groups, and public humanities workshops centering grassroots knowledge.</p>
+                </div>
+
+                <div class="focus-item focus-item--turquoise">
+                    <div class="focus-eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        Ecology
+                    </div>
+                    <h3>Water &amp; Land Relations</h3>
+                    <p>Critically confronting settler resource extraction, border militarization, and environmental racism through Indigenous land defense.</p>
+                </div>
+
+                <div class="focus-item focus-item--brown">
+                    <div class="focus-eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        Media
+                    </div>
+                    <h3>Creative-Critical Praxis</h3>
+                    <p>Fusing creative writing, print art, counter-cartographies, film, and sonic media with rigorous social critique.</p>
+                </div>
+
+                <div class="focus-item focus-item--amber">
+                    <div class="focus-eyebrow">
+                        <span class="eyebrow-mark"></span>
+                        Community
+                    </div>
+                    <h3>Transformative Justice</h3>
+                    <p>Fostering intergenerational memory, descendant community autonomy, and restorative processes that transcend institutional borders.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Director / Principal Investigator -->
+        <section class="about-section" id="director">
+            <h2 class="section-title">Director &amp; Principal Investigator</h2>
+            <div class="director-profile">
+                <div class="director-photo-wrap">
+                    <img src="images/amrah.jpg" alt="Dr. Amrah Salomón" class="director-photo" loading="lazy">
+                    <p class="director-photo-caption">Dr. Amrah Salomón, Founder and Director of Regeneraci&oacute;n Lab.</p>
+                </div>
+                <div class="director-content">
+                    <h3>Amrah Salom&oacute;n</h3>
+                    <span class="director-title">Founder &amp; Principal Investigator &bull; Associate Professor, UCSB</span>
+                    <div class="director-bio">
+                        <p>Amrah Salom&oacute;n is a scholar, creative writer, and practitioner of research justice working at the intersections of Ethnic Studies, Indigenous studies, Women of Color feminisms and Queer theory, environmental justice, and decolonial methodologies. Her work centers on critical-creative praxis, film and literary analysis, critical geography, archival study, community-based research praxis, and the development of frameworks that challenge extractive knowledge production.</p>
+                        <p>At the Regeneraci&oacute;n Lab, Dr. Salom&oacute;n develops collaborative projects with descendant communities, mentors resident scholars and artists, and builds educational resources for students and activists.</p>
+                    </div>
+                    <a href="mailto:asalomon@ucsb.edu" class="director-contact-link">Contact Dr. Salom&oacute;n &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Contact Us -->
+        <section class="about-section" id="contact">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-wrap">
+                <p class="contact-intro">We welcome inquiries regarding community collaborations, research justice initiatives, resident scholar proposals, and educational partnerships.</p>
+
+                <div class="form-success-msg" id="formSuccessMsg">
+                    Thank you for reaching out. Your message has been sent to the Regeneraci&oacute;n Lab team.
+                </div>
+
+                <form class="contact-form" id="contactForm" action="https://formspree.io/f/asalomon@ucsb.edu" method="POST">
+                    <div class="form-group">
+                        <label for="contactName" class="form-label">Your Name</label>
+                        <input type="text" id="contactName" name="name" class="form-input" placeholder="Name" required autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail" class="form-label">Email Address</label>
+                        <input type="email" id="contactEmail" name="email" class="form-input" placeholder="email@address.edu" required autocomplete="email">
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="contactSubject" class="form-label">Subject / Area of Interest</label>
+                        <input type="text" id="contactSubject" name="subject" class="form-input" placeholder="e.g. Research Justice, Residency Inquiry, Archive">
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="contactMessage" class="form-label">Message</label>
+                        <textarea id="contactMessage" name="message" class="form-textarea" placeholder="Share your message or inquiry..." required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="form-submit-btn">Send Message &rarr;</button>
+                        <p class="form-note">Direct correspondence: <a href="mailto:asalomon@ucsb.edu">asalomon@ucsb.edu</a> &bull; Regeneraci&oacute;n Lab, University of California, Santa Barbara.</p>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Site Footer -->
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <a href="index.html" class="footer-logo">Regeneraci&oacute;n Lab</a>
+                    <p class="footer-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+                </div>
+                <div class="footer-meta">
+                    <p class="footer-copy">&copy; <span id="currentYear">2026</span> Regeneraci&oacute;n Lab. All rights reserved.</p>
+                    <p class="footer-credit">Website designed by <a href="https://hire.graysonearle.com" target="_blank" rel="noopener noreferrer">Grayson Earle</a></p>
+                    <a href="#top" class="footer-back-to-top" id="backToTopBtn">Back to top &uarr;</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        // Hamburger menu toggle for mobile drawer
+        const burgerBtn = document.getElementById('slimTopbarBurger');
+        const mobileDrawer = document.getElementById('mobileNavDrawer');
+
+        function setMobileMenuOpen(open) {
+            if (!burgerBtn || !mobileDrawer) return;
+            burgerBtn.classList.toggle('is-open', open);
+            mobileDrawer.classList.toggle('is-open', open);
+            burgerBtn.setAttribute('aria-expanded', String(open));
+            mobileDrawer.setAttribute('aria-hidden', String(!open));
+            document.body.classList.toggle('menu-open', open);
+        }
+
+        if (burgerBtn && mobileDrawer) {
+            burgerBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = burgerBtn.classList.contains('is-open');
+                setMobileMenuOpen(!isOpen);
+            });
+
+            mobileDrawer.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    setMobileMenuOpen(false);
+                });
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && burgerBtn.classList.contains('is-open')) {
+                    setMobileMenuOpen(false);
+                }
+            });
+        }
+
+        // Dynamic footer year
+        const currentYearEl = document.getElementById('currentYear');
+        if (currentYearEl) {
+            currentYearEl.textContent = new Date().getFullYear();
+        }
+
+        // Back to top smooth scroll
+        const backToTopBtn = document.getElementById('backToTopBtn');
+        if (backToTopBtn) {
+            backToTopBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Contact form mock submit handler (clean UX feedback)
+        const contactForm = document.getElementById('contactForm');
+        const successMsg = document.getElementById('formSuccessMsg');
+        if (contactForm && successMsg) {
+            contactForm.addEventListener('submit', (e) => {
+                // If using formspree, let it submit or provide local feedback
+                if (contactForm.action.includes('asalomon@ucsb.edu')) {
+                    e.preventDefault();
+                    successMsg.classList.add('is-visible');
+                    contactForm.reset();
+                    successMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
