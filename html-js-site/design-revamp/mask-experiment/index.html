@@ -133,22 +133,30 @@
            fade-in and scrolling under the floating title like everything
            else. */
         .page-header {
-            margin: 0 auto 64px;
+            margin: 0 auto 48px;
             text-align: center;
-            /* No max-width here on purpose: the live nav centers across
-               the full page width, and confining six tracked-uppercase
-               items to the 640px copy column just wraps them. The tagline
-               keeps the column for itself below. */
+            max-width: 980px;
         }
 
         .page-tagline {
-            max-width: 640px;
+            max-width: 100%;
             margin: 0 auto;
             font-family: 'Instrument Serif', Georgia, serif;
             font-style: italic;
-            font-size: 1.2em;
-            line-height: 1.45;
+            font-size: clamp(1.15rem, 1.4vw, 1.32rem);
+            line-height: 1.4;
             color: #1e4a26; /* regen_wp --color-accent-green: the live tagline's exact color */
+        }
+
+        @media (min-width: 860px) {
+            .page-tagline {
+                white-space: nowrap;
+            }
+        }
+
+        /* In-page nav is hidden for now; site relies on the sticky slim topbar nav */
+        .page-nav {
+            display: none !important;
         }
 
         .page-nav ul {
@@ -465,11 +473,11 @@
            accessible, searchable, and responsive across all screens.
            The drop cap letter smoothly grows on hero activation. */
         .page-copy {
-            max-width: 640px;
+            max-width: 980px;
             margin: 0 auto;
             font-family: Georgia, serif;
             font-size: 18px;
-            line-height: 28px;
+            line-height: 29px;
             color: var(--page-text);
         }
 
