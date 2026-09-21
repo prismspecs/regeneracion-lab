@@ -117,7 +117,7 @@
             z-index: 2;
             opacity: 0;
             color: var(--page-text);
-            padding: 30px 20px 0;
+            padding: 12px 20px 0;
             transition: opacity 0.5s ease;
         }
 
@@ -139,7 +139,7 @@
         }
 
         .page-nav {
-            margin-bottom: 20px;
+            margin-bottom: 44px;
         }
 
         .page-nav ul {
@@ -1909,9 +1909,8 @@
             //
             // .hero-spacer reserves scroll room for the hero interaction.
             // Sized so that docking at LANDING_SCROLL_Y positions the
-            // tagline and menu cleanly below the pinned title (matching
-            // the tight editorial spacing without a huge blank void).
-            heroSpacer.style.height = Math.round(scaledHeight + 130) + 'px';
+            // menu cleanly below the pinned title, eliminating the cavernous gap.
+            heroSpacer.style.height = Math.round(scaledHeight + 70) + 'px';
 
             titleWhite.style.width = renderedWidth + 'px';
 
