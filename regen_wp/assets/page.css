@@ -657,7 +657,7 @@
     font-family: Georgia, serif;
     font-style: italic;
     font-size: 0.8rem;
-    color: rgba(33, 26, 18, 0.6);
+    color: var(--page-text-light);
     line-height: 1.4;
 }
 

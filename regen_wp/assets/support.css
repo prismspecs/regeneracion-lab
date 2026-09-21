@@ -146,7 +146,7 @@
     font-size: 0.8rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(33, 26, 18, 0.6);
+    color: var(--page-text-light);
     cursor: pointer;
     padding: 8px 12px;
     transition: color 0.2s ease;
