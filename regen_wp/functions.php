@@ -118,16 +118,97 @@ add_action( 'save_post_resident', 'regen_wp_save_resident_meta' );
  */
 
 function regen_wp_enqueue_scripts() {
-    // Enqueue main stylesheet
-    wp_enqueue_style( 'regen-main-style', get_stylesheet_uri() );
-    
-    // Enqueue Google Fonts (from index.html)
-    wp_enqueue_style( 'regen-google-fonts', 'https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Roboto:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap', array(), null );
+    $uri = get_template_directory_uri() . '/assets/';
+    $dir = get_template_directory() . '/assets/';
+    $ver = static function ( $file ) use ( $dir ) {
+        return file_exists( $dir . $file ) ? filemtime( $dir . $file ) : null;
+    };
 
-    // PJAX-style nav swaps (keeps clean URLs)
-    wp_enqueue_script( 'regen-pjax', get_template_directory_uri() . '/pjax.js', array(), null, true );
+    // Instrument Serif is the only web font; body copy is Georgia.
+    wp_enqueue_style( 'regen-fonts', 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap', array(), null );
+
+    // Shared chrome (tokens, top bar, drawer, footer) loads on every page.
+    wp_enqueue_style( 'regen-site', $uri . 'site.css', array( 'regen-fonts' ), $ver( 'site.css' ) );
+    wp_enqueue_script( 'regen-site', $uri . 'site.js', array(), $ver( 'site.js' ), true );
+
+    // Content-page components (masthead, prose, forms...) load everywhere but the hero homepage.
+    if ( ! is_front_page() ) {
+        wp_enqueue_style( 'regen-page', $uri . 'page.css', array( 'regen-site' ), $ver( 'page.css' ) );
+    }
+
+    // Theme header stylesheet: WP-specific rules only.
+    wp_enqueue_style( 'regen-theme', get_stylesheet_uri(), array( 'regen-site' ), $ver( '../style.css' ) );
 }
 add_action( 'wp_enqueue_scripts', 'regen_wp_enqueue_scripts' );
+
+/**
+ * Primary-menu walker: emits the plain <li><a> markup that site.css styles.
+ * Pass true for the mobile drawer (adds .mobile-nav-link and stagger index).
+ */
+class Regen_Nav_Walker extends Walker_Nav_Menu {
+    private $mobile;
+    private $index = 0;
+
+    public function __construct( $mobile = false ) {
+        $this->mobile = $mobile;
+    }
+
+    public function start_lvl( &$output, $depth = 0, $args = null ) {}
+    public function end_lvl( &$output, $depth = 0, $args = null ) {}
+
+    public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
+        if ( $depth > 0 ) {
+            return;
+        }
+        $active  = regen_wp_nav_item_is_active( $item );
+        $classes = array();
+        if ( $this->mobile ) {
+            $classes[] = 'mobile-nav-link';
+        }
+        if ( $active ) {
+            $classes[] = 'is-active';
+        }
+        $li_style = $this->mobile ? ' style="--i: ' . (int) $this->index++ . ';"' : '';
+        $target   = ( ! empty( $item->target ) ) ? ' target="' . esc_attr( $item->target ) . '" rel="noopener"' : '';
+
+        $output .= '<li' . $li_style . '><a href="' . esc_url( $item->url ) . '"'
+            . ( $classes ? ' class="' . esc_attr( implode( ' ', $classes ) ) . '"' : '' )
+            . ( $active ? ' aria-current="page"' : '' )
+            . $target . '>' . esc_html( $item->title ) . '</a>';
+    }
+
+    public function end_el( &$output, $item, $depth = 0, $args = null ) {
+        if ( $depth > 0 ) {
+            return;
+        }
+        $output .= '</li>';
+    }
+}
+
+/**
+ * A menu item is active when WP says it is current, or when the request sits
+ * under its path (so /projects/research-justice/ keeps "Projects" lit).
+ */
+function regen_wp_nav_item_is_active( $item ) {
+    if ( $item->current || $item->current_item_ancestor || $item->current_item_parent ) {
+        return true;
+    }
+    $home_path = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+    $strip     = static function ( $path ) use ( $home_path ) {
+        $path = trim( (string) $path, '/' );
+        if ( $home_path !== '' && 0 === strpos( $path, $home_path ) ) {
+            $path = trim( substr( $path, strlen( $home_path ) ), '/' );
+        }
+        return $path;
+    };
+    $item_path = $strip( wp_parse_url( $item->url, PHP_URL_PATH ) );
+    if ( '' === $item_path ) {
+        return is_front_page();
+    }
+    global $wp;
+    $request = isset( $wp->request ) ? trim( $wp->request, '/' ) : '';
+    return $request === $item_path || 0 === strpos( $request, $item_path . '/' );
+}
 
 // Disable CF7 auto-paragraph so our custom form-floating markup isn't broken by extra <p> tags.
 add_filter( 'wpcf7_autop_or_not', '__return_false' );
@@ -143,23 +224,6 @@ function regen_wp_register_menus() {
     ) );
 }
 add_action( 'after_setup_theme', 'regen_wp_register_menus' );
-
-// Add nav-link class to primary menu anchors for styling parity
-function regen_wp_nav_link_class( $atts, $item, $args ) {
-    if ( isset( $args->theme_location ) && 'primary' === $args->theme_location ) {
-        $classes = array( 'nav-link' );
-        
-        // Add active class if this is the current item or an ancestor
-        if ( $item->current || $item->current_item_ancestor || $item->current_item_parent ) {
-            $classes[] = 'active';
-        }
-
-        $existing_class = isset( $atts['class'] ) ? $atts['class'] . ' ' : '';
-        $atts['class'] = trim( $existing_class . implode( ' ', $classes ) );
-    }
-    return $atts;
-}
-add_filter( 'nav_menu_link_attributes', 'regen_wp_nav_link_class', 10, 3 );
 
 // Theme options via Customizer (hero and support CTA)
 function regen_wp_customize_register( $wp_customize ) {
@@ -270,8 +334,6 @@ function regen_wp_customize_register( $wp_customize ) {
     ) );
 }
 add_action( 'customize_register', 'regen_wp_customize_register' );
-
-// Note: SPA hash-routing has been removed from enqueue; app.js remains in the theme for reference if hash navigation is ever needed again.
 
 // Custom post types for structured content
 function regen_wp_register_cpts() {

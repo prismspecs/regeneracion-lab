@@ -402,3 +402,22 @@
         transform: none !important;
     }
 }
+
+
+/* Skip link: visible only on keyboard focus */
+.skip-link {
+    position: absolute;
+    left: 16px;
+    top: -60px;
+    z-index: 200;
+    padding: 10px 16px;
+    background: var(--page-text);
+    color: var(--page-bg);
+    font-family: Georgia, serif;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    top: 12px;
+}

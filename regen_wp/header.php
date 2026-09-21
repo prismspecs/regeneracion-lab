@@ -1,3 +1,9 @@
+<?php
+/**
+ * Site header: slim top bar + mobile drawer.
+ * Markup and classes come from assets/site.css (single source for all pages).
+ */
+?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 
@@ -8,33 +14,52 @@
     <?php wp_head(); ?>
 </head>
 
-<body <?php body_class(); ?>>
+<body <?php body_class(); ?> id="top">
 <?php wp_body_open(); ?>
-    <div class="app-container">
-        <div class="mockup">
-            <header class="site-header" id="siteHeader">
-                <div class="site-title-bar">
-                    <h1 class="site-title"><?php bloginfo( 'name' ); ?></h1>
-                    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-                </div>
-                <p class="site-tagline"><?php bloginfo( 'description' ); ?></p>
-                <nav class="site-nav" id="siteNav">
-                    <?php
-                        wp_nav_menu( array(
-                            'theme_location' => 'primary',
-                            'menu_class'     => 'nav-list',
-                            'container'      => false,
-                            'fallback_cb'    => false,
-                        ) );
-                    ?>
-                </nav>
-            </header>
+    <a class="skip-link" href="#mainContent"><?php esc_html_e( 'Skip to content', 'regen-wp' ); ?></a>
 
-            <div class="content-wrapper">
-                <div class="loading-spinner" id="loadingSpinner"></div>
-                <div class="content-area" id="mainContent">
-                    <!-- Content will be dynamically loaded here -->
+    <header class="slim-topbar" id="slimTopbar" aria-label="<?php esc_attr_e( 'Site Header', 'regen-wp' ); ?>">
+        <div class="slim-topbar-inner">
+            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="slim-topbar-title"><?php bloginfo( 'name' ); ?></a>
+            <nav class="slim-topbar-nav" aria-label="<?php esc_attr_e( 'Main Menu', 'regen-wp' ); ?>">
+                <?php
+                wp_nav_menu( array(
+                    'theme_location' => 'primary',
+                    'container'      => false,
+                    'items_wrap'     => '<ul>%3$s</ul>',
+                    'depth'          => 1,
+                    'fallback_cb'    => false,
+                    'walker'         => new Regen_Nav_Walker(),
+                ) );
+                ?>
+            </nav>
+            <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="<?php esc_attr_e( 'Open menu', 'regen-wp' ); ?>" aria-expanded="false" aria-controls="mobileNavDrawer">
+                <span class="burger-box">
+                    <span class="burger-bar burger-bar--top"></span>
+                    <span class="burger-bar burger-bar--bot"></span>
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'regen-wp' ); ?>">
+        <div class="mobile-nav-panel">
+            <nav class="mobile-nav-menu" aria-label="<?php esc_attr_e( 'Mobile Menu', 'regen-wp' ); ?>">
+                <?php
+                wp_nav_menu( array(
+                    'theme_location' => 'primary',
+                    'container'      => false,
+                    'items_wrap'     => '<ul class="mobile-nav-links">%3$s</ul>',
+                    'depth'          => 1,
+                    'fallback_cb'    => false,
+                    'walker'         => new Regen_Nav_Walker( true ),
+                ) );
+                ?>
+            </nav>
+            <div class="mobile-nav-footer">
+                <p class="mobile-nav-tagline"><?php bloginfo( 'description' ); ?></p>
+            </div>
+        </div>
+    </div>
+
+    <main class="page-container" id="mainContent">
