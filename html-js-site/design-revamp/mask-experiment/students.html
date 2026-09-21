@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Students &mdash; REGENERACI&Oacute;N LAB</title>
+    <link rel="icon" type="image/png" href="images/amrah.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="site.css">
+    <link rel="stylesheet" href="page.css">
+    <style>
+
+        /* Reading Group / Study Circle Cards */
+        .reading-group-list {
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+
+        .program-card {
+            border: 1px solid var(--color-border);
+            padding: 36px 36px 32px;
+            background: #ffffff;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .program-card:hover {
+            border-color: rgba(33, 26, 18, 0.25);
+            box-shadow: 0 4px 18px rgba(33, 26, 18, 0.04);
+        }
+
+        .program-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .program-badge {
+            display: inline-block;
+            font-family: Georgia, serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 0;
+            font-weight: 600;
+        }
+
+        .program-badge--active {
+            background: rgba(30, 74, 38, 0.08);
+            color: var(--color-accent-green);
+            border: 1px solid rgba(30, 74, 38, 0.25);
+        }
+
+        .program-badge--winter {
+            background: rgba(31, 122, 140, 0.08);
+            color: var(--color-turquoise);
+            border: 1px solid rgba(31, 122, 140, 0.25);
+        }
+
+        .program-partner {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.88rem;
+            color: var(--page-text-muted);
+        }
+
+        .program-card h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 2.1rem;
+            line-height: 1.15;
+            color: var(--page-text);
+            margin-bottom: 12px;
+        }
+
+        .program-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            font-family: Georgia, serif;
+            font-size: 0.85rem;
+            color: var(--page-text-muted);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--color-border-subtle);
+        }
+
+        .program-meta-item {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .program-meta-item strong {
+            font-weight: 600;
+            color: var(--page-text);
+        }
+
+        .program-desc {
+            font-family: Georgia, serif;
+            font-size: 17px;
+            line-height: 28px;
+            color: var(--page-text-muted);
+            margin-bottom: 24px;
+        }
+
+        .program-topics {
+            margin: 24px 0 28px;
+            padding: 18px 0 0;
+            border-top: 1px solid var(--color-border-subtle);
+            background: transparent;
+        }
+
+        .program-topics-title {
+            font-family: Georgia, serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--page-text);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .program-topics-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .program-topics-list li {
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 24px;
+            color: var(--page-text-muted);
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .program-topics-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--color-accent-green);
+            font-weight: bold;
+        }
+
+        .program-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-top: 18px;
+            border-top: 1px solid var(--color-border-subtle);
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: Georgia, serif;
+            font-size: 0.82rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--page-text);
+            text-decoration: none;
+            padding: 12px 24px;
+            border: 1px solid rgba(33, 26, 18, 0.3);
+            background: transparent;
+            border-radius: 0;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn-action:hover {
+            background: var(--page-text);
+            color: var(--page-bg);
+            border-color: var(--page-text);
+        }
+
+        .program-facilitator {
+            font-family: Georgia, serif;
+            font-style: italic;
+            font-size: 0.88rem;
+            color: var(--page-text-muted);
+        }
+
+        /* Two-Column Opportunities Grid */
+        .opportunities-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 36px;
+            margin: 36px 0;
+        }
+
+        .opp-card {
+            border: 1px solid var(--color-border);
+            padding: 32px 30px;
+            background: #ffffff;
+        }
+
+        .opp-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .opp-card h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1.85rem;
+            line-height: 1.18;
+            color: var(--page-text);
+            margin-bottom: 14px;
+        }
+
+        .opp-card-text {
+            font-family: Georgia, serif;
+            font-size: 16px;
+            line-height: 26px;
+            color: var(--page-text-muted);
+            margin-bottom: 20px;
+        }
+
+        .opp-item-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opp-item-list li {
+            font-family: Georgia, serif;
+            font-size: 15px;
+            line-height: 23px;
+            color: var(--page-text-muted);
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .opp-item-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--color-accent-green);
+        }
+
+        .opp-item-list strong {
+            color: var(--page-text);
+            font-weight: 600;
+        }
+
+        /* Pedagogical Frameworks 3-Col Grid */
+        .frameworks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .framework-card {
+            border: 1px solid var(--color-border);
+            padding: 28px 24px;
+            background: #ffffff;
+        }
+
+        .framework-num {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 2.2rem;
+            line-height: 1;
+            color: var(--color-accent-green);
+            margin-bottom: 12px;
+        }
+
+        .framework-card h4 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1.5rem;
+            line-height: 1.2;
+            color: var(--page-text);
+            margin-bottom: 10px;
+        }
+
+        .framework-card p {
+            font-family: Georgia, serif;
+            font-size: 15px;
+            line-height: 24px;
+            color: var(--page-text-muted);
+        }
+
+        /* Form Styling (Sharply Brutalist, Zero Border Radius) */
+        .form-section-container {
+            background: #ffffff;
+            border: 1px solid var(--color-border);
+            padding: 44px 40px;
+            margin-top: 36px;
+        }
+
+        .join-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .form-label .req {
+            color: var(--color-earth-brown);
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23211a12' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+
+        .checkbox-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-family: Georgia, serif;
+            font-size: 15.5px;
+            line-height: 1.45;
+            color: var(--page-text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-top: 3px;
+            width: 17px;
+            height: 17px;
+            border: 1px solid rgba(33, 26, 18, 0.35);
+            border-radius: 0;
+            accent-color: var(--color-accent-green);
+            cursor: pointer;
+        }
+
+        .checkbox-item span {
+            color: var(--page-text);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 860px) {
+            .opportunities-grid {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+
+            .frameworks-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .join-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        
+
+        @media (max-width: 640px) {
+
+            .program-card {
+                padding: 24px 20px;
+            }
+
+            .form-section-container {
+                padding: 28px 20px;
+            }
+
+            .btn-action {
+                width: 100%;
+                min-height: 48px;
+                padding: 14px 20px;
+                justify-content: center;
+                box-sizing: border-box;
+                font-size: 0.85rem;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                gap: 28px;
+            }
+
+            .footer-meta {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body id="top">
+
+    <!-- Sticky Slim Topbar -->
+    <header class="slim-topbar" id="slimTopbar" aria-label="Site Header">
+        <div class="slim-topbar-inner">
+            <a href="index.html" class="slim-topbar-title">Regeneraci&oacute;n Lab</a>
+            <nav class="slim-topbar-nav" aria-label="Main Menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="index.html#projects">Projects</a></li>
+                    <li><a href="residents.html">Residents</a></li>
+                    <li><a href="students.html" class="is-active">Students</a></li>
+                    <li><a href="index.html#support">Support</a></li>
+                </ul>
+            </nav>
+            <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavDrawer">
+                <span class="burger-box">
+                    <span class="burger-bar burger-bar--top"></span>
+                    <span class="burger-bar burger-bar--bot"></span>
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
+        <div class="mobile-nav-panel">
+            <nav class="mobile-nav-menu" aria-label="Mobile Menu">
+                <ul class="mobile-nav-links">
+                    <li style="--i: 0;"><a href="index.html" class="mobile-nav-link">Home</a></li>
+                    <li style="--i: 1;"><a href="about.html" class="mobile-nav-link">About</a></li>
+                    <li style="--i: 2;"><a href="index.html#projects" class="mobile-nav-link">Projects</a></li>
+                    <li style="--i: 3;"><a href="residents.html" class="mobile-nav-link">Residents</a></li>
+                    <li style="--i: 4;"><a href="students.html" class="mobile-nav-link is-active">Students</a></li>
+                    <li style="--i: 5;"><a href="index.html#support" class="mobile-nav-link">Support</a></li>
+                </ul>
+            </nav>
+            <div class="mobile-nav-footer">
+                <p class="mobile-nav-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+            </div>
+        </div>
+    </div>
+
+    <main class="page-container" id="mainContent">
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="page-eyebrow">
+                <span class="eyebrow-mark"></span>
+                Curricular &amp; Community Programs
+            </div>
+            <h1 class="page-title">For Students &amp; Community Researchers</h1>
+            <p class="page-tagline">Reading groups, collaborative coding spaces, directed study, and decolonial research opportunities centering Indigenous epistemologies and research justice.</p>
+
+            <nav class="section-jump-nav" aria-label="Jump to section">
+                <a href="#reading-groups">Reading Groups &amp; Labs &rarr;</a>
+                <a href="#opportunities">Study &amp; Research Opportunities &rarr;</a>
+                <a href="#frameworks">Pedagogical Frameworks &rarr;</a>
+                <a href="#join-form">Join a Group &rarr;</a>
+            </nav>
+        </header>
+
+        <!-- Section 1: Reading Groups & Study Circles -->
+        <section class="page-section" id="reading-groups">
+            <h2 class="section-title">Reading Groups &amp; Study Circles</h2>
+            <p class="section-intro">Our reading groups and collaborative labs provide rigorous, non-hierarchical spaces where students, faculty, and movement organizers analyze critical texts and build practical technical methodologies together.</p>
+
+            <div class="reading-group-list">
+
+                <!-- Program 1: Critical Temporalities Reading Group -->
+                <article class="program-card">
+                    <div class="program-card-header">
+                        <span class="program-badge program-badge--active">Active &bull; 2025&ndash;2026</span>
+                        <span class="program-partner">Co-sponsored with UCSB English Literature &amp; Environment</span>
+                    </div>
+                    <h3>2025&ndash;2026: Critical Temporalities Reading Group</h3>
+                    <div class="program-meta">
+                        <span class="program-meta-item"><strong>Schedule:</strong> Bi-weekly Seminar</span>
+                        <span class="program-meta-item"><strong>Format:</strong> Hybrid (UCSB Campus &amp; Online)</span>
+                        <span class="program-meta-item"><strong>Eligibility:</strong> Open to All Students &amp; Community</span>
+                    </div>
+                    <p class="program-desc">Join the Regeneraci&oacute;n Lab and the UCSB English Department Literature &amp; Environment research center for an interdisciplinary reading group on time, space, and environment. This collaborative space brings together students, faculty, and community members to engage with critical scholarship on temporality, environmental justice, and colonial climate fractures.</p>
+                    
+                    <div class="program-topics">
+                        <div class="program-topics-title">Selected Reading Inquiries</div>
+                        <ul class="program-topics-list">
+                            <li>Non-linear temporality, Indigenous cosmologies, and relational ecology</li>
+                            <li>Extractive acceleration, settler speed, and colonial climate ruptures</li>
+                            <li>Decolonial environmental humanities, more-than-human resistance, and deep time</li>
+                        </ul>
+                    </div>
+
+                    <div class="program-actions">
+                        <a href="#join-form" class="btn-action" data-preselect="critical-temporalities">&rarr; Join the Reading Group</a>
+                        <span class="program-facilitator">Co-convened by Regeneraci&oacute;n Lab &amp; Literature and Environment Faculty</span>
+                    </div>
+                </article>
+
+                <!-- Program 2: Python Learning Lab -->
+                <article class="program-card">
+                    <div class="program-card-header">
+                        <span class="program-badge program-badge--winter">Winter 2026 Cohort</span>
+                        <span class="program-partner">With the Transcriptions Center for Digital Humanities</span>
+                    </div>
+                    <h3>Winter 2026: Python Learning Lab / Coding for Justice</h3>
+                    <div class="program-meta">
+                        <span class="program-meta-item"><strong>Schedule:</strong> Weekly Workshop Labs</span>
+                        <span class="program-meta-item"><strong>Facilitator:</strong> B.T. Werner (Scholar-in-Residence)</span>
+                        <span class="program-meta-item"><strong>Level:</strong> Beginner to Intermediate &bull; No Prerequisites</span>
+                    </div>
+                    <p class="program-desc">Join the Regeneraci&oacute;n Lab and the Transcriptions Center for Digital Humanities in a collaborative space for learning and developing projects in Python. Open to students, faculty, and community members interested in learning how to code in Python or who want to workshop coding Digital Humanities and Research Justice frameworks projects. Facilitated by B.T. Werner.</p>
+                    
+                    <div class="program-topics">
+                        <div class="program-topics-title">Lab Praxis &amp; Technical Scope</div>
+                        <ul class="program-topics-list">
+                            <li>Python essentials applied to humanities, environmental, and oral history datasets</li>
+                            <li>Text scraping, natural language exploration, and ethical archival data handling</li>
+                            <li>Counter-cartography, non-extractive data governance, and spatial modeling</li>
+                        </ul>
+                    </div>
+
+                    <div class="program-actions">
+                        <a href="#join-form" class="btn-action" data-preselect="python-learning-lab">&rarr; Join the Python Lab</a>
+                        <span class="program-facilitator">Facilitated by B.T. Werner (Environmental Physics &amp; Complex Systems)</span>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- Section 2: Study & Research Opportunities -->
+        <section class="page-section" id="opportunities">
+            <h2 class="section-title">Study &amp; Research Opportunities</h2>
+            
+            <p class="dropcap-lead section-intro" style="margin-bottom: 24px;">
+                <span class="dropcap-letter">T</span>he Regeneraci&oacute;n Lab offers opportunities for students to engage in community-based research, decolonial praxis, and collaborative scholarship. We work with undergraduate and graduate students and postdoctoral fellows across disciplines who are committed to research justice and critical-creative methodologies.
+            </p>
+
+            <div class="opportunities-grid">
+                
+                <!-- Card 1: Ways to Engage -->
+                <div class="opp-card">
+                    <div class="opp-card-header">
+                        <span class="eyebrow-mark eyebrow-mark--turquoise"></span>
+                        <span class="page-eyebrow" style="margin-bottom: 0;">Participation Pathways</span>
+                    </div>
+                    <h3>Ways to Engage</h3>
+                    <p class="opp-card-text">Students can participate through directed research projects, reading groups and study circles, workshops, and collaborative initiatives with our resident scholars. We prioritize hands-on learning that centers community needs and Indigenous and marginalized epistemologies.</p>
+                    <ul class="opp-item-list">
+                        <li><strong>Directed Research:</strong> Supervised research credit in departmental independent study (English, Chicana/o Studies, Environmental Studies).</li>
+                        <li><strong>Archival Digitization:</strong> Practical preservation work with our Safiya Henderson Holmes Black Arts archive and oral histories.</li>
+                        <li><strong>Counter-Mapping:</strong> Field and GIS methodologies documenting water rights and ancestral river confluence geography.</li>
+                        <li><strong>Graduate Fellowships:</strong> Collaborative co-authorship on research justice curriculum and public monographs.</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2: Resources & Syllabi -->
+                <div class="opp-card">
+                    <div class="opp-card-header">
+                        <span class="eyebrow-mark eyebrow-mark--brown"></span>
+                        <span class="page-eyebrow" style="margin-bottom: 0;">Curricular Assets</span>
+                    </div>
+                    <h3>Resources &amp; Syllabi</h3>
+                    <p class="opp-card-text">Access our Indigenous Border Studies Syllabus, research justice frameworks, and educational materials developed through our community-based projects. These resources are designed to support critical engagement with decolonial scholarship and praxis.</p>
+                    <ul class="opp-item-list">
+                        <li><strong>Indigenous Border Studies Syllabus:</strong> Multi-thematic open-access curriculum mapping borders, colonial treaties, and carceral geography.</li>
+                        <li><strong>Research Justice Toolkits:</strong> Consent-based research frameworks, community verification protocols, and ethical citation models.</li>
+                        <li><strong>Digital Humanities Codebase:</strong> Open-source repository of text analysis and spatial scripts developed in lab workshops.</li>
+                        <li><strong>Movement Filmography:</strong> Curated primary documentation, recorded seminars, and indigenous water defense media.</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Editorial Pullquote -->
+            <blockquote class="pull-quote">
+                <p>&ldquo;Research justice is a strategic framework that transforms inquiry into an instrument of community self-determination, dismantling extractive university dynamics in favor of accountable, shared liberation.&rdquo;</p>
+                <cite>Regeneraci&oacute;n Lab Working Praxis</cite>
+            </blockquote>
+
+            <div style="display: flex; align-items: center; justify-content: flex-start; gap: 20px; flex-wrap: wrap;">
+                <a href="mailto:asalomon@ucsb.edu?subject=Student%20Research%20Opportunities%20Inquiry" class="btn-action">&rarr; Contact Us About Opportunities</a>
+                <span style="font-family: Georgia, serif; font-style: italic; font-size: 0.88rem; color: var(--page-text-muted);">Inquiries directed to Lab Director Dr. Alicia Re Cruz-Salomon</span>
+            </div>
+        </section>
+
+        <!-- Section 3: Pedagogical Frameworks -->
+        <section class="page-section" id="frameworks">
+            <h2 class="section-title">Pedagogical Frameworks &amp; Praxis</h2>
+            <p class="section-intro">Our student cohorts, reading groups, and lab collaborations are animated by three core pedagogical commitments designed to dissolve the boundary between academic research and community struggle.</p>
+
+            <div class="frameworks-grid">
+                <div class="framework-card">
+                    <div class="framework-num">01</div>
+                    <h4>Decolonial Epistemologies</h4>
+                    <p>Centering Indigenous, Black radical, and Global South traditions of knowledge that predate and resist colonial land partition, water diversion, and linear extraction.</p>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-num">02</div>
+                    <h4>Research Justice</h4>
+                    <p>Refusing top-down extractive methodologies. Community partners hold veto power, editorial authority, and shared stewardship over archival collections and publications.</p>
+                </div>
+                <div class="framework-card">
+                    <div class="framework-num">03</div>
+                    <h4>Critical-Creative Making</h4>
+                    <p>Blending rigorous theoretical scholarship with Python data modeling, counter-mapping, poetry archives, and public art to intervene directly in policy and culture.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Shared Join Form -->
+        <section class="page-section form-section" id="join-form">
+            <h2 class="section-title">Join a Reading Group / Study Circle</h2>
+            <p class="section-intro">To participate in our reading groups, Python Learning Lab, or upcoming study circles, please submit your information below. All circles are free and open to students, faculty, and community scholars.</p>
+
+            <div class="form-section-container">
+                <div class="form-success-msg" id="joinSuccessMsg" role="alert">
+                    Thank you for your interest! Your registration note has been recorded. We will be in touch shortly with upcoming meeting schedules and reading materials.
+                </div>
+
+                <form class="join-form" id="studentJoinForm" action="https://formspree.io/f/asalomon@ucsb.edu" method="POST">
+                    
+                    <div class="form-group">
+                        <label for="join-name" class="form-label">Full Name <span class="req">*</span></label>
+                        <input type="text" id="join-name" name="name" class="form-input" placeholder="e.g. Maya Lin" required autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="join-email" class="form-label">Email Address <span class="req">*</span></label>
+                        <input type="email" id="join-email" name="email" class="form-input" placeholder="e.g. mlin@ucsb.edu" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="join-affiliation" class="form-label">UCSB / Community Affiliation</label>
+                        <select id="join-affiliation" name="affiliation" class="form-select">
+                            <option value="">Select affiliation...</option>
+                            <option value="UCSB Undergraduate Student">UCSB Undergraduate Student</option>
+                            <option value="UCSB Graduate Student">UCSB Graduate Student</option>
+                            <option value="Postdoctoral Fellow / Researcher">Postdoctoral Fellow / Researcher</option>
+                            <option value="UCSB Faculty / Staff">UCSB Faculty / Staff</option>
+                            <option value="Independent / Community Scholar">Independent / Community Scholar</option>
+                            <option value="Other Institution">Other Institution</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="join-department" class="form-label">Major, Department, or Group</label>
+                        <input type="text" id="join-department" name="department" class="form-input" placeholder="e.g. English, Chicana/o Studies, Computer Science">
+                    </div>
+
+                    <div class="form-group form-group--full">
+                        <label class="form-label">Which group(s) are you interested in? <span class="req">*</span></label>
+                        <div class="checkbox-stack">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="group_interest" value="Critical Temporalities Reading Group" id="check-temporalities">
+                                <span><strong>Critical Temporalities Reading Group</strong> &mdash; 2025&ndash;2026 Academic Year</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="group_interest" value="Python Learning Lab" id="check-python">
+                                <span><strong>Python Learning Lab / Coding for Justice</strong> &mdash; Winter 2026</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="group_interest" value="Directed Research Opportunities" id="check-research">
+                                <span><strong>Directed Study &amp; Archival Research Opportunities</strong> &mdash; Ongoing</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-group--full">
+                        <label for="join-interest" class="form-label">Brief Statement of Interest <span class="req">*</span></label>
+                        <textarea id="join-interest" name="interest" class="form-textarea" placeholder="Briefly describe your background, what questions or topics you hope to explore, and any relevant reading or research interests..." required rows="4"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="form-submit-btn">
+                            &rarr; Submit Interest
+                        </button>
+                        <p class="form-note">
+                            Note: Form submissions are routed to Lab Director Dr. Alicia Re Cruz-Salomon (<a href="mailto:asalomon@ucsb.edu">asalomon@ucsb.edu</a>). You will receive seminar calendar invites and syllabus packets via email.
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Site Footer -->
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <a href="index.html" class="footer-logo">Regeneraci&oacute;n Lab</a>
+                    <p class="footer-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+                </div>
+                <div class="footer-meta">
+                    <p class="footer-copy">&copy; <span id="currentYear">2026</span> Regeneraci&oacute;n Lab. All rights reserved.</p>
+                    <p class="footer-credit">Website designed by <a href="https://hire.graysonearle.com" target="_blank" rel="noopener noreferrer">Grayson Earle</a></p>
+                    <a href="#top" class="footer-back-to-top" id="backToTopBtn">Back to top &uarr;</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="site.js"></script>
+    <script>
+
+        
+
+        // Pre-selection handler from action buttons
+        document.querySelectorAll('[data-preselect]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-preselect');
+                if (target === 'critical-temporalities') {
+                    const check = document.getElementById('check-temporalities');
+                    if (check) check.checked = true;
+                } else if (target === 'python-learning-lab') {
+                    const check = document.getElementById('check-python');
+                    if (check) check.checked = true;
+                }
+            });
+        });
+
+        // Form submission handling
+        const joinForm = document.getElementById('studentJoinForm');
+        const joinSuccessMsg = document.getElementById('joinSuccessMsg');
+        if (joinForm && joinSuccessMsg) {
+            joinForm.addEventListener('submit', (e) => {
+                // Ensure at least one checkbox is selected
+                const checkedBoxes = joinForm.querySelectorAll('input[name="group_interest"]:checked');
+                if (checkedBoxes.length === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one reading group or lab opportunity.');
+                    return;
+                }
+
+                // If running statically or pointing to mailto dummy endpoint
+                if (joinForm.action.includes('asalomon@ucsb.edu')) {
+                    e.preventDefault();
+                    joinSuccessMsg.style.display = 'block';
+                    joinSuccessMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    joinForm.reset();
+                }
+            });
+        }
+
+        
+    </script>
+</body>
+</html>

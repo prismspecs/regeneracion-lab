@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="site.css">
     <style>
         :root {
             /* The pinned-state background: what everything becomes once
@@ -31,21 +32,11 @@
                showing through happen to be close in tone. */
             --outline-color: rgba(20, 16, 12, 0.4);
 
-            /* The paragraph's ink color. No --page-bg here on purpose --
-               .hero's wash (below) already fades --wash-color in across
-               the whole viewport; a second, separately-painted page
-               background was a real bug twice over (see "Wash color" in
-               the README) before landing on "just don't paint one." */
-            --page-text: #1a1a1a;
+            /* No page background on purpose (see above): the hero wash paints
+               it. site.css would paint --page-bg on html/body, so blank it. */
+            --page-bg: #ffffff;
         }
 
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
         html,
         body {
@@ -185,19 +176,71 @@
         }
 
 
-        /* Slim Top Bar: sleek, slim sticky navigation that glides down
-           when the giant title scrolls off the top of the screen. */
-        .slim-topbar {
+        /* Hero Nav: the same menu as the slim top bar, but on the landing
+           screen -- no background, no site title, spread across the full
+           width. Fades out once the page activates (the slim bar takes
+           over on scroll). Desktop only; mobile keeps the hamburger. */
+        .hero-nav {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 52px;
-            z-index: 100;
-            background: rgba(250, 248, 245, 0.94);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(33, 26, 18, 0.09);
+            z-index: 6;
+            background: rgba(0, 0, 0, 0);
+            transition: opacity 0.4s ease, background-color 0.25s ease;
+        }
+
+        .hero-nav:hover,
+        .hero-nav:has(a:focus-visible) {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-nav.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .hero-nav ul {
+            list-style: none;
+            height: 100%;
+            margin: 0 auto;
+            padding: 0 32px;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hero-nav a {
+            font-family: Georgia, serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #fff;
+            text-decoration: none;
+            opacity: 0.6;
+            border-bottom: 1px solid transparent;
+            transition: opacity 0.2s ease, border-color 0.2s ease;
+        }
+
+        .hero-nav a:hover,
+        .hero-nav a:focus-visible {
+            opacity: 1;
+            border-bottom-color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .hero-nav {
+                display: none;
+            }
+        }
+
+        /* Homepage-only top bar behavior: the shared bar (site.css) is fixed and
+           hidden until the giant hero title scrolls away. */
+        .slim-topbar {
+            position: fixed;
             transform: translateY(-100%);
             opacity: 0;
             pointer-events: none;
@@ -208,254 +251,6 @@
             transform: translateY(0);
             opacity: 1;
             pointer-events: auto;
-        }
-
-        .slim-topbar-inner {
-            max-width: 1200px;
-            height: 100%;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .slim-topbar-title {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 1.45rem;
-            color: var(--page-text);
-            text-decoration: none;
-            line-height: 1;
-            letter-spacing: 0.01em;
-            transition: opacity 0.2s ease;
-        }
-
-        .slim-topbar-title:hover {
-            opacity: 0.7;
-        }
-
-        .slim-topbar-nav ul {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            margin: 0;
-            padding: 0;
-        }
-
-        .slim-topbar-nav a {
-            font-family: Georgia, serif;
-            font-size: 0.78rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--page-text);
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: color 0.2s ease, border-color 0.2s ease;
-        }
-
-        .slim-topbar-nav a:hover {
-            color: #1e4a26;
-            border-bottom-color: #1e4a26;
-        }
-
-        /* Mobile Hamburger Button: sleek, sexy, minimal hairline mark */
-        .slim-topbar-burger {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            width: 44px;
-            height: 44px;
-            padding: 0;
-            margin-right: -12px; /* optical alignment with 20px edge margin */
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            color: var(--page-text);
-            -webkit-tap-highlight-color: transparent;
-            z-index: 101;
-            transition: color 0.2s ease;
-        }
-
-        .slim-topbar-burger:hover,
-        .slim-topbar-burger:focus-visible {
-            color: #1e4a26;
-        }
-
-        .burger-box {
-            position: relative;
-            width: 20px;
-            height: 20px;
-            display: block;
-        }
-
-        .burger-bar {
-            position: absolute;
-            left: 1px;
-            width: 18px;
-            height: 1.4px;
-            background-color: currentColor;
-            border-radius: 1px;
-            transform-origin: center center;
-            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
-        }
-
-        .burger-bar--top {
-            top: 5.3px;
-        }
-
-        .burger-bar--bot {
-            bottom: 5.3px;
-        }
-
-        /* Seamless morph into a delicate, perfectly symmetrical 'X' when open */
-        .slim-topbar-burger.is-open .burger-bar--top {
-            transform: translateY(4px) rotate(45deg);
-        }
-
-        .slim-topbar-burger.is-open .burger-bar--bot {
-            transform: translateY(-4px) rotate(-45deg);
-        }
-
-        /* Mobile Navigation Overlay Drawer */
-        .mobile-nav-drawer {
-            display: none;
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-            z-index: 95;
-            background: rgba(250, 248, 245, 0.97);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(-8px);
-            transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            box-sizing: border-box;
-        }
-
-        .mobile-nav-drawer.is-open {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
-        }
-
-        .mobile-nav-panel {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 100%;
-            height: 100%;
-            padding: calc(env(safe-area-inset-top, 0px) + 68px) 32px calc(env(safe-area-inset-bottom, 0px) + 36px);
-            box-sizing: border-box;
-        }
-
-        .mobile-nav-links {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .mobile-nav-links li {
-            opacity: 0;
-            transform: translateY(14px);
-            transition: opacity 0.3s ease calc(var(--i, 0) * 0.04s + 0.06s),
-                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 0.04s + 0.06s);
-        }
-
-        .mobile-nav-drawer.is-open .mobile-nav-links li {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .mobile-nav-link {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 2.35rem;
-            line-height: 1.15;
-            color: var(--page-text);
-            text-decoration: none;
-            display: inline-block;
-            letter-spacing: 0.01em;
-            transition: color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .mobile-nav-link:active,
-        .mobile-nav-link:hover {
-            color: #1e4a26;
-            transform: translateX(6px);
-        }
-
-        .mobile-nav-footer {
-            border-top: 1px solid rgba(33, 26, 18, 0.09);
-            padding-top: 20px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.35s ease 0.28s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.28s;
-        }
-
-        .mobile-nav-drawer.is-open .mobile-nav-footer {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .mobile-nav-tagline {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.85rem;
-            line-height: 1.45;
-            color: #1e4a26;
-            margin: 0;
-        }
-
-        body.menu-open {
-            overflow: hidden !important;
-        }
-
-        @media (max-width: 768px) {
-            .slim-topbar {
-                height: 48px;
-            }
-
-            .slim-topbar-inner {
-                padding: 0 20px;
-            }
-
-            .slim-topbar-title {
-                font-size: 1.3rem;
-            }
-
-            .slim-topbar-nav {
-                display: none !important;
-            }
-
-            .slim-topbar-burger {
-                display: flex;
-            }
-
-            .mobile-nav-drawer {
-                display: flex;
-                flex-direction: column;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .mobile-nav-drawer,
-            .mobile-nav-links li,
-            .mobile-nav-footer,
-            .burger-bar {
-                transition: opacity 0.1s ease !important;
-                transform: none !important;
-            }
         }
 
         /* The growing-drop-cap paragraph, reused from
@@ -908,103 +703,6 @@
             background: #15341a;
         }
 
-        /* Site Footer */
-        .site-footer {
-            max-width: 980px;
-            margin: 64px auto 0;
-            padding: 40px 0 40px;
-            border-top: 1px solid rgba(33, 26, 18, 0.12);
-        }
-
-        .footer-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 40px;
-        }
-
-        .footer-brand {
-            max-width: 480px;
-        }
-
-        .footer-logo {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-size: 1.45rem;
-            color: var(--page-text);
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .footer-tagline {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: #1e4a26;
-            margin: 0;
-        }
-
-        .footer-meta {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .footer-copy,
-        .footer-credit {
-            font-family: Georgia, serif;
-            font-size: 0.82rem;
-            color: rgba(33, 26, 18, 0.6);
-            margin: 0;
-        }
-
-        .footer-credit a {
-            color: var(--page-text);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            transition: color 0.2s ease;
-        }
-
-        .footer-credit a:hover {
-            color: #1e4a26;
-        }
-
-        .footer-back-to-top {
-            font-family: Georgia, serif;
-            font-size: 0.78rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--page-text);
-            text-decoration: none;
-            margin-top: 8px;
-            display: inline-block;
-            transition: color 0.2s ease, transform 0.2s ease;
-        }
-
-        .footer-back-to-top:hover {
-            color: #1e4a26;
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 768px) {
-            .site-footer {
-                margin-top: 48px;
-                padding: 32px 0 32px;
-            }
-
-            .footer-inner {
-                flex-direction: column;
-                gap: 28px;
-            }
-
-            .footer-meta {
-                text-align: left;
-            }
-        }
-
         .hero-image {
             position: absolute;
             inset: 0;
@@ -1287,7 +985,7 @@
                     <li><a href="about.html">About</a></li>
                     <li><a href="#projects">Projects</a></li>
                     <li><a href="residents.html">Residents</a></li>
-                    <li><a href="#students">Students</a></li>
+                    <li><a href="students.html">Students</a></li>
                     <li><a href="#support">Support</a></li>
                 </ul>
             </nav>
@@ -1300,6 +998,18 @@
         </div>
     </header>
 
+    <!-- Hero nav: landing-screen version of the slim top bar's menu. -->
+    <nav class="hero-nav" id="heroNav" aria-label="Main Menu">
+        <ul>
+            <li><a href="#top">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="residents.html">Residents</a></li>
+            <li><a href="students.html">Students</a></li>
+            <li><a href="#support">Support</a></li>
+        </ul>
+    </nav>
+
     <!-- Mobile Navigation Overlay Drawer -->
     <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
         <div class="mobile-nav-panel">
@@ -1309,7 +1019,7 @@
                     <li style="--i: 1;"><a href="about.html" class="mobile-nav-link">About</a></li>
                     <li style="--i: 2;"><a href="#projects" class="mobile-nav-link">Projects</a></li>
                     <li style="--i: 3;"><a href="residents.html" class="mobile-nav-link">Residents</a></li>
-                    <li style="--i: 4;"><a href="#students" class="mobile-nav-link">Students</a></li>
+                    <li style="--i: 4;"><a href="students.html" class="mobile-nav-link">Students</a></li>
                     <li style="--i: 5;"><a href="#support" class="mobile-nav-link">Support</a></li>
                 </ul>
             </nav>
@@ -1574,7 +1284,7 @@
                     </div>
                     <h3>Research Justice</h3>
                     <p>More information about our framework for community-based research praxis featuring a TEDx talk, scholarly publications, and links to resources.</p>
-                    <a href="#">Learn More &rarr;</a>
+                    <a href="research-justice.html">Learn More &rarr;</a>
                 </div>
                 <div class="project-card project-card--turquoise">
                     <div class="project-eyebrow">
@@ -1625,7 +1335,7 @@
                     <h3>2025&ndash;2026 Reading Group:<br>Critical Temporalities</h3>
                     <p>Join the Regeneraci&oacute;n Lab and the UCSB English Department Lit &amp; Environment research center for an interdisciplinary reading group on time, space, and environment.</p>
                     <div class="card-links">
-                        <a href="#students">Join &rarr;</a>
+                        <a href="students.html#reading-groups">Join &rarr;</a>
                     </div>
                 </div>
                 <div class="update-card">
@@ -1674,6 +1384,7 @@
         </footer>
     </main>
 
+    <script src="site.js"></script>
     <script>
         // ---- Random hero photo ------------------------------------------
         // Shortlisted candidates only (picked by hand, not "all wide
@@ -1822,27 +1533,7 @@
         const titleWindow = document.getElementById('titleWindow');
         const titleWindowPhoto = document.getElementById('titleWindowPhoto');
         const slimTopbar = document.getElementById('slimTopbar');
-        const slimTopbarBurger = document.getElementById('slimTopbarBurger');
-        const mobileNavDrawer = document.getElementById('mobileNavDrawer');
-
-        function setMobileMenuOpen(open) {
-            if (!slimTopbarBurger || !mobileNavDrawer) return;
-            if (open) {
-                slimTopbarBurger.classList.add('is-open');
-                slimTopbarBurger.setAttribute('aria-expanded', 'true');
-                slimTopbarBurger.setAttribute('aria-label', 'Close menu');
-                mobileNavDrawer.classList.add('is-open');
-                mobileNavDrawer.setAttribute('aria-hidden', 'false');
-                document.body.classList.add('menu-open');
-            } else {
-                slimTopbarBurger.classList.remove('is-open');
-                slimTopbarBurger.setAttribute('aria-expanded', 'false');
-                slimTopbarBurger.setAttribute('aria-label', 'Open menu');
-                mobileNavDrawer.classList.remove('is-open');
-                mobileNavDrawer.setAttribute('aria-hidden', 'true');
-                document.body.classList.remove('menu-open');
-            }
-        }
+        const heroNav = document.getElementById('heroNav');
 
         // One-time renderer setup (see the flags above; they're consts by
         // design -- changing them needs a reload, not a runtime toggle).
@@ -2021,6 +1712,8 @@
             pageContent.style.transitionDelay = activated ? (CONTENT_REVEAL_DELAY_MS / 1000) + 's' : '0s';
             pageContent.style.opacity = activated ? 1 : 0;
 
+            heroNav.classList.toggle('is-hidden', activated);
+
             const titleOffY = LANDING_SCROLL_Y + (metrics.scaledHeight || 95);
             if (activated && window.scrollY >= titleOffY) {
                 slimTopbar.classList.add('is-visible');
@@ -2139,7 +1832,7 @@
         function triggerExit() {
             if (!activated) return;
             activated = false;
-            setMobileMenuOpen(false);
+            window.setMobileMenuOpen(false);
             slimTopbar.classList.remove('is-visible');
             titleWindow.style.transitionDuration = '';
             titleWindowPhoto.style.transitionDuration = '';
@@ -2186,7 +1879,7 @@
             metrics = layout();
             applyState(true);
             if (window.innerWidth > 768) {
-                setMobileMenuOpen(false);
+                window.setMobileMenuOpen(false);
             }
         }
 
@@ -2255,29 +1948,6 @@
             }
         });
 
-        // Mobile hamburger menu toggle and drawer interactions
-        if (slimTopbarBurger && mobileNavDrawer) {
-            slimTopbarBurger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isOpen = slimTopbarBurger.classList.contains('is-open');
-                setMobileMenuOpen(!isOpen);
-            });
-
-            // Close drawer when any mobile nav link is tapped
-            mobileNavDrawer.querySelectorAll('.mobile-nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    setMobileMenuOpen(false);
-                });
-            });
-
-            // Close on Escape key
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && slimTopbarBurger.classList.contains('is-open')) {
-                    setMobileMenuOpen(false);
-                }
-            });
-        }
-
         // Support modal open & close logic
         const supportOpenBtn = document.getElementById('supportOpenBtn');
         const supportModal = document.getElementById('supportModal');
@@ -2320,28 +1990,7 @@
             });
         }
 
-        // Dynamic footer year
-        const currentYearEl = document.getElementById('currentYear');
-        if (currentYearEl) {
-            currentYearEl.textContent = new Date().getFullYear();
-        }
 
-        // Smooth in-page anchor navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href');
-                if (targetId === '#' || targetId === '#top') {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    return;
-                }
-                const targetEl = document.querySelector(targetId);
-                if (targetEl) {
-                    e.preventDefault();
-                    targetEl.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
 
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onResize);

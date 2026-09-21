@@ -8,414 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="site.css">
+    <link rel="stylesheet" href="page.css">
     <style>
-        :root {
-            --page-bg: #faf8f5;
-            --page-text: #211a12;
-            --page-text-muted: #5a5247;
-            --page-text-light: #7c7267;
-            --color-accent-green: #1e4a26;
-            --color-earth-brown: #8c4a2f;
-            --color-clay-amber: #b85d19;
-            --color-turquoise: #1f7a8c;
-            --color-border: rgba(33, 26, 18, 0.12);
-            --color-border-subtle: rgba(33, 26, 18, 0.08);
-            --font-serif-display: 'Instrument Serif', Georgia, serif;
-            --font-serif-body: Georgia, 'Times New Roman', serif;
-        }
-
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            background-color: var(--page-bg);
-            color: var(--page-text);
-            font-family: var(--font-serif-body);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        body {
-            background-color: var(--page-bg);
-            color: var(--page-text);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Sticky Slim Topbar */
-        .slim-topbar {
-            position: sticky;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            height: 52px;
-            z-index: 100;
-            background: rgba(250, 248, 245, 0.94);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(33, 26, 18, 0.09);
-        }
-
-        .slim-topbar-inner {
-            max-width: 980px;
-            height: 100%;
-            margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .slim-topbar-title {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-size: 1.45rem;
-            color: var(--page-text);
-            text-decoration: none;
-            letter-spacing: 0.01em;
-            transition: color 0.2s ease;
-        }
-
-        .slim-topbar-title:hover {
-            color: var(--color-accent-green);
-        }
-
-        .slim-topbar-nav {
-            display: flex;
-            align-items: center;
-        }
-
-        .slim-topbar-nav ul {
-            display: flex;
-            align-items: center;
-            list-style: none;
-            gap: 26px;
-        }
-
-        .slim-topbar-nav a {
-            font-family: Georgia, serif;
-            font-size: 0.8rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--page-text-muted);
-            text-decoration: none;
-            padding-bottom: 3px;
-            border-bottom: 1px solid transparent;
-            transition: color 0.2s ease, border-color 0.2s ease;
-        }
-
-        .slim-topbar-nav a:hover {
-            color: var(--page-text);
-            border-bottom-color: var(--page-text);
-        }
-
-        .slim-topbar-nav a.is-active {
-            color: var(--color-accent-green);
-            border-bottom-color: var(--color-accent-green);
-        }
-
-        /* 2-Line Hairline Hamburger Menu Button */
-        .slim-topbar-burger {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            position: relative;
-            z-index: 101;
-            align-items: center;
-            justify-content: center;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .burger-icon {
-            width: 20px;
-            height: 12px;
-            position: relative;
-            display: block;
-        }
-
-        .burger-bar {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 1.4px;
-            background-color: var(--page-text);
-            border-radius: 1px;
-            transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1),
-                        top 0.28s cubic-bezier(0.2, 0, 0, 1),
-                        bottom 0.28s cubic-bezier(0.2, 0, 0, 1);
-            transform-origin: center center;
-        }
-
-        .burger-bar--top {
-            top: 5.3px;
-        }
-
-        .burger-bar--bot {
-            bottom: 5.3px;
-        }
-
-        .slim-topbar-burger.is-open .burger-bar--top {
-            transform: translateY(4px) rotate(45deg);
-        }
-
-        .slim-topbar-burger.is-open .burger-bar--bot {
-            transform: translateY(-4px) rotate(-45deg);
-        }
-
-        /* Mobile Navigation Overlay Drawer */
-        .mobile-nav-drawer {
-            display: none;
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-            z-index: 95;
-            background: rgba(250, 248, 245, 0.97);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(-8px);
-            transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            box-sizing: border-box;
-        }
-
-        .mobile-nav-drawer.is-open {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
-        }
-
-        .mobile-nav-panel {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 100%;
-            height: 100%;
-            padding: calc(env(safe-area-inset-top, 0px) + 68px) 32px calc(env(safe-area-inset-bottom, 0px) + 36px);
-            box-sizing: border-box;
-        }
-
-        .mobile-nav-links {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .mobile-nav-links li {
-            opacity: 0;
-            transform: translateY(14px);
-            transition: opacity 0.3s ease calc(var(--i, 0) * 0.04s + 0.06s),
-                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 0.04s + 0.06s);
-        }
-
-        .mobile-nav-drawer.is-open .mobile-nav-links li {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .mobile-nav-link {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 2.35rem;
-            line-height: 1.15;
-            color: var(--page-text);
-            text-decoration: none;
-            display: inline-block;
-            letter-spacing: 0.01em;
-            transition: color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .mobile-nav-link:active,
-        .mobile-nav-link:hover,
-        .mobile-nav-link.is-active {
-            color: var(--color-accent-green);
-            transform: translateX(6px);
-        }
-
-        .mobile-nav-footer {
-            border-top: 1px solid rgba(33, 26, 18, 0.09);
-            padding-top: 20px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.35s ease 0.28s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.28s;
-        }
-
-        .mobile-nav-drawer.is-open .mobile-nav-footer {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .mobile-nav-tagline {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.85rem;
-            line-height: 1.45;
-            color: var(--color-accent-green);
-            margin: 0;
-        }
-
-        body.menu-open {
-            overflow: hidden !important;
-        }
-
-        @media (max-width: 768px) {
-            .slim-topbar {
-                height: 48px;
-            }
-
-            .slim-topbar-inner {
-                padding: 0 20px;
-            }
-
-            .slim-topbar-title {
-                font-size: 1.3rem;
-            }
-
-            .slim-topbar-nav {
-                display: none !important;
-            }
-
-            .slim-topbar-burger {
-                display: flex;
-            }
-
-            .mobile-nav-drawer {
-                display: flex;
-                flex-direction: column;
-            }
-        }
-
-        /* Main Page Layout */
-        .page-container {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 56px 24px 0;
-        }
-
-        /* Page Masthead */
-        .residents-header {
-            margin-bottom: 56px;
-            text-align: left;
-        }
-
-        .residents-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            font-family: Georgia, serif;
-            font-size: 0.82rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--color-accent-green);
-            margin-bottom: 14px;
-        }
-
-        .eyebrow-mark {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: var(--color-accent-green);
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .eyebrow-mark--brown { background: var(--color-earth-brown); }
-        .eyebrow-mark--amber { background: var(--color-clay-amber); }
-        .eyebrow-mark--turquoise { background: var(--color-turquoise); }
-
-        .residents-title {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: clamp(2.4rem, 5.2vw, 3.8rem);
-            line-height: 1.1;
-            color: var(--page-text);
-            margin-bottom: 18px;
-            text-wrap: balance;
-        }
-
-        .residents-tagline {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 1.22rem;
-            line-height: 1.55;
-            color: var(--color-accent-green);
-            max-width: 100%;
-        }
-
-        /* Quick Subnav Anchor Jump */
-        .section-jump-nav {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px 22px;
-            margin-top: 24px;
-            padding-top: 18px;
-        }
-
-        .section-jump-nav a {
-            font-family: Georgia, serif;
-            font-size: 0.82rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--page-text-muted);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .section-jump-nav a:hover {
-            color: var(--color-accent-green);
-        }
-
-        /* Sections */
-        .resident-section {
-            padding-top: 52px;
-            margin-top: 52px;
-            border-top: 1px solid var(--color-border);
-            scroll-margin-top: 72px;
-        }
-
-        .resident-section:first-of-type {
-            margin-top: 0;
-            padding-top: 0;
-            border-top: none;
-        }
-
-        .section-title {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 2.25rem;
-            line-height: 1.18;
-            color: var(--page-text);
-            margin-bottom: 28px;
-            text-wrap: balance;
-        }
-
-        .section-intro {
-            font-family: Georgia, serif;
-            font-size: 18px;
-            line-height: 29px;
-            color: var(--page-text-muted);
-            margin-bottom: 36px;
-            max-width: 100%;
-        }
 
         /* Resident Profiles (Option 4 Typographic Column System) */
         .resident-profiles {
@@ -637,181 +232,6 @@
             margin-top: 24px;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group--full {
-            grid-column: 1 / -1;
-        }
-
-        .form-label {
-            font-family: Georgia, serif;
-            font-size: 0.78rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: rgba(33, 26, 18, 0.75);
-        }
-
-        .form-input,
-        .form-select,
-        .form-textarea {
-            font-family: Georgia, serif;
-            font-size: 16px;
-            color: var(--page-text);
-            background: #ffffff;
-            border: 1px solid rgba(33, 26, 18, 0.22);
-            border-radius: 2px;
-            padding: 12px 14px;
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            width: 100%;
-        }
-
-        .form-input:focus,
-        .form-select:focus,
-        .form-textarea:focus {
-            border-color: var(--color-accent-green);
-            box-shadow: 0 0 0 1px var(--color-accent-green);
-        }
-
-        .form-textarea {
-            min-height: 110px;
-            resize: vertical;
-        }
-
-        .form-actions {
-            grid-column: 1 / -1;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 14px;
-            margin-top: 8px;
-        }
-
-        .form-submit-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: transparent;
-            color: var(--page-text);
-            font-family: Georgia, serif;
-            font-size: 0.85rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            padding: 14px 28px;
-            border: 1px solid rgba(33, 26, 18, 0.35);
-            border-radius: 2px;
-            cursor: pointer;
-            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-        }
-
-        .form-submit-btn:hover {
-            background: var(--page-text);
-            color: var(--page-bg);
-            border-color: var(--page-text);
-        }
-
-        .form-note {
-            font-family: Georgia, serif;
-            font-size: 0.85rem;
-            color: var(--page-text-light);
-            line-height: 1.5;
-        }
-
-        .form-note a {
-            color: var(--color-accent-green);
-            text-decoration: underline;
-        }
-
-        .form-success-msg {
-            display: none;
-            padding: 18px 20px;
-            background: rgba(30, 74, 38, 0.08);
-            border: 1px solid rgba(30, 74, 38, 0.2);
-            border-radius: 2px;
-            font-family: Georgia, serif;
-            font-size: 16px;
-            color: var(--color-accent-green);
-            margin-bottom: 24px;
-        }
-
-        /* Site Footer */
-        .site-footer {
-            margin-top: 80px;
-            padding: 48px 0 64px;
-            border-top: 1px solid var(--color-border);
-        }
-
-        .footer-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-
-        .footer-brand {
-            max-width: 440px;
-        }
-
-        .footer-logo {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-size: 1.6rem;
-            color: var(--page-text);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
-
-        .footer-tagline {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.88rem;
-            line-height: 1.5;
-            color: var(--color-accent-green);
-        }
-
-        .footer-meta {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 6px;
-            font-family: Georgia, serif;
-            font-size: 0.82rem;
-            color: var(--page-text-light);
-        }
-
-        .footer-meta a {
-            color: var(--page-text);
-            text-decoration: underline;
-            text-underline-offset: 2px;
-            transition: color 0.2s ease;
-        }
-
-        .footer-meta a:hover {
-            color: var(--color-accent-green);
-        }
-
-        .footer-back-to-top {
-            margin-top: 8px;
-            font-family: Georgia, serif;
-            font-size: 0.78rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--page-text-muted);
-            text-decoration: none !important;
-            transition: color 0.2s ease;
-        }
-
-        .footer-back-to-top:hover {
-            color: var(--color-accent-green);
-        }
-
         /* Responsive Breakpoints */
         @media (max-width: 860px) {
             .profile-entry {
@@ -835,23 +255,6 @@
         }
 
         @media (max-width: 640px) {
-            .page-container {
-                padding: 36px 20px 0;
-            }
-
-            .residents-header {
-                margin-bottom: 40px;
-            }
-
-            .section-jump-nav {
-                gap: 10px 18px;
-                margin-top: 18px;
-                padding-top: 12px;
-            }
-
-            .section-jump-nav a {
-                font-size: 0.76rem;
-            }
 
             .apply-form {
                 grid-template-columns: 1fr;
@@ -881,12 +284,12 @@
                     <li><a href="about.html">About</a></li>
                     <li><a href="index.html#projects">Projects</a></li>
                     <li><a href="residents.html" class="is-active">Residents</a></li>
-                    <li><a href="index.html#students">Students</a></li>
+                    <li><a href="students.html">Students</a></li>
                     <li><a href="index.html#support">Support</a></li>
                 </ul>
             </nav>
-            <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="Toggle Menu" aria-expanded="false" aria-controls="mobileNavDrawer">
-                <span class="burger-icon">
+            <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavDrawer">
+                <span class="burger-box">
                     <span class="burger-bar burger-bar--top"></span>
                     <span class="burger-bar burger-bar--bot"></span>
                 </span>
@@ -903,7 +306,7 @@
                     <li style="--i: 1;"><a href="about.html" class="mobile-nav-link">About</a></li>
                     <li style="--i: 2;"><a href="index.html#projects" class="mobile-nav-link">Projects</a></li>
                     <li style="--i: 3;"><a href="residents.html" class="mobile-nav-link is-active">Residents</a></li>
-                    <li style="--i: 4;"><a href="index.html#students" class="mobile-nav-link">Students</a></li>
+                    <li style="--i: 4;"><a href="students.html" class="mobile-nav-link">Students</a></li>
                     <li style="--i: 5;"><a href="index.html#support" class="mobile-nav-link">Support</a></li>
                 </ul>
             </nav>
@@ -916,13 +319,13 @@
     <main class="page-container" id="mainContent">
 
         <!-- Page Header -->
-        <header class="residents-header">
-            <div class="residents-eyebrow">
+        <header class="page-header">
+            <div class="page-eyebrow">
                 <span class="eyebrow-mark"></span>
                 Scholars &amp; Artists in Residence
             </div>
-            <h1 class="residents-title">Scholars &amp; Artists in Residence</h1>
-            <p class="residents-tagline">The residency program supports Indigenous and allied scholars, artists, and organizers developing projects that advance decolonial theory, research justice, and creative-critical practice.</p>
+            <h1 class="page-title">Scholars &amp; Artists in Residence</h1>
+            <p class="page-tagline">The residency program supports Indigenous and allied scholars, artists, and organizers developing projects that advance decolonial theory, research justice, and creative-critical practice.</p>
 
             <nav class="section-jump-nav" aria-label="Jump to section">
                 <a href="#current">Current Cohort &rarr;</a>
@@ -932,7 +335,7 @@
         </header>
 
         <!-- Section 1: Current Residents -->
-        <section class="resident-section" id="current">
+        <section class="page-section" id="current">
             <h2 class="section-title">Current Residents</h2>
             <p class="section-intro">Our current resident cohort brings together critical thinkers working on ancestral repatriation, complex systems physics, border abolition, and more-than-human resistance.</p>
 
@@ -999,7 +402,7 @@
         </section>
 
         <!-- Section 2: Past Residents & Fellows -->
-        <section class="resident-section" id="past">
+        <section class="page-section" id="past">
             <h2 class="section-title">Past Residents &amp; Fellows</h2>
             <p class="section-intro">Since our founding, the Regeneraci&oacute;n Lab has hosted resident scholars, poets, and organizers whose work has yielded books, public humanities installations, and movement syllabi.</p>
 
@@ -1062,7 +465,7 @@
         </section>
 
         <!-- Section 3: Residency Model & Apply -->
-        <section class="resident-section" id="apply">
+        <section class="page-section" id="apply">
             <h2 class="section-title">Apply for Residency</h2>
             <div class="apply-wrap">
                 <p class="section-intro">Regeneraci&oacute;n Lab offers 3 to 12 month non-paid residencies for artists, activists, and scholars engaged in research justice initiatives and critical-creative praxis. Residencies may be undertaken in-person in Santa Barbara, CA or remotely.</p>
@@ -1166,45 +569,9 @@
         </footer>
     </main>
 
+    <script src="site.js"></script>
     <script>
-        // Hamburger menu toggle for mobile drawer
-        const burgerBtn = document.getElementById('slimTopbarBurger');
-        const mobileDrawer = document.getElementById('mobileNavDrawer');
-
-        function setMobileMenuOpen(open) {
-            if (!burgerBtn || !mobileDrawer) return;
-            burgerBtn.classList.toggle('is-open', open);
-            mobileDrawer.classList.toggle('is-open', open);
-            burgerBtn.setAttribute('aria-expanded', String(open));
-            mobileDrawer.setAttribute('aria-hidden', String(!open));
-            document.body.classList.toggle('menu-open', open);
-        }
-
-        if (burgerBtn && mobileDrawer) {
-            burgerBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isOpen = burgerBtn.classList.contains('is-open');
-                setMobileMenuOpen(!isOpen);
-            });
-
-            mobileDrawer.querySelectorAll('.mobile-nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    setMobileMenuOpen(false);
-                });
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && burgerBtn.classList.contains('is-open')) {
-                    setMobileMenuOpen(false);
-                }
-            });
-
-            mobileDrawer.addEventListener('click', (e) => {
-                if (e.target === mobileDrawer) {
-                    setMobileMenuOpen(false);
-                }
-            });
-        }
+        
 
         // Handle residency form submission cleanly
         const residencyForm = document.getElementById('residencyForm');

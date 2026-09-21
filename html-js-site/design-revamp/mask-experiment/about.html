@@ -9,446 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="site.css">
+    <link rel="stylesheet" href="page.css">
     <style>
-        :root {
-            --page-text: #1a1a1a;
-            --page-text-muted: rgba(33, 26, 18, 0.82);
-            --color-accent-green: #1e4a26;
-            --color-turquoise: #2a9d8f;
-            --color-earth-brown: #9c5424;
-            --color-clay-amber: #c86a3d;
-            --color-border: rgba(33, 26, 18, 0.12);
-            --color-border-subtle: rgba(33, 26, 18, 0.08);
-            --bg-topbar: rgba(250, 248, 245, 0.94);
-        }
-
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            background-color: #ffffff;
-            color: var(--page-text);
-            font-family: Georgia, 'Times New Roman', serif;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Slim Top Bar: sleek, slim sticky navigation identical to the homepage */
-        .slim-topbar {
-            position: sticky;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 52px;
-            z-index: 100;
-            background: var(--bg-topbar);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(33, 26, 18, 0.09);
-            transition: background 0.2s ease;
-        }
-
-        .slim-topbar-inner {
-            max-width: 1200px;
-            height: 100%;
-            margin: 0 auto;
-            padding: 0 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .slim-topbar-title {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 1.45rem;
-            color: var(--page-text);
-            text-decoration: none;
-            line-height: 1;
-            letter-spacing: 0.01em;
-            transition: opacity 0.2s ease;
-        }
-
-        .slim-topbar-title:hover {
-            opacity: 0.7;
-        }
-
-        .slim-topbar-nav ul {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            margin: 0;
-            padding: 0;
-        }
-
-        .slim-topbar-nav a {
-            font-family: Georgia, serif;
-            font-size: 0.78rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--page-text);
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            padding-bottom: 2px;
-            transition: color 0.2s ease, border-color 0.2s ease;
-        }
-
-        .slim-topbar-nav a:hover,
-        .slim-topbar-nav a.is-active {
-            color: var(--color-accent-green);
-            border-bottom-color: var(--color-accent-green);
-        }
-
-        /* Mobile Hamburger Button: sleek hairline mark */
-        .slim-topbar-burger {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            width: 44px;
-            height: 44px;
-            padding: 0;
-            margin-right: -12px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            color: var(--page-text);
-            -webkit-tap-highlight-color: transparent;
-            z-index: 101;
-            transition: color 0.2s ease;
-        }
-
-        .slim-topbar-burger:hover,
-        .slim-topbar-burger:focus-visible {
-            color: var(--color-accent-green);
-        }
-
-        .burger-box {
-            position: relative;
-            width: 20px;
-            height: 20px;
-            display: block;
-        }
-
-        .burger-bar {
-            position: absolute;
-            left: 1px;
-            width: 18px;
-            height: 1.4px;
-            background-color: currentColor;
-            border-radius: 1px;
-            transform-origin: center center;
-            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
-        }
-
-        .burger-bar--top {
-            top: 5.3px;
-        }
-
-        .burger-bar--bot {
-            bottom: 5.3px;
-        }
-
-        .slim-topbar-burger.is-open .burger-bar--top {
-            transform: translateY(4px) rotate(45deg);
-        }
-
-        .slim-topbar-burger.is-open .burger-bar--bot {
-            transform: translateY(-4px) rotate(-45deg);
-        }
-
-        /* Mobile Navigation Overlay Drawer */
-        .mobile-nav-drawer {
-            display: none;
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-            z-index: 95;
-            background: rgba(250, 248, 245, 0.97);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(-8px);
-            transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            box-sizing: border-box;
-        }
-
-        .mobile-nav-drawer.is-open {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
-        }
-
-        .mobile-nav-panel {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 100%;
-            height: 100%;
-            padding: calc(env(safe-area-inset-top, 0px) + 68px) 32px calc(env(safe-area-inset-bottom, 0px) + 36px);
-            box-sizing: border-box;
-        }
-
-        .mobile-nav-links {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .mobile-nav-links li {
-            opacity: 0;
-            transform: translateY(14px);
-            transition: opacity 0.3s ease calc(var(--i, 0) * 0.04s + 0.06s),
-                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 0.04s + 0.06s);
-        }
-
-        .mobile-nav-drawer.is-open .mobile-nav-links li {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .mobile-nav-link {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 2.35rem;
-            line-height: 1.15;
-            color: var(--page-text);
-            text-decoration: none;
-            display: inline-block;
-            letter-spacing: 0.01em;
-            transition: color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .mobile-nav-link:active,
-        .mobile-nav-link:hover,
-        .mobile-nav-link.is-active {
-            color: var(--color-accent-green);
-            transform: translateX(6px);
-        }
-
-        .mobile-nav-footer {
-            border-top: 1px solid rgba(33, 26, 18, 0.09);
-            padding-top: 20px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.35s ease 0.28s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.28s;
-        }
-
-        .mobile-nav-drawer.is-open .mobile-nav-footer {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .mobile-nav-tagline {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.85rem;
-            line-height: 1.45;
-            color: var(--color-accent-green);
-            margin: 0;
-        }
-
-        body.menu-open {
-            overflow: hidden !important;
-        }
-
-        @media (max-width: 768px) {
-            .slim-topbar {
-                height: 48px;
-            }
-
-            .slim-topbar-inner {
-                padding: 0 20px;
-            }
-
-            .slim-topbar-title {
-                font-size: 1.3rem;
-            }
-
-            .slim-topbar-nav {
-                display: none !important;
-            }
-
-            .slim-topbar-burger {
-                display: flex;
-            }
-
-            .mobile-nav-drawer {
-                display: flex;
-                flex-direction: column;
-            }
-        }
-
-        /* Main Page Layout */
-        .page-container {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 56px 24px 0;
-        }
-
-        /* Editorial Page Masthead */
-        .about-header {
-            margin-bottom: 56px;
-            text-align: left;
-        }
-
-        .about-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            font-family: Georgia, serif;
-            font-size: 0.82rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--color-accent-green);
-            margin-bottom: 14px;
-        }
-
-        .eyebrow-mark {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: var(--color-accent-green);
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .about-title {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: clamp(2.4rem, 5.2vw, 3.8rem);
-            line-height: 1.1;
-            color: var(--page-text);
-            margin-bottom: 18px;
-            text-wrap: balance;
-        }
-
-        .about-tagline {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 1.22rem;
-            line-height: 1.55;
-            color: var(--color-accent-green);
-            max-width: 100%;
-        }
-
-        /* Sections */
-        .about-section {
-            padding-top: 52px;
-            margin-top: 52px;
-            border-top: 1px solid var(--color-border);
-            scroll-margin-top: 72px;
-        }
-
-        .about-section:first-of-type {
-            margin-top: 0;
-            padding-top: 0;
-            border-top: none;
-        }
-
-        .section-title {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 2.25rem;
-            line-height: 1.18;
-            color: var(--page-text);
-            margin-bottom: 28px;
-            text-wrap: balance;
-        }
-
-        /* Reading prose column (fits container width) */
-        .prose-column {
-            max-width: 100%;
-            font-family: Georgia, serif;
-            font-size: 18px;
-            line-height: 29px;
-            color: var(--page-text-muted);
-        }
-
-        .prose-column p + p {
-            margin-top: 24px;
-        }
-
-        /* 3-line drop cap for opening paragraph (animates in when appearing, built as a configurable option) */
-        .dropcap-lead .dropcap-letter,
-        .dropcap-paragraph .dropcap-letter {
-            float: left;
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-size: 18px;
-            line-height: 29px;
-            margin-right: 0px;
-            margin-top: 0px;
-            color: var(--page-text);
-            user-select: text;
-            -webkit-user-select: text;
-            cursor: pointer;
-            transition: font-size 1s cubic-bezier(0.16, 1, 0.3, 1),
-                        line-height 1s cubic-bezier(0.16, 1, 0.3, 1),
-                        margin-right 1s cubic-bezier(0.16, 1, 0.3, 1),
-                        margin-top 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .dropcap-lead.dropcap-grown .dropcap-letter,
-        .dropcap-paragraph.dropcap-grown .dropcap-letter,
-        body.no-dropcap-animation .dropcap-lead .dropcap-letter,
-        body.no-dropcap-animation .dropcap-paragraph .dropcap-letter {
-            font-size: 96px;
-            line-height: 68px;
-            margin-right: 12px;
-            margin-top: 11px;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .dropcap-lead .dropcap-letter,
-            .dropcap-paragraph .dropcap-letter {
-                transition: none !important;
-            }
-        }
-
-        /* Editorial Pull Quote (clean typography without redundant enclosing borders) */
-        .pull-quote {
-            margin: 48px 0 20px;
-            padding: 0;
-            border: none;
-            max-width: 100%;
-        }
-
-        .pull-quote p {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-size: clamp(1.75rem, 3.4vw, 2.3rem);
-            line-height: 1.28;
-            color: var(--page-text);
-            margin-bottom: 12px;
-            text-wrap: balance;
-        }
-
-        .pull-quote cite {
-            font-family: Georgia, serif;
-            font-style: normal;
-            font-size: 0.85rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--color-accent-green);
-            display: block;
-        }
 
         /* Approach Focus Grid: Option 4 Minimalist Typographic Columns */
         .focus-grid {
@@ -619,227 +182,15 @@
             gap: 24px;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
 
-        .form-group--full {
-            grid-column: 1 / -1;
-        }
-
-        .form-label {
-            font-family: Georgia, serif;
-            font-size: 0.78rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: rgba(33, 26, 18, 0.75);
-        }
-
-        .form-input,
-        .form-textarea {
-            font-family: Georgia, serif;
-            font-size: 16px;
-            color: var(--page-text);
-            background: #ffffff;
-            border: 1px solid rgba(33, 26, 18, 0.22);
-            border-radius: 2px;
-            padding: 12px 14px;
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            width: 100%;
-        }
-
-        .form-input:focus,
-        .form-textarea:focus {
-            border-color: var(--color-accent-green);
-            box-shadow: 0 0 0 1px var(--color-accent-green);
-        }
-
-        .form-textarea {
-            min-height: 130px;
-            resize: vertical;
-        }
-
-        .form-actions {
-            grid-column: 1 / -1;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 14px;
-            margin-top: 8px;
-        }
-
-        .form-submit-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 36px;
-            font-family: Georgia, serif;
-            font-size: 0.84rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--page-text);
-            background: transparent;
-            border: 1px solid rgba(33, 26, 18, 0.35);
-            border-radius: 2px;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .form-submit-btn:hover {
-            background: var(--color-accent-green);
-            border-color: var(--color-accent-green);
-            color: #ffffff;
-            gap: 12px;
-        }
-
-        .form-note {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.86rem;
-            color: rgba(33, 26, 18, 0.62);
-            line-height: 1.5;
-        }
-
-        .form-note a {
-            color: var(--page-text);
-            text-decoration: underline;
-            text-underline-offset: 2px;
-        }
-
-        .form-success-msg {
-            display: none;
-            padding: 16px 20px;
-            background: rgba(30, 74, 38, 0.08);
-            border: 1px solid rgba(30, 74, 38, 0.2);
-            border-radius: 2px;
-            font-family: Georgia, serif;
-            font-size: 15px;
-            color: var(--color-accent-green);
-            margin-bottom: 20px;
-        }
-
-        .form-success-msg.is-visible {
-            display: block;
-        }
 
         @media (max-width: 640px) {
             .contact-form {
                 grid-template-columns: 1fr;
             }
-
-            .about-header {
-                margin-bottom: 40px;
-            }
-
-            .page-container {
-                padding-top: 36px;
-            }
         }
 
-        /* Site Footer matching index.html */
-        .site-footer {
-            max-width: 980px;
-            margin: 64px auto 0;
-            padding: 40px 0 40px;
-            border-top: 1px solid var(--color-border);
-        }
-
-        .footer-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 40px;
-        }
-
-        .footer-brand {
-            max-width: 480px;
-        }
-
-        .footer-logo {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-size: 1.45rem;
-            color: var(--page-text);
-            display: block;
-            margin-bottom: 8px;
-            text-decoration: none;
-        }
-
-        .footer-logo:hover {
-            opacity: 0.8;
-        }
-
-        .footer-tagline {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--color-accent-green);
-            margin: 0;
-        }
-
-        .footer-meta {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .footer-copy,
-        .footer-credit {
-            font-family: Georgia, serif;
-            font-size: 0.82rem;
-            color: rgba(33, 26, 18, 0.6);
-            margin: 0;
-        }
-
-        .footer-credit a {
-            color: var(--page-text);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            transition: color 0.2s ease;
-        }
-
-        .footer-credit a:hover {
-            color: var(--color-accent-green);
-        }
-
-        .footer-back-to-top {
-            font-family: Georgia, serif;
-            font-size: 0.78rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--page-text);
-            text-decoration: none;
-            margin-top: 8px;
-            display: inline-block;
-            transition: color 0.2s ease, transform 0.2s ease;
-        }
-
-        .footer-back-to-top:hover {
-            color: var(--color-accent-green);
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 768px) {
-            .site-footer {
-                margin-top: 48px;
-                padding: 32px 0 32px;
-            }
-
-            .footer-inner {
-                flex-direction: column;
-                gap: 28px;
-            }
-
-            .footer-meta {
-                text-align: left;
-            }
-        }
+        
     </style>
 </head>
 
@@ -855,12 +206,12 @@
                     <li><a href="about.html" class="is-active">About</a></li>
                     <li><a href="index.html#projects">Projects</a></li>
                     <li><a href="residents.html">Residents</a></li>
-                    <li><a href="index.html#students">Students</a></li>
+                    <li><a href="students.html">Students</a></li>
                     <li><a href="index.html#support">Support</a></li>
                 </ul>
             </nav>
-            <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="Toggle Menu" aria-expanded="false" aria-controls="mobileNavDrawer">
-                <span class="burger-icon">
+            <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavDrawer">
+                <span class="burger-box">
                     <span class="burger-bar burger-bar--top"></span>
                     <span class="burger-bar burger-bar--bot"></span>
                 </span>
@@ -877,7 +228,7 @@
                     <li style="--i: 1;"><a href="about.html" class="mobile-nav-link is-active">About</a></li>
                     <li style="--i: 2;"><a href="index.html#projects" class="mobile-nav-link">Projects</a></li>
                     <li style="--i: 3;"><a href="residents.html" class="mobile-nav-link">Residents</a></li>
-                    <li style="--i: 4;"><a href="index.html#students" class="mobile-nav-link">Students</a></li>
+                    <li style="--i: 4;"><a href="students.html" class="mobile-nav-link">Students</a></li>
                     <li style="--i: 5;"><a href="index.html#support" class="mobile-nav-link">Support</a></li>
                 </ul>
             </nav>
@@ -890,17 +241,17 @@
     <main class="page-container" id="mainContent">
 
         <!-- Page Header -->
-        <header class="about-header">
-            <div class="about-eyebrow">
+        <header class="page-header">
+            <div class="page-eyebrow">
                 <span class="eyebrow-mark"></span>
                 About the Lab
             </div>
-            <h1 class="about-title">About Regeneraci&oacute;n Lab</h1>
-            <p class="about-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
+            <h1 class="page-title">About Regeneraci&oacute;n Lab</h1>
+            <p class="page-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
         </header>
 
         <!-- Section 1: History & Why Regeneración? -->
-        <section class="about-section" id="history">
+        <section class="page-section" id="history">
             <h2 class="section-title">Why Regeneraci&oacute;n?</h2>
             <div class="prose-column">
                 <p class="dropcap-lead"><span class="dropcap-letter">W</span>e are named after the anarchist newspaper <em>Regeneraci&oacute;n</em>, published by the Flores Mag&oacute;n brothers from 1900&ndash;1918. Our lab carries forward their spirit of radical critique while centering Indigenous epistemologies and antiracism often erased in traditional anarchist narratives.</p>
@@ -917,7 +268,7 @@
         </section>
 
         <!-- Section 2: Our Approach -->
-        <section class="about-section" id="approach">
+        <section class="page-section" id="approach">
             <h2 class="section-title">Our Approach</h2>
             <div class="prose-column">
                 <p>We create space for research, dialogue, and cultural production that challenges settler-colonial frameworks and imagines otherwise. Our work brings together scholars, artists, community members, and activists working at the intersections of Indigenous studies, ethnic studies, border politics, environmental justice, women of color feminisms, queer theory, and decolonial theory.</p>
@@ -981,7 +332,7 @@
         </section>
 
         <!-- Section 3: Director / Principal Investigator -->
-        <section class="about-section" id="director">
+        <section class="page-section" id="director">
             <h2 class="section-title">Director &amp; Principal Investigator</h2>
             <div class="director-profile">
                 <div class="director-photo-wrap">
@@ -1001,7 +352,7 @@
         </section>
 
         <!-- Section 4: Contact Us -->
-        <section class="about-section" id="contact">
+        <section class="page-section" id="contact">
             <h2 class="section-title">Contact Us</h2>
             <div class="contact-wrap">
                 <p class="contact-intro">We welcome inquiries regarding community collaborations, research justice initiatives, resident scholar proposals, and educational partnerships.</p>
@@ -1051,54 +402,8 @@
         </footer>
     </main>
 
+    <script src="site.js"></script>
     <script>
-        // Hamburger menu toggle for mobile drawer
-        const burgerBtn = document.getElementById('slimTopbarBurger');
-        const mobileDrawer = document.getElementById('mobileNavDrawer');
-
-        function setMobileMenuOpen(open) {
-            if (!burgerBtn || !mobileDrawer) return;
-            burgerBtn.classList.toggle('is-open', open);
-            mobileDrawer.classList.toggle('is-open', open);
-            burgerBtn.setAttribute('aria-expanded', String(open));
-            mobileDrawer.setAttribute('aria-hidden', String(!open));
-            document.body.classList.toggle('menu-open', open);
-        }
-
-        if (burgerBtn && mobileDrawer) {
-            burgerBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isOpen = burgerBtn.classList.contains('is-open');
-                setMobileMenuOpen(!isOpen);
-            });
-
-            mobileDrawer.querySelectorAll('.mobile-nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    setMobileMenuOpen(false);
-                });
-            });
-
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && burgerBtn.classList.contains('is-open')) {
-                    setMobileMenuOpen(false);
-                }
-            });
-        }
-
-        // Dynamic footer year
-        const currentYearEl = document.getElementById('currentYear');
-        if (currentYearEl) {
-            currentYearEl.textContent = new Date().getFullYear();
-        }
-
-        // Back to top smooth scroll
-        const backToTopBtn = document.getElementById('backToTopBtn');
-        if (backToTopBtn) {
-            backToTopBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
 
         // Contact form mock submit handler (clean UX feedback)
         const contactForm = document.getElementById('contactForm');
@@ -1115,64 +420,7 @@
             });
         }
 
-        // Dropcap animate-in feature (built as a configurable option)
-        // Can be configured globally, via URL query parameter (?dropcap=animate or ?dropcap=static),
-        // or toggled dynamically via window.toggleDropcapAnimation(true|false).
-        const ENABLE_DROPCAP_ANIMATION = true;
-
-        function initDropcapAnimation() {
-            const params = new URLSearchParams(window.location.search);
-            const dropcapParam = params.get('dropcap');
-            const shouldAnimate = dropcapParam === 'static' ? false : (dropcapParam === 'animate' ? true : ENABLE_DROPCAP_ANIMATION);
-
-            if (!shouldAnimate) {
-                document.body.classList.add('no-dropcap-animation');
-                return;
-            }
-
-            const dropcaps = document.querySelectorAll('.dropcap-lead, .dropcap-paragraph');
-            if (!dropcaps.length) return;
-
-            if ('IntersectionObserver' in window) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            setTimeout(() => {
-                                entry.target.classList.add('dropcap-grown');
-                            }, 200);
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, {
-                    threshold: 0.15,
-                    rootMargin: '0px 0px -30px 0px'
-                });
-
-                dropcaps.forEach(p => observer.observe(p));
-            } else {
-                setTimeout(() => {
-                    dropcaps.forEach(p => p.classList.add('dropcap-grown'));
-                }, 250);
-            }
-
-            // Clicking the letter replays the animation
-            dropcaps.forEach(p => {
-                const letter = p.querySelector('.dropcap-letter');
-                if (letter) {
-                    letter.addEventListener('click', () => {
-                        p.classList.remove('dropcap-grown');
-                        setTimeout(() => p.classList.add('dropcap-grown'), 80);
-                    });
-                }
-            });
-        }
-
-        window.toggleDropcapAnimation = function(enable) {
-            document.body.classList.toggle('no-dropcap-animation', !enable);
-            document.querySelectorAll('.dropcap-lead, .dropcap-paragraph').forEach(p => p.classList.toggle('dropcap-grown', enable));
-        };
-
-        initDropcapAnimation();
+        
     </script>
 </body>
 
