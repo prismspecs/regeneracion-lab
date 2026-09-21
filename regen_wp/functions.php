@@ -117,6 +117,11 @@ add_action( 'save_post_resident', 'regen_wp_save_resident_meta' );
  * Regeneración Lab Theme Functions
  */
 
+require_once get_template_directory() . '/inc/helpers.php';
+require_once get_template_directory() . '/inc/page-fields.php';
+require_once get_template_directory() . '/inc/programs.php';
+require_once get_template_directory() . '/inc/patterns.php';
+
 function regen_wp_enqueue_scripts() {
     $uri = get_template_directory_uri() . '/assets/';
     $dir = get_template_directory() . '/assets/';
@@ -134,6 +139,29 @@ function regen_wp_enqueue_scripts() {
     // Content-page components (masthead, prose, forms...) load everywhere but the hero homepage.
     if ( ! is_front_page() ) {
         wp_enqueue_style( 'regen-page', $uri . 'page.css', array( 'regen-site' ), $ver( 'page.css' ) );
+    }
+
+    // Per-template styles.
+    $page_styles = array(
+        'about'     => is_page( 'about' ),
+        'residents' => is_page( 'residents' ) || is_singular( 'resident' ),
+        'students'  => is_page( 'students' ),
+    );
+    foreach ( $page_styles as $name => $needed ) {
+        if ( $needed ) {
+            wp_enqueue_style( 'regen-page-' . $name, $uri . 'pages/' . $name . '.css', array( 'regen-page' ), $ver( 'pages/' . $name . '.css' ) );
+        }
+    }
+
+    // Project cards: homepage grid + Projects page.
+    if ( is_front_page() || is_page( 'projects' ) ) {
+        wp_enqueue_style( 'regen-cards', $uri . 'cards.css', array( 'regen-site' ), $ver( 'cards.css' ) );
+    }
+
+    // Support call-to-action + donation modal: homepage + Support page.
+    if ( is_front_page() || is_page( 'support' ) ) {
+        wp_enqueue_style( 'regen-support', $uri . 'support.css', array( 'regen-site' ), $ver( 'support.css' ) );
+        wp_enqueue_script( 'regen-support', $uri . 'support.js', array( 'regen-site' ), $ver( 'support.js' ), true );
     }
 
     // Theme header stylesheet: WP-specific rules only.
@@ -343,7 +371,7 @@ function regen_wp_register_cpts() {
             'singular_name' => __( 'Project', 'regen-wp' ),
         ),
         'public' => true,
-        'has_archive' => true,
+        'has_archive' => false, // /projects/ is an editable Page (page-projects.php)
         'menu_position' => 5,
         'show_in_rest' => true,
         'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
@@ -356,7 +384,7 @@ function regen_wp_register_cpts() {
             'singular_name' => __( 'Resident', 'regen-wp' ),
         ),
         'public' => true,
-        'has_archive' => true,
+        'has_archive' => false, // /residents/ is an editable Page (page-residents.php)
         'menu_position' => 6,
         'show_in_rest' => true,
         'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
@@ -390,6 +418,15 @@ function regen_wp_register_cpts() {
     ) );
 }
 add_action( 'init', 'regen_wp_register_cpts' );
+
+// Flush permalinks once when the routing model changes (projects/residents became Pages).
+function regen_wp_maybe_flush_rewrites() {
+    if ( '2' !== get_option( 'regen_rewrite_version' ) ) {
+        flush_rewrite_rules();
+        update_option( 'regen_rewrite_version', '2' );
+    }
+}
+add_action( 'init', 'regen_wp_maybe_flush_rewrites', 99 );
 
 // Project meta (badge/meta/link label) with editor-friendly UI
 function regen_wp_register_project_meta() {

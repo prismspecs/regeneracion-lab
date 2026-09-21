@@ -11,187 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../../regen_wp/assets/site.css">
     <link rel="stylesheet" href="../../../regen_wp/assets/page.css">
-    <style>
-
-        /* Approach Focus Grid: Option 4 Minimalist Typographic Columns */
-        .focus-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 48px 44px;
-            margin-top: 36px;
-        }
-
-        @media (max-width: 860px) {
-            .focus-grid {
-                grid-template-columns: 1fr;
-                gap: 36px;
-            }
-        }
-
-        .focus-item {
-            background: transparent;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .focus-item--turquoise { --item-accent: var(--color-turquoise); }
-        .focus-item--brown { --item-accent: var(--color-earth-brown); }
-        .focus-item--amber { --item-accent: var(--color-clay-amber); }
-
-        .focus-eyebrow {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-family: Georgia, serif;
-            font-size: 0.78rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--item-accent);
-            margin-bottom: 10px;
-        }
-
-        .focus-eyebrow .eyebrow-mark {
-            background: var(--item-accent);
-        }
-
-        .focus-item h3 {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 1.55rem;
-            line-height: 1.22;
-            color: var(--page-text);
-            margin-bottom: 12px;
-        }
-
-        .focus-item p {
-            font-family: Georgia, serif;
-            font-size: 15.5px;
-            line-height: 24px;
-            color: var(--page-text-muted);
-        }
-
-        /* Director Profile: Asymmetric Editorial Layout */
-        .director-profile {
-            display: grid;
-            grid-template-columns: 240px 1fr;
-            gap: 48px;
-            align-items: start;
-            margin-top: 12px;
-        }
-
-        .director-photo-wrap {
-            position: relative;
-        }
-
-        .director-photo {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 4 / 5;
-            object-fit: cover;
-            display: block;
-            filter: contrast(1.04) saturate(0.95);
-            border: 1px solid rgba(33, 26, 18, 0.08);
-        }
-
-        .director-photo-caption {
-            margin-top: 10px;
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.8rem;
-            color: rgba(33, 26, 18, 0.6);
-            line-height: 1.4;
-        }
-
-        .director-content h3 {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 2.1rem;
-            line-height: 1.15;
-            color: var(--page-text);
-            margin-bottom: 6px;
-        }
-
-        .director-title {
-            font-family: Georgia, serif;
-            font-size: 0.84rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--color-accent-green);
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .director-bio {
-            font-family: Georgia, serif;
-            font-size: 16.5px;
-            line-height: 27px;
-            color: var(--page-text-muted);
-        }
-
-        .director-bio p + p {
-            margin-top: 16px;
-        }
-
-        .director-contact-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 22px;
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 15.5px;
-            color: var(--color-accent-green);
-            text-decoration: none;
-            transition: gap 0.2s ease, opacity 0.2s ease;
-        }
-
-        .director-contact-link:hover {
-            opacity: 0.75;
-            gap: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .director-profile {
-                grid-template-columns: 1fr;
-                gap: 28px;
-            }
-
-            .director-photo-wrap {
-                max-width: 220px;
-            }
-        }
-
-        /* Contact Section & Form (fits full container width) */
-        .contact-wrap {
-            max-width: 100%;
-        }
-
-        .contact-intro {
-            font-family: Georgia, serif;
-            font-size: 17px;
-            line-height: 27px;
-            color: var(--page-text-muted);
-            margin-bottom: 32px;
-        }
-
-        .contact-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-
-
-
-        @media (max-width: 640px) {
-            .contact-form {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        
-    </style>
+    <link rel="stylesheet" href="../../../regen_wp/assets/pages/about.css">
 </head>
 
 <body>
@@ -277,7 +97,6 @@
             <div class="focus-grid">
                 <div class="focus-item focus-item--turquoise">
                     <div class="focus-eyebrow">
-                        <span class="eyebrow-mark"></span>
                         Methodology
                     </div>
                     <h3>Archives &amp; Historiographies</h3>
@@ -286,7 +105,6 @@
 
                 <div class="focus-item focus-item--brown">
                     <div class="focus-eyebrow">
-                        <span class="eyebrow-mark"></span>
                         Praxis
                     </div>
                     <h3>Decolonial Methodologies</h3>
@@ -295,7 +113,6 @@
 
                 <div class="focus-item focus-item--amber">
                     <div class="focus-eyebrow">
-                        <span class="eyebrow-mark"></span>
                         Pedagogy
                     </div>
                     <h3>Popular Education</h3>
@@ -304,7 +121,6 @@
 
                 <div class="focus-item focus-item--turquoise">
                     <div class="focus-eyebrow">
-                        <span class="eyebrow-mark"></span>
                         Ecology
                     </div>
                     <h3>Water &amp; Land Relations</h3>
@@ -313,7 +129,6 @@
 
                 <div class="focus-item focus-item--brown">
                     <div class="focus-eyebrow">
-                        <span class="eyebrow-mark"></span>
                         Media
                     </div>
                     <h3>Creative-Critical Praxis</h3>
@@ -322,7 +137,6 @@
 
                 <div class="focus-item focus-item--amber">
                     <div class="focus-eyebrow">
-                        <span class="eyebrow-mark"></span>
                         Community
                     </div>
                     <h3>Transformative Justice</h3>

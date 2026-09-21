@@ -1,0 +1,372 @@
+/* Reading Group / Study Circle Cards */
+.reading-group-list {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+}
+
+.program-card {
+    border: 1px solid var(--color-border);
+    padding: 36px 36px 32px;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.program-card:hover {
+    border-color: rgba(33, 26, 18, 0.25);
+    box-shadow: 0 4px 18px rgba(33, 26, 18, 0.04);
+}
+
+.program-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.program-badge {
+    display: inline-block;
+    font-family: Georgia, serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 0;
+    font-weight: 600;
+}
+
+.program-badge--active {
+    background: rgba(30, 74, 38, 0.08);
+    color: var(--color-accent-green);
+    border: 1px solid rgba(30, 74, 38, 0.25);
+}
+
+.program-badge--winter {
+    background: rgba(31, 122, 140, 0.08);
+    color: var(--color-turquoise);
+    border: 1px solid rgba(31, 122, 140, 0.25);
+}
+
+.program-partner {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 0.88rem;
+    color: var(--page-text-muted);
+}
+
+.program-card h3 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 2.1rem;
+    line-height: 1.15;
+    color: var(--page-text);
+    margin-bottom: 12px;
+}
+
+.program-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-family: Georgia, serif;
+    font-size: 0.85rem;
+    color: var(--page-text-muted);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.program-meta-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.program-meta-item strong {
+    font-weight: 600;
+    color: var(--page-text);
+}
+
+.program-desc {
+    font-family: Georgia, serif;
+    font-size: 17px;
+    line-height: 28px;
+    color: var(--page-text-muted);
+    margin-bottom: 24px;
+}
+
+.program-topics {
+    margin: 24px 0 28px;
+    padding: 18px 0 0;
+    border-top: 1px solid var(--color-border-subtle);
+    background: transparent;
+}
+
+.program-topics-title {
+    font-family: Georgia, serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--page-text);
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.program-topics-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.program-topics-list li {
+    font-family: Georgia, serif;
+    font-size: 15.5px;
+    line-height: 24px;
+    color: var(--page-text-muted);
+    padding-left: 18px;
+    position: relative;
+}
+
+.program-topics-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--color-accent-green);
+    font-weight: bold;
+}
+
+.program-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-top: 18px;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: Georgia, serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--page-text);
+    text-decoration: none;
+    padding: 12px 24px;
+    border: 1px solid rgba(33, 26, 18, 0.3);
+    background: transparent;
+    border-radius: 0;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-action:hover {
+    background: var(--page-text);
+    color: var(--page-bg);
+    border-color: var(--page-text);
+}
+
+.program-facilitator {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 0.88rem;
+    color: var(--page-text-muted);
+}
+
+/* Two-Column Opportunities Grid */
+.opportunities-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    margin: 36px 0;
+}
+
+.opp-card {
+    border: 1px solid var(--color-border);
+    padding: 32px 30px;
+    background: #ffffff;
+}
+
+.opp-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.opp-card h3 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.85rem;
+    line-height: 1.18;
+    color: var(--page-text);
+    margin-bottom: 14px;
+}
+
+.opp-card-text {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    line-height: 26px;
+    color: var(--page-text-muted);
+    margin-bottom: 20px;
+}
+
+.opp-item-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.opp-item-list li {
+    font-family: Georgia, serif;
+    font-size: 15px;
+    line-height: 23px;
+    color: var(--page-text-muted);
+    padding-left: 18px;
+    position: relative;
+}
+
+.opp-item-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--color-accent-green);
+}
+
+.opp-item-list strong {
+    color: var(--page-text);
+    font-weight: 600;
+}
+
+/* Form Styling (Sharply Brutalist, Zero Border Radius) */
+.form-section-container {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    padding: 44px 40px;
+    margin-top: 36px;
+}
+
+.join-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.form-label .req {
+    color: var(--color-earth-brown);
+}
+
+.form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23211a12' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+.checkbox-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-family: Georgia, serif;
+    font-size: 15.5px;
+    line-height: 1.45;
+    color: var(--page-text-muted);
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-top: 3px;
+    width: 17px;
+    height: 17px;
+    border: 1px solid rgba(33, 26, 18, 0.35);
+    border-radius: 0;
+    accent-color: var(--color-accent-green);
+    cursor: pointer;
+}
+
+.checkbox-item span {
+    color: var(--page-text);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 860px) {
+    .opportunities-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .join-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+
+    .program-card {
+        padding: 24px 20px;
+    }
+
+    .form-section-container {
+        padding: 28px 20px;
+    }
+
+    .btn-action {
+        width: 100%;
+        min-height: 48px;
+        padding: 14px 20px;
+        justify-content: center;
+        box-sizing: border-box;
+        font-size: 0.85rem;
+    }
+
+    .footer-inner {
+        flex-direction: column;
+        gap: 28px;
+    }
+
+    .footer-meta {
+        align-items: flex-start;
+    }
+}
+
+/* Contact Form 7 checkbox list, styled like the prototype's checkbox stack. */
+.checkbox-stack .wpcf7-checkbox {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkbox-stack .wpcf7-list-item {
+    margin: 0;
+}
+
+.checkbox-stack .wpcf7-list-item label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-family: Georgia, serif;
+    font-size: 16px;
+    color: var(--page-text);
+    cursor: pointer;
+}
+
+.checkbox-stack input[type="checkbox"] {
+    margin-top: 5px;
+    accent-color: var(--color-accent-green);
+}

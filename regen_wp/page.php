@@ -1,21 +1,24 @@
 <?php
 /**
- * Page template
+ * Generic page: masthead + editable content.
  */
 
 get_header();
 
-if ( have_posts() ) :
-    while ( have_posts() ) : the_post(); ?>
-        <article <?php post_class( 'content-article page-article' ); ?>>
-            <div class="article-header">
-                <h1 class="article-title"><?php the_title(); ?></h1>
-            </div>
-            <div class="article-content"><?php the_content(); ?></div>
-        </article>
-    <?php endwhile;
-else :
-    echo '<p>No content found.</p>';
-endif;
+while ( have_posts() ) :
+    the_post();
+    regen_wp_masthead( array(
+        'eyebrow' => regen_wp_page_field( 'eyebrow' ),
+        'title'   => get_the_title(),
+        'tagline' => has_excerpt() ? get_the_excerpt() : '',
+    ) );
+    ?>
+    <section class="page-section">
+        <div class="prose-column">
+            <?php echo regen_wp_dropcap( apply_filters( 'the_content', get_the_content() ) ); // phpcs:ignore ?>
+        </div>
+    </section>
+    <?php
+endwhile;
 
 get_footer();

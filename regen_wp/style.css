@@ -34,11 +34,85 @@ Text Domain: regen-wp
     font-weight: 400;
     color: var(--page-text);
     line-height: 1.18;
-    margin-top: 48px;
 }
 
-.prose-column h2 { font-size: 2.25rem; }
-.prose-column h3 { font-size: 1.6rem; }
+/* An H2 in editable content starts a new section, like .page-section + .section-title. */
+.prose-column h2 {
+    font-size: 2.25rem;
+    margin: 52px 0 28px;
+    padding-top: 52px;
+    border-top: 1px solid var(--color-border);
+    text-wrap: balance;
+}
+
+.prose-column > h2:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+.prose-column h3 {
+    font-size: 1.6rem;
+    margin: 40px 0 16px;
+}
+
+.prose-column .wp-block-buttons {
+    margin-top: 32px;
+}
+
+.prose-column .wp-block-button__link {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    border: 1px solid rgba(33, 26, 18, 0.35);
+    border-radius: 0;
+    background: transparent;
+    color: var(--page-text);
+    font-family: Georgia, serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.prose-column .wp-block-button__link:hover {
+    background: var(--page-text);
+    color: var(--page-bg);
+    border-color: var(--page-text);
+}
+
+.page-figure {
+    margin: 0 0 40px;
+}
+
+.page-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.page-back {
+    margin-top: 48px;
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+}
+
+.page-back a,
+.page-links a {
+    color: var(--color-accent-green);
+    text-underline-offset: 3px;
+}
+
+.page-links {
+    margin-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-family: Georgia, serif;
+    font-style: italic;
+}
 
 .prose-column a {
     color: var(--color-accent-green);

@@ -15,6 +15,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../../regen_wp/assets/site.css">
+    <link rel="stylesheet" href="../../../regen_wp/assets/cards.css">
+    <link rel="stylesheet" href="../../../regen_wp/assets/support.css">
     <style>
         :root {
             /* The pinned-state background: what everything becomes once
@@ -36,7 +38,6 @@
                it. site.css would paint --page-bg on html/body, so blank it. */
             --page-bg: #ffffff;
         }
-
 
         html,
         body {
@@ -174,7 +175,6 @@
                 white-space: nowrap;
             }
         }
-
 
         /* Hero Nav: the same menu as the slim top bar, but on the landing
            screen -- no background, no site title, spread across the full
@@ -351,17 +351,7 @@
             color: var(--page-text);
         }
 
-        .project-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 52px 84px;
-        }
-
         @media (max-width: 640px) {
-            .project-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
 
             .page-tagline {
                 font-size: 1.05em;
@@ -372,335 +362,11 @@
             }
         }
 
-        /* Option 4: The Minimalist Typographic Column (zero container, pure type) */
-        .project-card {
-            background: transparent;
-            padding: 8px 0 16px;
-        }
-
-        .project-card--turquoise {
-            --project-accent: #2a9d8f;
-        }
-
-        .project-card--brown {
-            --project-accent: #9c5424;
-        }
-
-        .project-card--amber {
-            --project-accent: #c86a3d;
-        }
-
-        .project-card .project-eyebrow {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.82rem;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--project-accent);
-            margin-bottom: 12px;
-        }
-
-        .project-card .eyebrow-mark {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: var(--project-accent);
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .project-card .project-badge {
-            font-weight: 600;
-        }
-
-        .project-card .project-meta-sep {
-            opacity: 0.6;
-        }
-
-        .project-card .project-meta {
-            letter-spacing: 0.06em;
-        }
-
-        .project-card h3 {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-weight: 400;
-            font-size: 1.65em;
-            line-height: 1.22;
-            margin-bottom: 12px;
-            color: var(--page-text);
-        }
-
-        .project-card p {
-            font-family: Georgia, serif;
-            font-size: 16px;
-            line-height: 25px;
-            color: rgba(33, 26, 18, 0.85);
-            margin-bottom: 18px;
-        }
-
-        .project-card a {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 16px;
-            color: var(--project-accent);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: gap 0.2s ease, opacity 0.2s ease;
-        }
-
-        .project-card a:hover {
-            opacity: 0.75;
-            gap: 10px;
-        }
-
-        /* 3-Column Layout for Collaborations & Updates */
-        .three-col-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 44px 48px;
-        }
-
-        @media (max-width: 860px) {
-            .three-col-grid {
-                grid-template-columns: 1fr;
-                gap: 36px;
-            }
-        }
-
-        .collab-card,
-        .update-card {
-            background: transparent;
-            padding: 4px 0 16px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .collab-card h3,
-        .update-card h3 {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-weight: 400;
-            font-size: 1.5em;
-            line-height: 1.25;
-            margin-bottom: 12px;
-            color: var(--page-text);
-        }
-
-        .collab-card p,
-        .update-card p {
-            font-family: Georgia, serif;
-            font-size: 15.5px;
-            line-height: 24px;
-            color: rgba(33, 26, 18, 0.85);
-            margin-bottom: 16px;
-            flex-grow: 1;
-        }
-
-        .collab-card a,
-        .update-card a {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 15.5px;
-            color: #1e4a26;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: gap 0.2s ease, opacity 0.2s ease;
-        }
-
-        .collab-card a:hover,
-        .update-card a:hover {
-            opacity: 0.75;
-            gap: 10px;
-        }
-
         .card-links {
             display: flex;
             flex-wrap: wrap;
             gap: 12px 20px;
             margin-top: auto;
-        }
-
-        /* Support Section */
-        .page-section--support {
-            text-align: center;
-            padding-bottom: 0;
-        }
-
-        .support-content {
-            max-width: 640px;
-            margin: 0 auto;
-        }
-
-        .support-description {
-            font-family: Georgia, serif;
-            font-size: 17px;
-            line-height: 27px;
-            color: rgba(33, 26, 18, 0.85);
-            margin-bottom: 32px;
-        }
-
-        .support-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .support-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 38px;
-            font-family: Georgia, serif;
-            font-size: 0.84rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--page-text);
-            background: transparent;
-            border: 1px solid rgba(33, 26, 18, 0.35);
-            border-radius: 2px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .support-button:hover {
-            background: #1e4a26;
-            border-color: #1e4a26;
-            color: #ffffff;
-            gap: 12px;
-        }
-
-        .support-note {
-            font-family: Georgia, serif;
-            font-style: italic;
-            font-size: 0.88rem;
-            color: rgba(33, 26, 18, 0.65);
-            max-width: 480px;
-            line-height: 1.5;
-        }
-
-        .support-note em {
-            color: var(--page-text);
-            font-style: normal;
-            font-weight: 600;
-        }
-
-        /* Support Modal Popover */
-        .support-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
-
-        .support-modal[hidden] {
-            display: none;
-        }
-
-        .support-modal.is-open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .support-modal-backdrop {
-            position: absolute;
-            inset: 0;
-            background: rgba(20, 16, 12, 0.45);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-        }
-
-        .support-modal-dialog {
-            position: relative;
-            width: 100%;
-            max-width: 460px;
-            background: #faf8f5;
-            border: 1px solid rgba(33, 26, 18, 0.15);
-            border-radius: 3px;
-            padding: 36px 32px 28px;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
-            transform: translateY(12px) scale(0.98);
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .support-modal.is-open .support-modal-dialog {
-            transform: translateY(0) scale(1);
-        }
-
-        .support-modal-title {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-size: 1.8rem;
-            font-weight: 400;
-            color: var(--page-text);
-            margin-bottom: 14px;
-        }
-
-        .support-modal-text {
-            font-family: Georgia, serif;
-            font-size: 15px;
-            line-height: 24px;
-            color: rgba(33, 26, 18, 0.85);
-            margin-bottom: 28px;
-        }
-
-        .support-modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .support-modal-cancel {
-            background: transparent;
-            border: none;
-            font-family: Georgia, serif;
-            font-size: 0.8rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: rgba(33, 26, 18, 0.6);
-            cursor: pointer;
-            padding: 8px 12px;
-            transition: color 0.2s ease;
-        }
-
-        .support-modal-cancel:hover {
-            color: var(--page-text);
-        }
-
-        .support-modal-continue {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 22px;
-            background: #1e4a26;
-            color: #ffffff;
-            font-family: Georgia, serif;
-            font-size: 0.8rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            text-decoration: none;
-            border-radius: 2px;
-            transition: background 0.2s ease;
-        }
-
-        .support-modal-continue:hover {
-            background: #15341a;
         }
 
         .hero-image {
@@ -1385,6 +1051,7 @@
     </main>
 
     <script src="../../../regen_wp/assets/site.js"></script>
+    <script src="../../../regen_wp/assets/support.js"></script>
     <script>
         // ---- Random hero photo ------------------------------------------
         // Shortlisted candidates only (picked by hand, not "all wide
@@ -1947,50 +1614,6 @@
                 }
             }
         });
-
-        // Support modal open & close logic
-        const supportOpenBtn = document.getElementById('supportOpenBtn');
-        const supportModal = document.getElementById('supportModal');
-        if (supportOpenBtn && supportModal) {
-            const closeEls = supportModal.querySelectorAll('[data-support-close]');
-            const continueBtn = supportModal.querySelector('[data-support-continue]');
-            const supportUrl = 'https://give.ucsb.edu/campaigns/58594/donations/new';
-
-            const openModal = (e) => {
-                if (e) e.preventDefault();
-                supportModal.removeAttribute('hidden');
-                requestAnimationFrame(() => {
-                    supportModal.classList.add('is-open');
-                });
-            };
-
-            const closeModal = (e) => {
-                if (e) e.preventDefault();
-                supportModal.classList.remove('is-open');
-                setTimeout(() => {
-                    supportModal.setAttribute('hidden', 'hidden');
-                }, 250);
-            };
-
-            supportOpenBtn.addEventListener('click', openModal);
-            closeEls.forEach(el => el.addEventListener('click', closeModal));
-
-            if (continueBtn) {
-                continueBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    closeModal();
-                    window.open(supportUrl, '_blank', 'noopener');
-                });
-            }
-
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && supportModal.classList.contains('is-open')) {
-                    closeModal();
-                }
-            });
-        }
-
-
 
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onResize);
