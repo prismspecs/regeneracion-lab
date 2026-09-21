@@ -133,30 +133,13 @@
            fade-in and scrolling under the floating title like everything
            else. */
         .page-header {
-            margin: 0 auto 48px;
+            margin: 0 auto 52px;
             text-align: center;
             max-width: 980px;
         }
 
-        .page-tagline {
-            max-width: 100%;
-            margin: 0 auto;
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-style: italic;
-            font-size: clamp(1.15rem, 1.4vw, 1.32rem);
-            line-height: 1.4;
-            color: #1e4a26; /* regen_wp --color-accent-green: the live tagline's exact color */
-        }
-
-        @media (min-width: 860px) {
-            .page-tagline {
-                white-space: nowrap;
-            }
-        }
-
-        /* In-page nav is hidden for now; site relies on the sticky slim topbar nav */
         .page-nav {
-            display: none !important;
+            margin-bottom: 20px;
         }
 
         .page-nav ul {
@@ -165,7 +148,7 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 14px 45px; /* column-gap matches the live nav's 45px */
-            margin: 26px 0 0;
+            margin: 0;
             padding: 0;
         }
 
@@ -184,6 +167,23 @@
             color: #1e4a26;
             border-bottom-color: #1e4a26;
         }
+
+        .page-tagline {
+            max-width: 100%;
+            margin: 0 auto;
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-style: italic;
+            font-size: clamp(1.15rem, 1.4vw, 1.32rem);
+            line-height: 1.4;
+            color: #1e4a26; /* regen_wp --color-accent-green: the live tagline's exact color */
+        }
+
+        @media (min-width: 860px) {
+            .page-tagline {
+                white-space: nowrap;
+            }
+        }
+
 
         /* Slim Top Bar: sleek, slim sticky navigation that glides down
            when the giant title scrolls off the top of the screen. */
@@ -1511,7 +1511,6 @@
              this static prototype doesn't have, same as the project
              cards' Explore links below. -->
         <header class="page-header">
-            <p class="page-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
             <nav class="page-nav" aria-label="Primary">
                 <ul>
                     <li><a href="#top">Home</a></li>
@@ -1522,6 +1521,7 @@
                     <li><a href="#support">Support</a></li>
                 </ul>
             </nav>
+            <p class="page-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
         </header>
         <div class="page-copy" id="about">
             <p class="dropcap-paragraph" id="dropcapContainer"><span class="dropcap-letter" id="dropcapLetter">R</span>egeneration has become one of the most commercialized and co-opted terms of the 21st century. It is commonly used to market a plethora of ventures that greenwash extractive and colonial land relations, sell products and settler ways of life, and envision alternatives that may delink from one system but reproduce others.</p>

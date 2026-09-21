@@ -386,16 +386,40 @@
             margin-top: 24px;
         }
 
-        /* 3-line drop cap for opening paragraph */
-        .dropcap-lead .dropcap-letter {
+        /* 3-line drop cap for opening paragraph (animates in when appearing, built as a configurable option) */
+        .dropcap-lead .dropcap-letter,
+        .dropcap-paragraph .dropcap-letter {
             float: left;
             font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 18px;
+            line-height: 29px;
+            margin-right: 0px;
+            margin-top: 0px;
+            color: var(--page-text);
+            user-select: text;
+            -webkit-user-select: text;
+            cursor: pointer;
+            transition: font-size 1s cubic-bezier(0.16, 1, 0.3, 1),
+                        line-height 1s cubic-bezier(0.16, 1, 0.3, 1),
+                        margin-right 1s cubic-bezier(0.16, 1, 0.3, 1),
+                        margin-top 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dropcap-lead.dropcap-grown .dropcap-letter,
+        .dropcap-paragraph.dropcap-grown .dropcap-letter,
+        body.no-dropcap-animation .dropcap-lead .dropcap-letter,
+        body.no-dropcap-animation .dropcap-paragraph .dropcap-letter {
             font-size: 96px;
             line-height: 68px;
             margin-right: 12px;
             margin-top: 11px;
-            color: var(--page-text);
-            user-select: text;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .dropcap-lead .dropcap-letter,
+            .dropcap-paragraph .dropcap-letter {
+                transition: none !important;
+            }
         }
 
         /* Editorial Pull Quote (clean typography without redundant enclosing borders) */
@@ -1090,6 +1114,65 @@
                 }
             });
         }
+
+        // Dropcap animate-in feature (built as a configurable option)
+        // Can be configured globally, via URL query parameter (?dropcap=animate or ?dropcap=static),
+        // or toggled dynamically via window.toggleDropcapAnimation(true|false).
+        const ENABLE_DROPCAP_ANIMATION = true;
+
+        function initDropcapAnimation() {
+            const params = new URLSearchParams(window.location.search);
+            const dropcapParam = params.get('dropcap');
+            const shouldAnimate = dropcapParam === 'static' ? false : (dropcapParam === 'animate' ? true : ENABLE_DROPCAP_ANIMATION);
+
+            if (!shouldAnimate) {
+                document.body.classList.add('no-dropcap-animation');
+                return;
+            }
+
+            const dropcaps = document.querySelectorAll('.dropcap-lead, .dropcap-paragraph');
+            if (!dropcaps.length) return;
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setTimeout(() => {
+                                entry.target.classList.add('dropcap-grown');
+                            }, 200);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.15,
+                    rootMargin: '0px 0px -30px 0px'
+                });
+
+                dropcaps.forEach(p => observer.observe(p));
+            } else {
+                setTimeout(() => {
+                    dropcaps.forEach(p => p.classList.add('dropcap-grown'));
+                }, 250);
+            }
+
+            // Clicking the letter replays the animation
+            dropcaps.forEach(p => {
+                const letter = p.querySelector('.dropcap-letter');
+                if (letter) {
+                    letter.addEventListener('click', () => {
+                        p.classList.remove('dropcap-grown');
+                        setTimeout(() => p.classList.add('dropcap-grown'), 80);
+                    });
+                }
+            });
+        }
+
+        window.toggleDropcapAnimation = function(enable) {
+            document.body.classList.toggle('no-dropcap-animation', !enable);
+            document.querySelectorAll('.dropcap-lead, .dropcap-paragraph').forEach(p => p.classList.toggle('dropcap-grown', enable));
+        };
+
+        initDropcapAnimation();
     </script>
 </body>
 
