@@ -322,6 +322,7 @@
     color: var(--page-text);
     display: block;
     margin-bottom: 8px;
+    text-decoration: none;
 }
 
 .footer-tagline {

@@ -1,204 +1,179 @@
 <?php
 /**
- * Front Page Template
+ * Homepage: pinned title/hero (assets/home.css + home.js) over normal content.
+ *
+ * Editable in WP:
+ *  - hero quote/attribution and the support copy/URL: Appearance > Customize
+ *  - intro copy: the "Home" page body
+ *  - projects, collaborations, recent updates: their own post types / posts
  */
 
 get_header();
 
-$home_id          = get_queried_object_id();
-$hero_image_id    = get_theme_mod( 'regen_hero_image' );
-$hero_image_url   = $hero_image_id ? wp_get_attachment_image_url( $hero_image_id, 'full' ) : get_the_post_thumbnail_url( $home_id, 'full' );
-$hero_quote       = get_theme_mod( 'regen_hero_quote', '"THEY TRIED TO BURY US BUT THEY DIDN\'T KNOW WE WERE SEEDS"' );
-$hero_attribution = get_theme_mod( 'regen_hero_attribution', 'Mexican revolutionary dicho circa. 1910' );
-$support_heading  = get_theme_mod( 'regen_support_heading', 'Support Our Work' );
-$support_text     = get_theme_mod( 'regen_support_text', 'Regeneración Lab operates through community support and grant funding. Your contribution helps us maintain this platform, support resident scholars, and keep these resources freely accessible.' );
-$support_url      = get_theme_mod( 'regen_support_url', 'https://give.ucsb.edu/campaigns/58594/donations/new' );
-$support_button   = get_theme_mod( 'regen_support_button_label', 'CONTRIBUTE' );
-$support_pop_msg  = get_theme_mod( 'regen_support_popover_message', 'When you check out, specify the donation is for Regeneracion Lab.' );
-$support_pop_cta  = get_theme_mod( 'regen_support_popover_button', 'Continue' );
+$support_heading = get_theme_mod( 'regen_support_heading', 'Support Our Work' );
+$support_text    = get_theme_mod( 'regen_support_text', 'Regeneración Lab operates through community support and grant funding. Your contribution helps us maintain this platform, support resident scholars, and keep these resources freely accessible.' );
+$support_button  = get_theme_mod( 'regen_support_button_label', 'Contribute' );
+$support_note    = get_theme_mod( 'regen_support_note', 'When you check out, please specify that your donation is for <em>Regeneración Lab</em>.' );
+
+/**
+ * Wrap the first letter of the intro's first paragraph for the growing drop cap
+ * (assets/home.js toggles .dropcap-grown on #dropcapContainer).
+ */
+$intro = '';
+while ( have_posts() ) {
+    the_post();
+    $intro = apply_filters( 'the_content', get_the_content() );
+}
+$intro = preg_replace(
+    '/<p([^>]*)>(\s*)([A-Za-zÀ-ÿ])/u',
+    '<p class="dropcap-paragraph" id="dropcapContainer"><span class="dropcap-letter" id="dropcapLetter">$3</span>',
+    $intro,
+    1
+);
 ?>
 
-<div class="hero-image-container">
-    <div class="hero-image fade-in" <?php echo $hero_image_url ? 'style="background-image: url(' . esc_url( $hero_image_url ) . ');"' : ''; ?>>
-        <div class="quote-overlay">
-            <div class="quote-label"><?php echo esc_html( $hero_quote ); ?><br>—<?php echo esc_html( $hero_attribution ); ?></div>
-        </div>
-    </div>
-</div>
-
-<div class="intro-text fade-in">
-    <?php if ( have_posts() ) : ?>
-        <?php while ( have_posts() ) : the_post(); ?>
-            <?php the_content(); ?>
-        <?php endwhile; ?>
-    <?php endif; ?>
-</div>
-
-<section class="section">
-    <h2 class="section-header">Projects</h2>
+<nav class="hero-nav" id="heroNav" aria-label="<?php esc_attr_e( 'Main Menu', 'regen-wp' ); ?>">
     <?php
-    $projects_query = new WP_Query( array(
+    wp_nav_menu( array(
+        'theme_location' => 'primary',
+        'container'      => false,
+        'items_wrap'     => '<ul>%3$s</ul>',
+        'depth'          => 1,
+        'fallback_cb'    => false,
+        'walker'         => new Regen_Nav_Walker(),
+    ) );
+    ?>
+</nav>
+
+<?php get_template_part( 'template-parts/home-hero' ); ?>
+
+<div class="hero-spacer" id="heroSpacer"></div>
+
+<main class="page-content" id="pageContent">
+    <header class="page-header">
+        <nav class="page-nav" aria-label="<?php esc_attr_e( 'Primary', 'regen-wp' ); ?>">
+            <?php
+            wp_nav_menu( array(
+                'theme_location' => 'primary',
+                'container'      => false,
+                'items_wrap'     => '<ul>%3$s</ul>',
+                'depth'          => 1,
+                'fallback_cb'    => false,
+                'walker'         => new Regen_Nav_Walker(),
+            ) );
+            ?>
+        </nav>
+        <p class="page-tagline"><?php bloginfo( 'description' ); ?></p>
+    </header>
+
+    <div class="page-copy" id="about">
+        <?php echo $intro; // phpcs:ignore WordPress.Security.EscapeOutput ?>
+        <p style="margin-top: 20px;"><a class="page-copy-more" href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'Read our full history, research praxis & leadership', 'regen-wp' ); ?> &rarr;</a></p>
+    </div>
+
+    <?php
+    $projects = new WP_Query( array(
         'post_type'      => 'project',
         'posts_per_page' => 6,
         'orderby'        => 'menu_order',
         'order'          => 'ASC',
     ) );
-    ?>
-    <?php if ( $projects_query->have_posts() ) : ?>
-        <div class="projects-grid">
-            <?php while ( $projects_query->have_posts() ) : $projects_query->the_post(); ?>
+    if ( $projects->have_posts() ) :
+        ?>
+        <section class="page-projects" id="projects">
+            <h2><?php esc_html_e( 'Projects', 'regen-wp' ); ?></h2>
+            <div class="project-grid">
                 <?php
-                    $badge        = get_post_meta( get_the_ID(), 'project_badge', true );
-                    $meta         = get_post_meta( get_the_ID(), 'project_meta', true );
-                    $link_label   = get_post_meta( get_the_ID(), 'project_link_label', true );
-                    $link_url     = get_post_meta( get_the_ID(), 'project_link_url', true );
-                    $style        = get_post_meta( get_the_ID(), 'project_style', true );
-                    $style_class  = $style ? ' project-card--' . sanitize_html_class( $style ) : ' project-card--turquoise';
-                    $cta_label    = $link_label ? $link_label : 'Explore';
-                    $link_href    = $link_url ? esc_url( $link_url ) : get_permalink();
-                    $is_external  = $link_url && preg_match( '/^https?:\/\//i', $link_url );
-                    $link_target  = $is_external ? ' target="_blank" rel="noopener"' : '';
-                ?>
-                <div class="project-card<?php echo esc_attr( $style_class ); ?>">
-                    <?php if ( $badge && 0 === strcasecmp( trim( $badge ), 'ongoing' ) ) : ?><div class="item-badge"><?php echo esc_html( $badge ); ?></div><?php endif; ?>
-                    <h3><?php the_title(); ?></h3>
-                    <?php if ( $meta ) : ?><p class="item-meta"><?php echo esc_html( $meta ); ?></p><?php endif; ?>
-                    <p><?php echo esc_html( get_the_excerpt() ); ?></p>
-                    <a href="<?php echo esc_url( $link_href ); ?>" class="item-link"<?php echo $link_target; ?>>→ <?php echo esc_html( $cta_label ); ?></a>
-                </div>
-            <?php endwhile; ?>
-        </div>
-        <?php wp_reset_postdata(); ?>
-    <?php else : ?>
-        <p>No projects published yet.</p>
-    <?php endif; ?>
-</section>
-
-<?php get_template_part( 'template-parts/content', 'collaborations' ); ?>
-
-<section class="section">
-    <h2 class="section-header">Recent Updates</h2>
-    <?php
-    $updates_query = new WP_Query( array(
-        'post_type'      => 'post',
-        'posts_per_page' => 3,
-    ) );
-    ?>
-    <?php if ( $updates_query->have_posts() ) : ?>
-        <?php while ( $updates_query->have_posts() ) : $updates_query->the_post(); ?>
-            <div class="home-section-box">
-                <h3 class="home-section-title"><?php the_title(); ?></h3>
-                <p><?php echo esc_html( get_the_excerpt() ); ?></p>
-                <?php
-                    $update_links = get_post_meta( get_the_ID(), 'update_links', true );
-                ?>
-                <div class="update-links">
-                    <?php if ( is_array( $update_links ) && ! empty( $update_links ) ) : ?>
-                        <?php foreach ( $update_links as $link ) :
-                            $label = isset( $link['label'] ) ? $link['label'] : '';
-                            $url   = isset( $link['url'] ) ? $link['url'] : '';
-                            if ( ! $url ) {
-                                continue;
-                            }
-                            $is_external = preg_match( '/^https?:\/\//i', $url );
-                            $target_attr = $is_external ? ' target="_blank" rel="noopener"' : '';
-                        ?>
-                            <a href="<?php echo esc_url( $url ); ?>" class="item-link"<?php echo $target_attr; ?>>→ <?php echo esc_html( $label ? $label : 'Read More' ); ?></a>
-                        <?php endforeach; ?>
-                    <?php else : ?>
-                        <a href="<?php the_permalink(); ?>" class="item-link home-link-button">→ Read More</a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        <?php endwhile; ?>
-        <?php wp_reset_postdata(); ?>
-    <?php else : ?>
-        <p>No updates posted yet.</p>
-    <?php endif; ?>
-</section>
-
-<div class="support-box">
-    <h3><?php echo esc_html( $support_heading ); ?></h3>
-    <p style="margin-bottom: 20px;"><?php echo esc_html( $support_text ); ?></p>
-    <a href="<?php echo esc_url( $support_url ); ?>" target="_blank" rel="noopener" class="btn" data-support-open>→ <?php echo esc_html( $support_button ); ?></a>
-</div>
-
-<div class="support-modal" id="supportModal" hidden>
-    <div class="support-modal__backdrop" data-support-close></div>
-    <div class="support-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="supportModalTitle">
-        <h3 id="supportModalTitle" class="support-modal__title"><?php echo esc_html( $support_heading ); ?></h3>
-        <p class="support-modal__message"><?php echo wp_kses_post( $support_pop_msg ); ?></p>
-        <div class="support-modal__actions">
-            <button type="button" class="support-modal__close" data-support-close>Cancel</button>
-            <a href="<?php echo esc_url( $support_url ); ?>" target="_blank" rel="noopener" class="btn" data-support-continue><?php echo esc_html( $support_pop_cta ); ?></a>
-        </div>
-    </div>
-</div>
-
-<script>
-(function() {
-    const openBtn = document.querySelector('[data-support-open]');
-    const modal = document.getElementById('supportModal');
-    if (!openBtn || !modal) return;
-
-    const closeEls = modal.querySelectorAll('[data-support-close]');
-    const dialog = modal.querySelector('.support-modal__dialog');
-    const continueBtn = modal.querySelector('[data-support-continue]');
-    const supportHref = continueBtn ? continueBtn.getAttribute('href') : '';
-    const fadeMs = 180;
-
-    const open = (e) => {
-        if (e) e.preventDefault();
-        modal.removeAttribute('hidden');
-        requestAnimationFrame(() => {
-            modal.classList.add('is-open');
-            dialog?.focus({ preventScroll: true });
-        });
-    };
-
-    const finishClose = () => {
-        modal.setAttribute('hidden', 'hidden');
-        modal.classList.remove('is-open');
-        modal.classList.remove('is-closing');
-    };
-
-    const close = (e) => {
-        if (e) e.preventDefault();
-        modal.classList.remove('is-open');
-        modal.classList.add('is-closing');
-        setTimeout(finishClose, fadeMs);
-        openBtn.focus({ preventScroll: true });
-    };
-
-    openBtn.addEventListener('click', open);
-    closeEls.forEach((el) => el.addEventListener('click', close));
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            close(e);
-        }
-    });
-
-    if (continueBtn) {
-        continueBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            modal.classList.remove('is-open');
-            modal.classList.add('is-closing');
-            setTimeout(() => {
-                finishClose();
-                if (supportHref) {
-                    window.open(supportHref, '_blank', 'noopener');
+                while ( $projects->have_posts() ) {
+                    $projects->the_post();
+                    get_template_part( 'template-parts/project-card' );
                 }
-            }, fadeMs);
-        });
-    }
+                wp_reset_postdata();
+                ?>
+            </div>
+        </section>
+    <?php endif; ?>
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('is-open')) {
-            close(e);
-        }
-    });
-})();
-</script>
+    <?php
+    $collabs = new WP_Query( array(
+        'post_type'      => 'collaboration',
+        'posts_per_page' => 6,
+        'orderby'        => 'menu_order',
+        'order'          => 'ASC',
+    ) );
+    if ( $collabs->have_posts() ) :
+        ?>
+        <section class="page-section" id="collaborations">
+            <h2 class="page-section-header"><?php esc_html_e( 'Collaborations', 'regen-wp' ); ?></h2>
+            <div class="three-col-grid">
+                <?php
+                while ( $collabs->have_posts() ) :
+                    $collabs->the_post();
+                    $label    = get_post_meta( get_the_ID(), 'collaboration_link_label', true );
+                    $url      = get_post_meta( get_the_ID(), 'collaboration_link_url', true );
+                    $href     = $url ? $url : get_permalink();
+                    $external = $url && preg_match( '/^https?:\/\//i', $url ) && 0 !== strpos( $url, home_url() );
+                    ?>
+                    <div class="collab-card">
+                        <h3><?php the_title(); ?></h3>
+                        <?php if ( has_excerpt() ) : ?><p><?php echo esc_html( get_the_excerpt() ); ?></p><?php endif; ?>
+                        <a href="<?php echo esc_url( $href ); ?>"<?php echo $external ? ' target="_blank" rel="noopener"' : ''; ?>><?php echo esc_html( $label ? $label : __( 'Learn More', 'regen-wp' ) ); ?> &rarr;</a>
+                    </div>
+                <?php endwhile; wp_reset_postdata(); ?>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <?php
+    $updates = new WP_Query( array(
+        'post_type'           => 'post',
+        'posts_per_page'      => 3,
+        'ignore_sticky_posts' => true,
+    ) );
+    if ( $updates->have_posts() ) :
+        ?>
+        <section class="page-section" id="updates">
+            <h2 class="page-section-header"><?php esc_html_e( 'Recent Updates', 'regen-wp' ); ?></h2>
+            <div class="three-col-grid">
+                <?php
+                while ( $updates->have_posts() ) :
+                    $updates->the_post();
+                    $links = get_post_meta( get_the_ID(), 'update_links', true );
+                    ?>
+                    <div class="update-card">
+                        <h3><?php the_title(); ?></h3>
+                        <?php if ( has_excerpt() || '' !== trim( get_the_content() ) ) : ?>
+                            <p><?php echo esc_html( wp_trim_words( get_the_excerpt(), 32 ) ); ?></p>
+                        <?php endif; ?>
+                        <div class="update-links">
+                            <?php if ( is_array( $links ) && $links ) : ?>
+                                <?php foreach ( $links as $link ) : if ( empty( $link['url'] ) ) { continue; } ?>
+                                    <a href="<?php echo esc_url( $link['url'] ); ?>"<?php echo preg_match( '/^https?:\/\//i', $link['url'] ) ? ' target="_blank" rel="noopener"' : ''; ?>><?php echo esc_html( ! empty( $link['label'] ) ? $link['label'] : __( 'Read More', 'regen-wp' ) ); ?> &rarr;</a>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <a href="<?php the_permalink(); ?>"><?php esc_html_e( 'Read More', 'regen-wp' ); ?> &rarr;</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endwhile; wp_reset_postdata(); ?>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <section class="page-section page-section--support" id="support">
+        <div class="support-content">
+            <h2 class="page-section-header"><?php echo esc_html( $support_heading ); ?></h2>
+            <p class="support-description"><?php echo esc_html( $support_text ); ?></p>
+            <div class="support-actions">
+                <button type="button" class="support-button" id="supportOpenBtn"><?php echo esc_html( $support_button ); ?> &rarr;</button>
+                <p class="support-note"><?php echo wp_kses( $support_note, array( 'em' => array(), 'strong' => array() ) ); ?></p>
+            </div>
+        </div>
+    </section>
+
+    <?php get_template_part( 'template-parts/site-footer' ); ?>
+</main>
+
+<?php get_template_part( 'template-parts/support-modal' ); ?>
 
 <?php get_footer(); ?>

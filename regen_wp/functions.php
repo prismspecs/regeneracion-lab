@@ -153,6 +153,13 @@ function regen_wp_enqueue_scripts() {
         }
     }
 
+    // Homepage: pinned title hero + scroll behaviour.
+    if ( is_front_page() ) {
+        wp_enqueue_style( 'regen-home', $uri . 'home.css', array( 'regen-site', 'regen-cards', 'regen-support' ), $ver( 'home.css' ) );
+        wp_enqueue_script( 'regen-home', $uri . 'home.js', array( 'regen-site' ), $ver( 'home.js' ), true );
+        wp_add_inline_script( 'regen-home', 'window.REGEN_HOME = ' . wp_json_encode( array( 'imageBase' => get_template_directory_uri() . '/images/' ) ) . ';', 'before' );
+    }
+
     // Project cards: homepage grid + Projects page.
     if ( is_front_page() || is_page( 'projects' ) ) {
         wp_enqueue_style( 'regen-cards', $uri . 'cards.css', array( 'regen-site' ), $ver( 'cards.css' ) );
@@ -290,7 +297,7 @@ function regen_wp_customize_register( $wp_customize ) {
         'sanitize_callback' => 'absint',
     ) );
     $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'regen_hero_image', array(
-        'label'    => __( 'Hero Background Image', 'regen-wp' ),
+        'label'       => __( 'Hero Background Image (unused: the homepage rotates photos from the theme images folder)', 'regen-wp' ),
         'section'  => $section_id,
         'mime_type'=> 'image',
     ) ) );
@@ -326,6 +333,17 @@ function regen_wp_customize_register( $wp_customize ) {
         'label'   => __( 'Support URL', 'regen-wp' ),
         'section' => $section_id,
         'type'    => 'url',
+    ) );
+
+    // Support note under the button
+    $wp_customize->add_setting( 'regen_support_note', array(
+        'default'           => 'When you check out, please specify that your donation is for <em>Regeneración Lab</em>.',
+        'sanitize_callback' => 'wp_kses_post',
+    ) );
+    $wp_customize->add_control( 'regen_support_note', array(
+        'label'   => __( 'Support Note (under the button)', 'regen-wp' ),
+        'section' => $section_id,
+        'type'    => 'textarea',
     ) );
 
     // Support button label

@@ -16,7 +16,7 @@
 
 <body <?php body_class(); ?> id="top">
 <?php wp_body_open(); ?>
-    <a class="skip-link" href="#mainContent"><?php esc_html_e( 'Skip to content', 'regen-wp' ); ?></a>
+    <a class="skip-link" href="#<?php echo is_front_page() ? 'pageContent' : 'mainContent'; ?>"><?php esc_html_e( 'Skip to content', 'regen-wp' ); ?></a>
 
     <header class="slim-topbar" id="slimTopbar" aria-label="<?php esc_attr_e( 'Site Header', 'regen-wp' ); ?>">
         <div class="slim-topbar-inner">
@@ -62,4 +62,6 @@
         </div>
     </div>
 
+    <?php if ( ! is_front_page() ) : ?>
     <main class="page-container" id="mainContent">
+    <?php endif; ?>
