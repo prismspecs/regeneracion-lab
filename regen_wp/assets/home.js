@@ -1,5 +1,6 @@
-// Page config (window.REGEN_HOME.imageBase) is printed by the page: the theme
-// sets it to its images folder, the static prototype to a relative path.
+// Page config (window.REGEN_HOME) is printed by the page: the theme sends the
+// photos picked in the admin plus its images folder; the static prototype sends
+// only a relative images folder.
 // ---- Random hero photo ------------------------------------------
 // Shortlisted candidates only (picked by hand, not "all wide
 // photos" anymore). Re-rolled on every load; hardcode one once a
@@ -76,9 +77,15 @@ const TITLE_RENDERER = 'window';
 // are composited and stay pixel-aligned even mid-crossfade).
 const FAST_FILL = false;
 
-const chosenImage = IMAGE_POOL[Math.floor(Math.random() * IMAGE_POOL.length)];
+// Photos chosen in WordPress (Appearance > Hero Photos) arrive as full URLs;
+// with none chosen (or in the static prototype) fall back to the list above.
+const HOME_CFG = window.REGEN_HOME || {};
+const PHOTO_URLS = (HOME_CFG.photos && HOME_CFG.photos.length)
+    ? HOME_CFG.photos
+    : IMAGE_POOL.map((name) => (HOME_CFG.imageBase || '') + name);
+const chosenImage = PHOTO_URLS[Math.floor(Math.random() * PHOTO_URLS.length)];
 const heroImage = document.getElementById('heroImage');
-heroImage.src = ((window.REGEN_HOME && window.REGEN_HOME.imageBase) || '') + chosenImage;
+heroImage.src = chosenImage;
 
 const quote = document.getElementById('quote');
 const heroSpacer = document.getElementById('heroSpacer');

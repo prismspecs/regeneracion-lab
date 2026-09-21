@@ -121,6 +121,7 @@ require_once get_template_directory() . '/inc/helpers.php';
 require_once get_template_directory() . '/inc/page-fields.php';
 require_once get_template_directory() . '/inc/programs.php';
 require_once get_template_directory() . '/inc/patterns.php';
+require_once get_template_directory() . '/inc/hero-photos.php';
 
 function regen_wp_enqueue_scripts() {
     $uri = get_template_directory_uri() . '/assets/';
@@ -157,7 +158,10 @@ function regen_wp_enqueue_scripts() {
     if ( is_front_page() ) {
         wp_enqueue_style( 'regen-home', $uri . 'home.css', array( 'regen-site', 'regen-cards', 'regen-support' ), $ver( 'home.css' ) );
         wp_enqueue_script( 'regen-home', $uri . 'home.js', array( 'regen-site' ), $ver( 'home.js' ), true );
-        wp_add_inline_script( 'regen-home', 'window.REGEN_HOME = ' . wp_json_encode( array( 'imageBase' => get_template_directory_uri() . '/images/' ) ) . ';', 'before' );
+        wp_add_inline_script( 'regen-home', 'window.REGEN_HOME = ' . wp_json_encode( array(
+            'imageBase' => get_template_directory_uri() . '/images/',
+            'photos'    => regen_wp_hero_photo_urls(),
+        ) ) . ';', 'before' );
     }
 
     // Project cards: homepage grid + Projects page.
@@ -291,16 +295,6 @@ function regen_wp_customize_register( $wp_customize ) {
         'section' => $section_id,
         'type'    => 'text',
     ) );
-
-    // Hero background image
-    $wp_customize->add_setting( 'regen_hero_image', array(
-        'sanitize_callback' => 'absint',
-    ) );
-    $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'regen_hero_image', array(
-        'label'       => __( 'Hero Background Image (unused: the homepage rotates photos from the theme images folder)', 'regen-wp' ),
-        'section'  => $section_id,
-        'mime_type'=> 'image',
-    ) ) );
 
     // Support heading
     $wp_customize->add_setting( 'regen_support_heading', array(
