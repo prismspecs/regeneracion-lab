@@ -57,7 +57,10 @@ Text Domain: regen-wp
 }
 
 .prose-column .wp-block-buttons {
-    margin-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 24px 0 32px;
 }
 
 .prose-column .wp-block-button__link {

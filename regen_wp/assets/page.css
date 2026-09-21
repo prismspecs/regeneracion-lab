@@ -364,8 +364,10 @@
 
 /* ---- Publications / resource list (also the "resource-list" block pattern) ---- */
 /* Publications list: hairline-separated citations, no card chrome */
-.resource-list {
+.resource-list,
+.prose-column .resource-list {
     list-style: none;
+    padding: 0;
     margin: 0;
     font-family: Georgia, serif;
     font-size: 16px;
@@ -555,4 +557,70 @@
     .contact-form {
         grid-template-columns: 1fr;
     }
+}
+
+/* Small heading above a resource list (block pattern "Resource Header"). */
+.resource-header,
+.prose-column h4.resource-header {
+    margin: 36px 0 12px;
+    font-family: Georgia, serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--page-text);
+}
+
+/* ---- Timeline (block pattern "Project Timeline") ---- */
+.timeline {
+    position: relative;
+    margin: 32px 0;
+    padding-left: 32px;
+    border-left: 1px solid var(--color-border);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 36px;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -37px;
+    top: 9px;
+    width: 9px;
+    height: 9px;
+    background: var(--color-accent-green);
+}
+
+.timeline-year {
+    margin-bottom: 10px;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-size: 1.6rem;
+    line-height: 1.1;
+    color: var(--page-text);
+}
+
+.timeline-list,
+.prose-column .timeline-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.timeline-list li {
+    margin-bottom: 10px;
+    font-family: Georgia, serif;
+    font-size: 16px;
+    line-height: 26px;
+    color: var(--page-text-muted);
+}
+
+.timeline-list li:last-child {
+    margin-bottom: 0;
 }
