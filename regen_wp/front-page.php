@@ -45,9 +45,9 @@ $intro = preg_replace(
     ?>
 </nav>
 
-<?php get_template_part( 'template-parts/home-hero' ); ?>
+<h1 class="screen-reader-text"><?php bloginfo( 'name' ); ?></h1>
 
-<div class="hero-spacer" id="heroSpacer"></div>
+<?php get_template_part( 'template-parts/home-hero' ); ?>
 
 <main class="page-content" id="pageContent">
     <header class="page-header">

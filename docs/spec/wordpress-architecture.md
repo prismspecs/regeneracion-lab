@@ -1,76 +1,109 @@
 # WordPress Architecture & Content Model Specification
 
-This specification documents the live WordPress theme implementation located in `regen_wp/` for [Regeneración Lab](https://regeneracionlab.org).
+The live WordPress theme is `regen_wp/` for [Regeneración Lab](https://regeneracionlab.org). Classic PHP theme, no build step. The design is the one prototyped in `html-js-site/design-revamp/mask-experiment/`; the theme and the prototype **share the same CSS/JS files** in `regen_wp/assets/` (there is exactly one copy of each).
 
 ---
 
-## 1. Overview & Architecture
-* **Theme Directory:** `regen_wp/`
-* **Stack:** Classic WordPress theme, PHP templates, semantic CSS/JS, no build step.
-* **Environment:** Local (by WP Engine), site `regeneracion-lab`, table prefix `wpjp_`.
-* **Theme Setup:**
-  * Nav menus registered (`Primary`).
-  * Enqueues only necessary assets; SPA script (`app.js`) is disabled by default.
-  * Title tag, featured images (post thumbnails), primary menu, and Customizer options (hero/support CTA) enabled.
-  * `front-page.php` handles the landing page with standard WP loops and template parts.
+## 1. Structure
+
+```
+regen_wp/
+  style.css              Theme header + WordPress-only rules (admin bar, block-editor output, CF7 messages)
+  functions.php          Enqueues, walker, CPTs, meta boxes, Customizer, block/shortcode, patterns
+  inc/                   helpers, page-fields, programs (CPT), patterns, hero-photos (admin page)
+  header.php footer.php  Slim top bar + mobile drawer; footer. Homepage prints its own <main>
+  front-page.php         Homepage (hero + content sections)
+  page.php               Generic page: masthead + editable content (About, and any new page)
+  page-{students,residents,projects,support}.php   Templates picked by page slug
+  single-project.php single-resident.php single.php index.php 404.php
+  template-parts/        masthead, project-card, resident-profile, site-footer,
+                         support-modal, home-hero
+  assets/
+    site.css site.js     Chrome on EVERY page: tokens, top bar, drawer, footer, smooth anchors
+    page.css             Content pages: masthead, sections, prose, forms, patterns, timeline
+    cards.css            Project / collaboration / update cards (homepage + Projects page)
+    support.css/.js      Contribute button + donation-reminder modal (homepage + Support page)
+    home.css home.js     Homepage only: pinned title mask, scroll behaviour
+    pages/               Per-template CSS (residents.css, students.css)
+    admin/               Admin-only JS (hero-photos.js)
+  images/                Bundled fallback hero photos
+  blocks/person-card/    Editor script for the Person Card block
+```
+
+**Rule:** styles and scripts live in `assets/` once. Prototype pages link to `../../../regen_wp/assets/…`; do not copy them.
+
+Enqueue logic is in `regen_wp_enqueue_scripts()` (`functions.php`): `site.*` everywhere; `page.css` on everything except the homepage; the per-template files by slug; `cards.css` on the homepage and `/projects/`; `support.*` on the homepage and `/support/`; `home.*` on the homepage.
 
 ---
 
-## 2. Landing Page Content Model & Sources
+## 2. What is edited where (everything visible is editable in WP)
 
-| Section | Content Source / Implementation | Details |
-| :--- | :--- | :--- |
-| **Site Identity** | `bloginfo()` + Custom Logo | Theme supports custom logo via WordPress Customizer. |
-| **Navigation** | `wp_nav_menu()` | "Primary" menu location configured in WP Dashboard. |
-| **Hero** | Page Featured Image / Customizer | Homepage featured image (or Customizer image fallback). Hero quote and attribution configured via Customizer. |
-| **Intro Copy** | Page Content (`the_content()`) | Drawn from Home page (WP page ID 7). |
-| **Projects Grid** | Custom Post Type `project` | Rendered via custom loop with meta fields (see schema below). |
-| **Collaborations**| Custom Post Type `collaboration` | Rendered via template part; supports external link CTA. |
-| **Recent Updates**| Standard Posts | Category: `Updates`. Loop count restricted on the front page. |
-| **Support CTA** | Customizer Options | Button label, URL, and callout text configured in Customizer. |
-
----
-
-## 3. Custom Post Types & Meta Schema
-
-### A. Projects (`project`)
-* **Badge (`project_badge`):** Displays when set (on live site, displays when value is "Ongoing"; template supports "New" and other custom badges).
-* **Meta line (`project_meta`):** Year/status string (e.g. `Ongoing`, `2025–2026`).
-* **Link Label (`project_link_label`):** Call-to-action text (e.g. `Explore →`).
-* **Link URL (`project_link_url`):** Optional URL (external URLs open in a new tab).
-* **Card Style (`project_style`):** Color accent variant (`turquoise`, `brown`, `amber`).
-* **Title Overrides (`project_title_line1` / `project_title_line2`):** Manual two-line title break formatting.
-* **Excerpt:** Standard post excerpt populates the project card body.
-* **Editor Metabox:** "Project Display" in main column containing all above fields.
-
-### B. Collaborations (`collaboration`)
-* **Link Label (`collaboration_link_label`):** CTA button text.
-* **Link URL (`collaboration_link_url`):** Destination URL (external opens in a new tab).
-* **Editor Metabox:** "Collaboration Link" in main edit column.
+| Thing | Where to edit |
+| :--- | :--- |
+| Menu | Appearance > Menus ("Primary Menu"). Current section is highlighted automatically. |
+| Homepage intro copy | Page "Home" body (first letter becomes the growing drop cap) |
+| Homepage hero quote + attribution | Appearance > Customize > Regeneracion Theme Options |
+| Homepage hero photos (random per load) | Appearance > **Hero Photos** (Media Library picker). Empty = bundled fallback photos |
+| Support heading/text/note/button/URL/modal copy | Customize > Regeneracion Theme Options |
+| Page headline, tagline, eyebrow | Page title, **Excerpt** (= tagline), "Page Header & Sections" box (eyebrow) |
+| About page | Page "About" body. Director block = a *Person Card* block (People post type); "Contact Us" form = a Contact Form 7 shortcode |
+| Projects | Projects post type. Card = title/excerpt + meta box "Project Display"; page body = optional intro. Order = "Order" attribute |
+| Residents | Residents post type (title, dates, bio, links, "past resident" checkbox, featured photo). Page "Scholars & Artists in Residence" body = application text; section intros = "Page Header & Sections" box |
+| Students reading groups & labs | **Programs** post type (title, description, meta box "Program Details", order). Page body = "Study & Research Opportunities" section |
+| Collaborations | Collaborations post type (title, excerpt, "Collaboration Link" box) |
+| Recent Updates | Posts (latest 3). "Update Links" box adds custom CTA links |
+| Support page sections | Page "Support" + "Support Sections" box; empty = defaults |
+| Forms | Contact > Contact Forms (see §4) |
 
 ---
 
-## 4. Theme Templates
+## 3. Routing
 
-* `front-page.php`: Main landing page combining hero, intro copy, projects grid, collaborations, updates, and CTA.
-* `archive-project.php`: Dedicated archive grid for all `project` posts.
-* `single-project.php`: Single project detail view with neutral header palette.
-* `single.php`: Generic single post template.
-* `index.php`: Fallback default loop template.
-* `page.php` *(Planned)*: Standard static page template matching global typography and spacing.
+`/projects/` and `/residents/` are **Pages** (slugs `projects`, `residents`) rendered by `page-projects.php` / `page-residents.php`. The `project` and `resident` post types keep `has_archive = false` and only provide single URLs (`/projects/{slug}/`, `/residents/{slug}/`). Changing routing needs a permalink flush (`regen_rewrite_version` option triggers one).
+
+Templates are chosen by WordPress from the page slug (`page-students.php` etc.); no "Template Name" selection is needed. Creating a new Page with any other slug uses `page.php`.
 
 ---
 
-## 5. Block Patterns
+## 4. Contact Form 7
 
-* **Timeline (`timeline`):** Block pattern markup with `.timeline` CSS classes for chronological project histories and milestones.
-* **Resource Header (`resource-header`):** `<h4>` element with `.resource-header` class for bibliography and syllabus sections.
-* **Resource List (`resource-list`):** `<ul>` element with `.resource-list` class providing stylized bibliographic list spacing.
+Forms are rendered with `regen_wp_cf7( $title, $class )`, which passes `html_class` so the `<form>` gets the layout class (`join-form`, `apply-form`, `contact-form`).
+
+| Form (title) | ID* | Used on | Mail |
+| :--- | :--- | :--- | :--- |
+| Main Contact Form | 66 | About (via shortcode in content), Support | subject, reply-to, message |
+| Residency Application Form | 77 | Residents | all fields + CV attachment (`[documents]`) |
+| Students | 83 | Students | all fields |
+
+*IDs are from the current database. Recipient is `[_site_admin_email]`; sender `wordpress@regeneracionlab.org` (must match the site domain for SPF).
+Mail templates must reference fields that exist in the form template — the originals for forms 77/83 referenced `[your-name]` etc. and delivered blank messages.
+
+**Testing mail locally:** Local routes PHP mail to Mailpit (site's own ports are in `~/.config/Local/sites.json`). Submit through the REST endpoint or the page, then read `http://localhost:<mailpit web port>/api/v1/messages`.
 
 ---
 
-## 6. Migration & Operational Notes
+## 5. Custom post types & meta
 
-* **Data Migration:** Migrate static HTML fragments from `regen_wp/pages/*.html` into native WordPress content types (Pages, CPTs, Posts). Map local image URLs to the WordPress Media Library.
-* **Email Delivery:** Configure an SMTP plugin (e.g., WP Mail SMTP) to guarantee reliable delivery for Contact Form 7 submissions and prevent spam filtering.
-* **SPA Transition:** SPA hash-based routing (`app.js`) is retired for the production theme in favor of native WordPress template routing. Keep `app.js` archived only if standalone static parity testing is required.
+* **project** — `project_badge`, `project_meta`, `project_link_label`, `project_link_url`, `project_style` (turquoise/brown/amber), `project_title_line1/2`. Excerpt = card body.
+* **resident** — `resident_title`, `resident_dates`, `resident_bio`, `resident_links` (array of label/url), `resident_is_past`, `resident_order`. Post content = "Residency Focus".
+* **collaboration** — `collaboration_link_label`, `collaboration_link_url`.
+* **person** — `person_role`, `person_years`, `person_link_label`, `person_link_url`, `person_order`. Rendered by the Person Card block / `[person_card id=…]` via `regen_wp_person_card_html()`.
+* **program** — `program_badge`, `program_badge_style` (active|winter), `program_partner`, `program_schedule`, `program_facilitator`, `program_level`, `program_topics_title`, `program_topics` (one per line), `program_cta`, `program_facilitator_note`. Not public; listed only on the Students page.
+* **Pages** — `regen_eyebrow`, `regen_intro_current`, `regen_intro_past`, `regen_intro_programs`; Support: `support_section{1,2,3}_{heading,body}`, `support_contact_heading`.
+* **Posts** — `update_links` (array of label/url).
+
+---
+
+## 6. Block patterns (category "Regeneracion")
+
+Timeline, Resource Header, Resource List, Focus Grid (3 columns), Three-Column Notes, Numbered Commitments, Pull Quote. All are plain core blocks with a CSS class, so every word stays editable. Their CSS is in `assets/page.css`.
+
+---
+
+## 7. Development & deployment
+
+* **Local site:** `Regeneración Lab newermaybe` (`~/Local Sites/regeneracin-lab-newermaybe`, `https://regeneracin-lab-newermaybe.local`) holds a pull of production. Its `wp-content/themes/regen_wp` is a **symlink to this repo's `regen_wp/`**, so edits apply immediately. Use the site's Local "Trust" button for the SSL certificate.
+* **Branch flow:** work on a branch, verify with the Playwright CLI (`./.claude/skills/playwright/scripts/playwright_cli.sh`, config with `ignoreHTTPSErrors` for the local cert), merge to `main`.
+* **DB backups:** `mysqldump` is not on PATH under Local. Use the site's socket: `~/.config/Local/lightning-services/mysql-*/bin/linux/bin/mysqldump --socket=<site run dir>/mysql/mysqld.sock -uroot -proot local`.
+* **Going live (Namecheap):** push the theme, and/or upload a Migrate DB Pro package. **Pull production into Local immediately before creating the package** so recent production edits are not overwritten. The package must include the Media Library (hero photos are attachments).
+* **Content that must exist in the database** (created by hand or by the setup scripts in the redesign branch history): Pages `projects` and `residents`; two Programs; restyled CF7 forms + mail templates; hero-photo option `regen_hero_photos`.
