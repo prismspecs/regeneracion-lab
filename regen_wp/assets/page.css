@@ -547,14 +547,16 @@
     margin-bottom: 32px;
 }
 
-.contact-form {
+.contact-form,
+.prose-column .wpcf7-form {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
 }
 
 @media (max-width: 640px) {
-    .contact-form {
+    .contact-form,
+    .prose-column .wpcf7-form {
         grid-template-columns: 1fr;
     }
 }
@@ -623,4 +625,98 @@
 
 .timeline-list li:last-child {
     margin-bottom: 0;
+}
+
+
+/* ---- Person card (block/shortcode) and director profile ---- */
+/* Director Profile: Asymmetric Editorial Layout */
+.director-profile {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 48px;
+    align-items: start;
+    margin-top: 12px;
+}
+
+.director-photo-wrap {
+    position: relative;
+}
+
+.director-photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    display: block;
+    filter: contrast(1.04) saturate(0.95);
+    border: 1px solid rgba(33, 26, 18, 0.08);
+}
+
+.director-photo-caption {
+    margin-top: 10px;
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: rgba(33, 26, 18, 0.6);
+    line-height: 1.4;
+}
+
+.director-content h3 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 2.1rem;
+    line-height: 1.15;
+    color: var(--page-text);
+    margin-bottom: 6px;
+}
+
+.director-title {
+    font-family: Georgia, serif;
+    font-size: 0.84rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent-green);
+    margin-bottom: 20px;
+    display: block;
+}
+
+.director-bio {
+    font-family: Georgia, serif;
+    font-size: 16.5px;
+    line-height: 27px;
+    color: var(--page-text-muted);
+}
+
+.director-bio p + p {
+    margin-top: 16px;
+}
+
+.director-contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 22px;
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 15.5px;
+    color: var(--color-accent-green);
+    text-decoration: none;
+    transition: gap 0.2s ease, opacity 0.2s ease;
+}
+
+.director-contact-link:hover {
+    opacity: 0.75;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .director-profile {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .director-photo-wrap {
+        max-width: 220px;
+    }
 }

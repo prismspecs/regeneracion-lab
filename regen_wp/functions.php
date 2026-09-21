@@ -144,7 +144,6 @@ function regen_wp_enqueue_scripts() {
 
     // Per-template styles.
     $page_styles = array(
-        'about'     => is_page( 'about' ),
         'residents' => is_page( 'residents' ) || is_singular( 'resident' ),
         'students'  => is_page( 'students' ),
     );
@@ -510,7 +509,18 @@ function regen_wp_register_project_meta() {
     register_post_meta( 'post', 'update_links', array(
         'type'              => 'array',
         'single'            => true,
-        'show_in_rest'      => true,
+        'show_in_rest'      => array(
+            'schema' => array(
+                'type'  => 'array',
+                'items' => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'label' => array( 'type' => 'string' ),
+                        'url'   => array( 'type' => 'string' ),
+                    ),
+                ),
+            ),
+        ),
         'sanitize_callback' => 'regen_wp_sanitize_update_links',
     ) );
 
@@ -947,6 +957,41 @@ function regen_wp_block_category( $categories ) {
 }
 add_filter( 'block_categories_all', 'regen_wp_block_category' );
 
+/**
+ * One person as the "director profile" layout (photo, name, role, bio, contact
+ * link). Used by the Person Card block and the [person_card] shortcode.
+ */
+function regen_wp_person_card_html( $person_id ) {
+    $post = get_post( $person_id );
+    if ( ! $post || 'person' !== $post->post_type ) {
+        return '';
+    }
+
+    $title   = esc_html( get_the_title( $post ) );
+    $role    = esc_html( get_post_meta( $person_id, 'person_role', true ) );
+    $label   = esc_html( get_post_meta( $person_id, 'person_link_label', true ) );
+    $url     = esc_url( get_post_meta( $person_id, 'person_link_url', true ) );
+    $content = regen_person_get_content( $person_id );
+
+    $html = '<div class="director-profile">';
+    if ( has_post_thumbnail( $person_id ) ) {
+        $html .= '<div class="director-photo-wrap">'
+            . get_the_post_thumbnail( $person_id, 'large', array( 'class' => 'director-photo', 'loading' => 'lazy' ) )
+            . '</div>';
+    }
+    $html .= '<div class="director-content"><h3>' . $title . '</h3>';
+    if ( $role ) {
+        $html .= '<span class="director-title">' . $role . '</span>';
+    }
+    if ( $content ) {
+        $html .= '<div class="director-bio">' . $content . '</div>';
+    }
+    if ( $label && $url ) {
+        $html .= '<a href="' . $url . '" class="director-contact-link">' . $label . ' &rarr;</a>';
+    }
+    return $html . '</div></div>';
+}
+
 // Render callback for the Person Card dynamic block.
 function regen_render_person_card_block( $attributes ) {
     $person_id = isset( $attributes['personId'] ) ? absint( $attributes['personId'] ) : 0;
@@ -961,74 +1006,7 @@ function regen_render_person_card_block( $attributes ) {
         return '<div class="person-card-placeholder">Select a valid person.</div>';
     }
 
-    $title   = esc_html( get_the_title( $post ) );
-    $role    = esc_html( get_post_meta( $person_id, 'person_role', true ) );
-    $years   = esc_html( get_post_meta( $person_id, 'person_years', true ) );
-    $label   = esc_html( get_post_meta( $person_id, 'person_link_label', true ) );
-    $url     = esc_url( get_post_meta( $person_id, 'person_link_url', true ) );
-    $content = regen_person_get_content( $person_id );
-
-    $image_html = '';
-    if ( has_post_thumbnail( $person_id ) ) {
-        $img_class = ( 'resident' === $variant ) ? 'resident-avatar' : 'about-profile-image';
-        $image_html = get_the_post_thumbnail( $person_id, 'large', array( 'class' => $img_class ) );
-    }
-
-    $button_html = '';
-    if ( $label && $url ) {
-        $button_html = '<div class="wp-block-buttons"><div class="wp-block-button is-style-outline"><a class="wp-block-button__link" href="' . $url . '" target="_blank" rel="noopener">' . $label . '</a></div></div>';
-    }
-
-    $meta_line = '';
-    if ( $role || $years ) {
-        $meta_line = '<p><strong>' . $role . '</strong>' . ( $years ? ' <span style="margin-left:12px;">' . $years . '</span>' : '' ) . '</p>';
-    }
-
-    // Order badge for resident variant
-    $order_badge = '';
-    if ( 'resident' === $variant ) {
-        $order_meta = get_post_meta( $person_id, 'person_order', true );
-        $order_val  = ( '' !== $order_meta ) ? absint( $order_meta ) : (int) get_post_field( 'menu_order', $person_id );
-        if ( $order_val ) {
-            $order_badge = '<span class="person-order-badge">' . str_pad( (string) $order_val, 2, '0', STR_PAD_LEFT ) . '</span>';
-        }
-    }
-
-    if ( 'resident' === $variant ) {
-        $html  = '<div class="project-card resident-card person-card person-card--resident" data-variant="resident">';
-        $html .= '<div class="wp-block-columns are-vertically-aligned-top">';
-        $html .= '<div class="wp-block-column" style="flex-basis:30%">' . $image_html . '</div>';
-        $html .= '<div class="wp-block-column" style="flex-basis:70%">';
-        if ( $order_badge ) {
-            $html .= '<p class="person-order">' . $order_badge . '</p>';
-        }
-        if ( $meta_line ) {
-            $html .= '<p class="person-meta-line"><span class="person-role">' . $role . '</span>' . ( $years ? ' <span class="person-years" style="margin-left:12px;">' . $years . '</span>' : '' ) . '</p>';
-        }
-        $html .= '<h3 class="card-title">' . $title . '</h3>';
-        if ( $content ) {
-            $html .= '<div class="card-text">' . $content . '</div>';
-        }
-        $html .= $button_html;
-        $html .= '</div></div></div>';
-        return $html;
-    }
-
-    // About/default variant
-    $html  = '<div class="project-card full-width">';
-    $html .= '<div class="about-profile-container">';
-    $html .= $image_html ? $image_html : '';
-    $html .= '<div class="about-profile-content">';
-    $html .= '<h3 class="about-profile-name">' . $title . '</h3>';
-    if ( $content ) {
-        $html .= $content;
-    }
-    if ( $button_html ) {
-        $html .= $button_html;
-    }
-    $html .= '</div></div></div>';
-
-    return $html;
+    return regen_wp_person_card_html( $person_id );
 }
 
 // Register the Person Card dynamic block and its editor script.
@@ -1138,39 +1116,7 @@ function regen_person_card_shortcode( $atts ) {
         return '';
     }
 
-    $title   = esc_html( get_the_title( $post ) );
-    $role    = esc_html( get_post_meta( $post_id, 'person_role', true ) );
-    $years   = esc_html( get_post_meta( $post_id, 'person_years', true ) );
-    $label   = esc_html( get_post_meta( $post_id, 'person_link_label', true ) );
-    $url     = esc_url( get_post_meta( $post_id, 'person_link_url', true ) );
-    $content = regen_person_get_content( $post_id );
-
-    $img_html = '';
-    if ( has_post_thumbnail( $post_id ) ) {
-        $img_html = get_the_post_thumbnail( $post_id, 'large', array( 'class' => 'resident-avatar' ) );
-    }
-
-    $button_html = '';
-    if ( $label && $url ) {
-        $button_html = '<div class="wp-block-buttons"><div class="wp-block-button is-style-outline"><a class="wp-block-button__link" href="' . $url . '" target="_blank" rel="noopener">' . $label . '</a></div></div>';
-    }
-
-    $meta_line = '';
-    if ( $role || $years ) {
-        $meta_line = '<p><strong>' . $role . '</strong>' . ( $years ? ' <span style="margin-left:12px;">' . $years . '</span>' : '' ) . '</p>';
-    }
-
-    $html  = '<div class="project-card full-width">';
-    $html .= '<div class="wp-block-columns are-vertically-aligned-top">';
-    $html .= '<div class="wp-block-column" style="flex-basis:28%">' . $img_html . '</div>';
-    $html .= '<div class="wp-block-column" style="flex-basis:72%">';
-    $html .= '<h3 class="card-title">' . $title . '</h3>';
-    $html .= $meta_line;
-    $html .= $content ? '<div class="card-text">' . $content . '</div>' : '';
-    $html .= $button_html;
-    $html .= '</div></div></div>';
-
-    return $html;
+    return regen_wp_person_card_html( $post_id );
 }
 add_shortcode( 'person_card', 'regen_person_card_shortcode' );
 
@@ -1253,18 +1199,6 @@ function regen_wp_register_block_patterns() {
         )
     );
 
-    // Profile card for About/Team sections
-    register_block_pattern(
-        'regen/profile-card',
-        array(
-            'title'       => __( 'Profile Card', 'regen-wp' ),
-            'description' => __( 'Director / Principal Investigator profile card with image and bio.', 'regen-wp' ),
-            'categories'  => array( 'regen' ),
-            'content'     => '<!-- wp:group {"className":"about-profile-card"} -->
-<div class="about-profile-card"><img class="about-profile-image" src="https://via.placeholder.com/180x240" alt="Profile"/><div class="about-profile-content"><h3 class="about-profile-name">Amrah Salomon</h3><p>Amrah Salomon is a scholar, creative writer, and practitioner of research justice working at the intersections of Ethnic Studies, Indigenous studies, Women of Color feminisms and Queer theory, environmental justice, and decolonial methodologies.</p><p>At the Regeneracion Lab, Dr. Salomon develops collaborative projects with communities, supports resident scholars and artists, and builds educational resources for students and activists.</p></div></div>
-<!-- /wp:group -->',
-        )
-    );
 
 }
 add_action( 'init', 'regen_wp_register_block_patterns' );
