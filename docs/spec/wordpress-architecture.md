@@ -32,7 +32,7 @@ regen_wp/
 
 **Rule:** styles and scripts live in `assets/` once. Prototype pages link to `../../../regen_wp/assets/…`; do not copy them.
 
-Enqueue logic is in `regen_wp_enqueue_scripts()` (`functions.php`): `site.*` everywhere; `page.css` on everything except the homepage; the per-template files by slug; `cards.css` on the homepage and `/projects/`; `support.*` on the homepage and `/support/`; `home.*` on the homepage. `regen_wp_font_preconnect()` upgrades the Google Fonts host hints from `dns-prefetch` to `preconnect` (the font stylesheet is the only cross-origin, render-blocking request on the page).
+Enqueue logic is in `regen_wp_enqueue_scripts()` (`functions.php`): `site.*` everywhere; `page.css` on everything except the homepage; the per-template files by slug; `cards.css` on the homepage and `/projects/`; `support.*` on the homepage and `/support/`; `home.*` on the homepage. Instrument Serif is self-hosted in `assets/fonts/` (latin subset, woff2) with a `filemtime`-versioned stylesheet and `wp_head` preloads — no cross-origin, render-blocking request remains (a slow/blocked `fonts.googleapis.com` used to stall first paint and surface as a flash of unstyled content).
 
 ---
 
