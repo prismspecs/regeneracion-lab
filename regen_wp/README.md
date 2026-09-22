@@ -13,8 +13,8 @@ Classic PHP theme (no build step) for regeneracionlab.org. Full specification: [
 
 1. Activate the theme; assign a menu to **Primary Menu**; set Settings > Reading to a static front page ("Home").
 2. Permalinks: "Post name".
-3. Create Pages with slugs `projects` and `residents` (they use `page-projects.php` / `page-residents.php`).
-4. Plugins: Contact Form 7 (forms: Main Contact Form, Residency Application Form, Students).
+3. Create Pages with slugs `projects` and `residents` (they use `page-projects.php` / `page-residents.php`), and add all six section links to the menu as **Page** links, not custom URLs — a custom link without a trailing slash forces an extra redirect on every click.
+4. Plugins: Contact Form 7 (forms: Main Contact Form, Residency Application Form, Students — see the spec §4 for the mail-template gotcha).
 5. Homepage photos: Appearance > Hero Photos. Quote/support copy: Appearance > Customize.
 
-Nothing visible on the site is hard-coded: see the "what is edited where" table in the spec.
+Nothing visible on the site is hard-coded: see the "what is edited where" table in the spec. The theme is verified at zero axe-core violations (WCAG 2.1/2.2 AA + best-practice) across every template — see spec §7 before changing heading levels, landmarks or nav labels.
