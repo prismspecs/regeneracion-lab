@@ -7,7 +7,7 @@
 $quote       = trim( get_theme_mod( 'regen_hero_quote', "THEY TRIED TO BURY US BUT THEY DIDN\u{2019}T KNOW\nWE WERE SEEDS" ), " \t\n\r\0\x0B\"\u{201C}\u{201D}" );
 $attribution = get_theme_mod( 'regen_hero_attribution', 'Mexican revolutionary dicho, circa 1910' );
 ?>
-    <div class="hero" id="hero">
+    <div class="hero" id="hero" role="region" aria-label="Hero">
                 <img class="hero-image" id="heroImage" alt="">
         <svg class="wash" id="wash" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -53,7 +53,7 @@ $attribution = get_theme_mod( 'regen_hero_attribution', 'Mexican revolutionary d
         </svg>
         <blockquote class="quote" id="quote">
             <p><?php echo wp_kses( nl2br( esc_html( $quote ) ), array( 'br' => array() ) ); ?></p>
-            <footer>&mdash; <?php echo esc_html( $attribution ); ?></footer>
+            <p class="quote-attribution">&mdash; <?php echo esc_html( $attribution ); ?></p>
         </blockquote>
     </div>
         <div class="title-window" id="titleWindow">

@@ -20,6 +20,8 @@
 
     <header class="slim-topbar" id="slimTopbar" aria-label="<?php esc_attr_e( 'Site Header', 'regen-wp' ); ?>">
         <div class="slim-topbar-inner">
+            <?php // The homepage's own h1 is the pinned title graphic (an SVG mask, not real text); this gives it one, inside a landmark, for screen readers. Inner pages already have a visible h1 in their masthead. ?>
+            <?php if ( is_front_page() ) : ?><h1 class="screen-reader-text"><?php bloginfo( 'name' ); ?></h1><?php endif; ?>
             <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="slim-topbar-title"><?php bloginfo( 'name' ); ?></a>
             <nav class="slim-topbar-nav" aria-label="<?php esc_attr_e( 'Main Menu', 'regen-wp' ); ?>">
                 <?php

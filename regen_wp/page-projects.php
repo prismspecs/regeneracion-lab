@@ -30,6 +30,7 @@ while ( have_posts() ) :
     ?>
     <section class="page-section" id="projects">
         <?php if ( $projects->have_posts() ) : ?>
+            <h2 class="screen-reader-text"><?php esc_html_e( 'All projects', 'regen-wp' ); ?></h2>
             <div class="project-grid">
                 <?php
                 while ( $projects->have_posts() ) {

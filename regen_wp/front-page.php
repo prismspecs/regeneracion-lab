@@ -32,7 +32,7 @@ $intro = preg_replace(
 );
 ?>
 
-<nav class="hero-nav" id="heroNav" aria-label="<?php esc_attr_e( 'Main Menu', 'regen-wp' ); ?>">
+<nav class="hero-nav" id="heroNav" aria-label="<?php esc_attr_e( 'Main Menu (Landing)', 'regen-wp' ); ?>">
     <?php
     wp_nav_menu( array(
         'theme_location' => 'primary',
@@ -44,8 +44,6 @@ $intro = preg_replace(
     ) );
     ?>
 </nav>
-
-<h1 class="screen-reader-text"><?php bloginfo( 'name' ); ?></h1>
 
 <?php get_template_part( 'template-parts/home-hero' ); ?>
 

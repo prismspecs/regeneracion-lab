@@ -605,7 +605,7 @@ body {
    (not italic), uppercase, and tracked out wide enough to read as
    a distinct, more legible register on its own rather than a
    smaller/fainter copy of the quote above it. */
-.quote footer {
+.quote-attribution {
     margin-top: 1.1em;
     font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
     font-size: 0.85rem;
