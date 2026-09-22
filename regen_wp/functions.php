@@ -131,7 +131,9 @@ function regen_wp_enqueue_scripts() {
     };
 
     // Instrument Serif is the only web font; body copy is Georgia.
-    wp_enqueue_style( 'regen-fonts', 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap', array(), null );
+    // Self-hosted (assets/fonts/) so no render-blocking request leaves this
+    // server — a slow or blocked fonts.googleapis.com stalls first paint.
+    wp_enqueue_style( 'regen-fonts', $uri . 'fonts/instrument-serif.css', array(), $ver( 'fonts/instrument-serif.css' ) );
 
     // Shared chrome (tokens, top bar, drawer, footer) loads on every page.
     wp_enqueue_style( 'regen-site', $uri . 'site.css', array( 'regen-fonts' ), $ver( 'site.css' ) );
@@ -178,17 +180,6 @@ function regen_wp_enqueue_scripts() {
     wp_enqueue_style( 'regen-theme', get_stylesheet_uri(), array( 'regen-site' ), $ver( '../style.css' ) );
 }
 add_action( 'wp_enqueue_scripts', 'regen_wp_enqueue_scripts' );
-
-// Upgrade the font host hints from dns-prefetch to preconnect (one real
-// round trip saved on first paint: this is a render-blocking stylesheet).
-function regen_wp_font_preconnect( $hints, $relation_type ) {
-    if ( 'preconnect' === $relation_type ) {
-        $hints[] = array( 'href' => 'https://fonts.googleapis.com', 'crossorigin' => '' );
-        $hints[] = array( 'href' => 'https://fonts.gstatic.com', 'crossorigin' => '' );
-    }
-    return $hints;
-}
-add_filter( 'wp_resource_hints', 'regen_wp_font_preconnect', 10, 2 );
 
 /**
  * Primary-menu walker: emits the plain <li><a> markup that site.css styles.
@@ -1221,6 +1212,15 @@ function regen_wp_favicon() {
     }
 }
 add_action( 'wp_head', 'regen_wp_favicon' );
+
+// Start the self-hosted web fonts downloading before the CSS is parsed.
+function regen_wp_preload_fonts() {
+    $base = get_template_directory_uri() . '/assets/fonts/';
+    foreach ( array( 'instrument-serif-latin.woff2', 'instrument-serif-italic-latin.woff2' ) as $file ) {
+        printf( '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin="anonymous" />' . "\n", esc_url( $base . $file ) );
+    }
+}
+add_action( 'wp_head', 'regen_wp_preload_fonts', 1 );
 
 // Mobile hamburger nav toggle + scroll detection
 function regen_wp_mobile_nav_script() {
