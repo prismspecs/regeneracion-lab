@@ -1,36 +1,20 @@
 # Regeneración Lab WordPress Theme
 
-Custom WordPress theme for Regeneración Lab, designed to maintain the aesthetic and content structure of the original static site while leveraging WordPress for content management.
+Classic PHP theme (no build step) for regeneracionlab.org. Full specification: [`docs/spec/wordpress-architecture.md`](../docs/spec/wordpress-architecture.md).
 
-## Overview
+## Layout
 
-- **Theme Name:** Regeneración Lab Theme
-- **Text Domain:** `regeneracion-lab`
-- **Architecture:** PHP template-driven (replaces previous JS SPA routing).
-
-## Key Features
-
-- **Custom Post Types:**
-  - `project`: For the "Projects" section (supports `project_badge` and `project_style` meta).
-  - `collaboration`: For the "Collaborations" section.
-- **Customizer Support:**
-  - Site Identity (Logo/Title).
-  - Hero Section (Home page featured image).
-  - Support CTA (Button label/URL).
-- **Templates:**
-  - `front-page.php`: Custom landing page.
-  - `archive-project.php`: Grid layout for projects.
-  - `single-project.php`: Specialized view for project details.
+- `assets/` — the only copy of the design CSS/JS. `site.*` loads on every page, `page.css` on content pages, `home.*` on the homepage, plus `cards.css`, `support.*` and `pages/*.css`. The static prototype in `html-js-site/design-revamp/mask-experiment/` links to these same files.
+- `inc/` — helpers, page fields, Programs post type, block patterns, Hero Photos admin page.
+- `template-parts/` — masthead, cards, resident profile, footer, donation modal, homepage hero.
+- Templates: `front-page.php`, `page.php`, `page-{students,residents,projects,support}.php`, `single-*.php`, `index.php`, `404.php`.
 
 ## Setup
 
-1. **Activate:** Select "Regeneración Lab Theme" in Appearance > Themes.
-2. **Menu:** Create a menu and assign it to the "Primary Menu" location.
-3. **Front Page:** Go to Settings > Reading and set "Your homepage displays" to a static page (select your "Home" page).
-4. **Permalinks:** Set to "Post name" for clean URLs.
+1. Activate the theme; assign a menu to **Primary Menu**; set Settings > Reading to a static front page ("Home").
+2. Permalinks: "Post name".
+3. Create Pages with slugs `projects` and `residents` (they use `page-projects.php` / `page-residents.php`), and add all six section links to the menu as **Page** links, not custom URLs — a custom link without a trailing slash forces an extra redirect on every click.
+4. Plugins: Contact Form 7 (forms: Main Contact Form, Residency Application Form, Students — see the spec §4 for the mail-template gotcha).
+5. Homepage photos: Appearance > Hero Photos. Quote/support copy: Appearance > Customize.
 
-## Development
-
-- **Styles:** `style.css` handles global theming.
-- **Templates:** Modify `*.php` files in the root for layout changes.
-- **Assets:** Images in `images/`, script logic (if any) in `app.js`.
+Nothing visible on the site is hard-coded: see the "what is edited where" table in the spec. The theme is verified at zero axe-core violations (WCAG 2.1/2.2 AA + best-practice) across every template — see spec §7 before changing heading levels, landmarks or nav labels.

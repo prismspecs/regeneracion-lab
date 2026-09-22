@@ -1,0 +1,160 @@
+/* Card components shared by the homepage and the Projects page. */
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 52px 84px;
+}
+
+@media (max-width: 640px) {
+    .project-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+.project-card {
+    background: transparent;
+    padding: 8px 0 16px;
+}
+
+.project-card--turquoise {
+    --project-accent: #187a6f;
+}
+
+.project-card--brown {
+    --project-accent: #9c5424;
+}
+
+.project-card--amber {
+    --project-accent: #a9531f;
+}
+
+.project-card .project-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--project-accent);
+    margin-bottom: 12px;
+}
+
+.project-card .eyebrow-mark {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--project-accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.project-card .project-badge {
+    font-weight: 600;
+}
+
+.project-card .project-meta-sep {
+    opacity: 0.6;
+}
+
+.project-card .project-meta {
+    letter-spacing: 0.06em;
+}
+
+.project-card h3 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.65em;
+    line-height: 1.22;
+    margin-bottom: 12px;
+    color: var(--page-text);
+}
+
+.project-card p {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    line-height: 25px;
+    color: rgba(33, 26, 18, 0.85);
+    margin-bottom: 18px;
+}
+
+.project-card a {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--project-accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.2s ease, opacity 0.2s ease;
+}
+
+.project-card a:hover {
+    opacity: 0.75;
+    gap: 10px;
+}
+
+.three-col-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 44px 48px;
+}
+
+@media (max-width: 860px) {
+    .three-col-grid {
+        grid-template-columns: 1fr;
+        gap: 36px;
+    }
+}
+
+.collab-card,
+.update-card {
+    background: transparent;
+    padding: 4px 0 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.collab-card h3,
+.update-card h3 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.5em;
+    line-height: 1.25;
+    margin-bottom: 12px;
+    color: var(--page-text);
+}
+
+.collab-card p,
+.update-card p {
+    font-family: Georgia, serif;
+    font-size: 15.5px;
+    line-height: 24px;
+    color: rgba(33, 26, 18, 0.85);
+    margin-bottom: 16px;
+    flex-grow: 1;
+}
+
+.collab-card a,
+.update-card a {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 15.5px;
+    color: #1e4a26;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.2s ease, opacity 0.2s ease;
+}
+
+.collab-card a:hover,
+.update-card a:hover {
+    opacity: 0.75;
+    gap: 10px;
+}

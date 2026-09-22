@@ -1,0 +1,631 @@
+:root {
+    /* The pinned-state background: what everything becomes once
+       the title reaches the top and the wash takes over (see
+       .hero and .wash-rect below -- both read this one variable,
+       so this is the only edit needed to change it).
+       #765163 is the site's plum-purple (used elsewhere in this
+       repo, see design-revamp/new-test/styles.css) -- kept here,
+       commented out, so it's one line to switch back. */
+    /* --wash-color: #765163; */
+    --wash-color: #ffffff; /* matches the title's own white exactly */
+
+    /* Outline traced around the pinned letters (#outlineGroup) so
+       they stay visible even when --wash-color and the photo
+       showing through happen to be close in tone. */
+    --outline-color: rgba(20, 16, 12, 0.4);
+
+    /* No page background on purpose (see above): the hero wash paints
+       it. site.css would paint --page-bg on html/body, so blank it. */
+    --page-bg: #ffffff;
+}
+
+html,
+body {
+    overflow-x: hidden;
+}
+
+/*
+ * .hero is fixed for the life of the page: it's the pinned stage the
+ * whole interaction plays out on. Everything inside it is driven by
+ * one scroll-progress value computed in JS. Because it's fixed, it
+ * takes up no space in normal document flow -- .hero-spacer (below)
+ * is what actually reserves scroll room for it.
+ */
+.hero {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--wash-color);
+}
+
+/* Height set by JS -- just enough scroll room to trigger and
+   confirm the pin (same formula .hero used on <body> directly
+   before .page-content existed). Doesn't need to be any taller
+   than that: .page-content (below) is normal document flow right
+   after this spacer and supplies its own scroll room from its
+   real content, so there's nothing further to reserve here. */
+.hero-spacer {
+    display: block;
+}
+
+/* The real page. This used to be a fixed overlay pinned right
+   below the title (top: var(--title-height)), with its own
+   internal overflow-y: auto scrollbar once .page-projects made it
+   taller than the viewport. That meant two separate scroll
+   regions -- the document, and this box -- and whatever content
+   scrolled up inside this box past its own top edge just vanished
+   there, with .hero's fixed title sitting permanently in front of
+   it the whole time. From outside that looked like scrolled
+   content getting blocked by an opaque bar with no relationship
+   to what was behind it, because that's exactly what it was.
+
+   Back to normal document flow instead: this sits right after
+   .hero-spacer, one single document scrollbar for the whole page.
+   Its z-index (2) puts it above .hero's own children (the wash,
+   the at-rest white title -- neither has a z-index), so content
+   scrolls up over those as you keep going. It deliberately does
+   NOT cover the title itself: .title-window (z-index 3) and the
+   outline (.title-outline, 4) are top-level fixed layers above
+   this element, so the photo-filled letters float on top and
+   text passes beneath them, visible only in the gaps between
+   letters -- the "title on top, content underneath" rule, now
+   without needing the solid cap (see .title-cap below).
+
+   No background color here -- .hero's own wash (the SVG rect a
+   few blocks up, faded in by the same `activated` state on the
+   same 2s shared transition) already covers the entire viewport,
+   including the area behind this element, in --wash-color. That
+   already reaches near-full opacity by the time this fades in
+   (see CONTENT_REVEAL_DELAY_MS below). Giving .page-content its
+   OWN background as well meant two independent white fades
+   layered on top of each other, on two different timings --
+   visibly a background sweeping in twice, once from the wash and
+   again from this element's own paint. One backdrop is enough;
+   this only ever needs to paint its text. */
+.page-content {
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    color: var(--page-text);
+    padding: 12px 20px 0;
+    transition: opacity 0.5s ease;
+}
+
+/* The live site's header content (regen_wp/header.php + the
+   primary menu from the DB), translated into this page's
+   two-typeface system. On the real site the tagline is italic
+   serif in --color-accent-green and the nav is a centered sans
+   row -- Inter is banned here (see the .page-projects comment
+   about typefaces), so the nav borrows the project-meta's
+   tracked-uppercase Georgia voice instead. The giant pinned
+   title IS this page's site-title, so only tagline + nav live
+   here, at the top of the content column, riding .page-content's
+   fade-in and scrolling under the floating title like everything
+   else. */
+.page-header {
+    margin: 0 auto 52px;
+    text-align: center;
+    max-width: 980px;
+}
+
+.page-nav {
+    margin-bottom: 44px;
+}
+
+.page-nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px 45px; /* column-gap matches the live nav's 45px */
+    margin: 0;
+    padding: 0;
+}
+
+.page-nav a {
+    font-family: Georgia, serif;
+    font-size: 0.82em;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--page-text);
+    text-decoration: none;
+    border-bottom: 1px solid transparent; /* reserves the underline space; hover flips it green like the live site's accent */
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.page-nav a:hover {
+    color: #1e4a26;
+    border-bottom-color: #1e4a26;
+}
+
+.page-tagline {
+    max-width: 100%;
+    margin: 0 auto;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-size: clamp(1.15rem, 1.4vw, 1.32rem);
+    line-height: 1.4;
+    color: #1e4a26; /* regen_wp --color-accent-green: the live tagline's exact color */
+}
+
+@media (min-width: 860px) {
+    .page-tagline {
+        white-space: nowrap;
+    }
+}
+
+/* Hero Nav: the same menu as the slim top bar, but on the landing
+   screen -- no background, no site title, spread across the full
+   width. Fades out once the page activates (the slim bar takes
+   over on scroll). Desktop only; mobile keeps the hamburger. */
+.hero-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 52px;
+    z-index: 6;
+    background: rgba(0, 0, 0, 0);
+    transition: opacity 0.4s ease, background-color 0.25s ease;
+}
+
+.hero-nav:hover,
+.hero-nav:has(a:focus-visible) {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.hero-nav.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hero-nav ul {
+    list-style: none;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0 32px;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hero-nav a {
+    font-family: Georgia, serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+    text-decoration: none;
+    opacity: 0.6;
+    border-bottom: 1px solid transparent;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.hero-nav a:hover,
+.hero-nav a:focus-visible {
+    opacity: 1;
+    border-bottom-color: #fff;
+}
+
+@media (max-width: 768px) {
+    .hero-nav {
+        display: none;
+    }
+}
+
+/* Homepage-only top bar behavior: the shared bar (site.css) is fixed and
+   hidden until the giant hero title scrolls away. */
+.slim-topbar {
+    position: fixed;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.slim-topbar.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* The growing-drop-cap paragraph, reused from
+   design-revamp/pretext-experiment/ -- see the script at the
+   bottom for how it works and what changed.
+
+   overflow: hidden crops the canvas (which draws into a taller,
+   fixed-size buffer -- see CANVAS_HEIGHT below) down to this
+   container's own height, which JS sets to the actual drawn
+   content's height every frame. Without this, whatever blank
+   buffer room CANVAS_HEIGHT leaves below the real text would
+   show up as a gap before .page-copy's paragraphs beneath it. */
+/* Semantic, fully selectable drop-cap paragraph -- replaces the
+   canvas prototype so that all text is natively selectable,
+   accessible, searchable, and responsive across all screens.
+   The drop cap letter smoothly grows on hero activation. */
+.page-copy {
+    max-width: 980px;
+    margin: 0 auto;
+    font-family: Georgia, serif;
+    font-size: 18px;
+    line-height: 29px;
+    color: var(--page-text);
+}
+
+.dropcap-paragraph {
+    margin: 0 auto;
+}
+
+.dropcap-letter {
+    float: left;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 18px;
+    line-height: 28px;
+    margin-right: 0px;
+    margin-top: 0px;
+    color: var(--page-text);
+    user-select: text;
+    -webkit-user-select: text;
+    transition: font-size 1s cubic-bezier(0.16, 1, 0.3, 1),
+                line-height 1s cubic-bezier(0.16, 1, 0.3, 1),
+                margin-right 1s cubic-bezier(0.16, 1, 0.3, 1),
+                margin-top 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropcap-grown .dropcap-letter {
+    font-size: 96px;
+    line-height: 68px;
+    margin-right: 12px;
+    margin-top: 11px;
+}
+
+@media (max-width: 640px) {
+    .dropcap-grown .dropcap-letter {
+        font-size: 96px;
+        line-height: 68px;
+        margin-right: 12px;
+        margin-top: 11px;
+    }
+}
+
+.page-copy p + p {
+    margin-top: 28px;
+}
+
+/* A real content type, not just body copy: three of the live
+   site's actual `project` posts (see the projects-grid comment
+   near the markup below for which ones and why). Colors are the
+   live theme's own accent set (regen_wp/style.css --color-
+   secondary-green/-earth-brown), so the cards are testing real
+   brand color against this page's wash/photo backgrounds, not
+   invented ones. Typefaces stay disciplined to this page's
+   existing two (Instrument Serif for the card titles/section
+   header, Georgia for everything else) rather than pulling in
+   the live theme's Inter/IBM Plex Mono -- reintroducing that
+   would be exactly the "too many typefaces" problem this page
+   already solved once. */
+.page-projects,
+.page-section {
+    max-width: 980px;
+    margin: 72px auto 0;
+    padding-top: 48px;
+    border-top: 1px solid rgba(33, 26, 18, 0.12);
+    scroll-margin-top: 72px;
+}
+
+#about {
+    scroll-margin-top: 72px;
+}
+
+.page-projects h2,
+.page-section-header {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 2.2em;
+    margin-bottom: 32px;
+    color: var(--page-text);
+}
+
+@media (max-width: 640px) {
+
+    .page-tagline {
+        font-size: 1.05em;
+    }
+
+    .page-nav ul {
+        gap: 10px 22px;
+    }
+}
+
+.card-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    margin-top: auto;
+}
+
+.hero-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: contrast(1.05) saturate(1.1) brightness(0.95);
+    transform-origin: center center;
+    will-change: transform;
+    transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Solid --wash-color fill with a title-shaped hole punched out of
+   it (via the SVG <mask> below). Fades in over the image as the
+   user scrolls; the hole is kept in registration with
+   .title-white by JS. */
+.wash {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wash-rect {
+    fill: var(--wash-color);
+}
+
+#outlineGroup use {
+    fill: none;
+    stroke: var(--outline-color);
+    stroke-width: 1.4;
+}
+
+/* Plain white title glyph — this is literally what "the title in
+   white" is. No mask, just a filled path. Fades out while the
+   photo-filled layer fades in, so the letters read as "filling"
+   with the photo. Fade timing is flag-controlled: 2s (the shared
+   ease) by default, 0.5s under .fast-fill -- the FAST_FILL flag,
+   see the renderer flags in the script for both options' story. */
+.title-white {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    /* width set by JS */
+    transform: translate(-50%, 0);
+    display: block;
+    filter: drop-shadow(0 2px 18px rgba(0, 0, 0, 0.35));
+    transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Option B: the 'window' title renderer (TITLE_RENDERER) ----
+   A title-sized div clipped to the letterforms by an element-local
+   mask-image (built at startup from the same DOM paths the SVG
+   mask holds -- the letterforms still have one source of truth),
+   with a full-viewport copy of the hero photo inside it,
+   counter-translated by the exact inverse of this element's own
+   transform. That keeps the photo registered to the viewport
+   while the glyphs rise -- the same "window" semantics as the SVG
+   mask hole -- and it mirrors the hero image's 1.06 activation
+   zoom with a matching scale about the same (viewport) center.
+   Both transforms are GPU-composited and the mask is static
+   relative to its own layer, so nothing re-rasterizes per frame
+   and the fill can never trail the glyphs the way the 'mask'
+   renderer's CPU-rasterized hole does under load. Hidden
+   entirely in 'mask' mode. Sits OUTSIDE .hero as a top-level
+   fixed layer (see the markup comment at the element for why):
+   .hero forms its own stacking context, so a title inside it can
+   never be raised above .page-content -- and raising .hero
+   wholesale would raise the full-viewport photo with it. This
+   element is title-sized, so raising just it (z-index 3) is
+   safe: scrolling text passes UNDER the letters. */
+.title-window {
+    position: fixed;
+    left: 50%;
+    top: 0;
+    /* width + height set by JS */
+    transform: translate(-50%, 0);
+    z-index: 3; /* above .page-content (2): text scrolls under the letters */
+    pointer-events: none; /* never block clicks/selection on the content beneath */
+    overflow: hidden; /* clip the viewport-sized photo to the title box; the mask then shapes it */
+    opacity: 0;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    will-change: transform, opacity;
+    transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.title-window-photo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* width/height = viewport, set by JS */
+    object-fit: cover; /* identical to .hero-image */
+    transform-origin: center center;
+    filter: contrast(1.05) saturate(1.1) brightness(0.95); /* identical to .hero-image, so letter content matches the backdrop tone-for-tone */
+    will-change: transform;
+    transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* FAST_FILL (option A): the quick in-place fade, as a class on
+   <html> set once at startup from the flag, so both glyph layers
+   switch timing together. */
+.fast-fill .title-white,
+.fast-fill .title-window {
+    transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+/* SVG transform is a CSS property in modern browsers, so it
+   transitions the same way the HTML layers above do.
+   fill: black lives here (not on the <path>s themselves) so that
+   #outlineGroup's <use> clones of the same paths -- which live in
+   a different part of the document -- can inherit fill: none from
+   their own ancestor instead. A fill specified directly on a path
+   always wins over inheritance, even from a highly specific rule,
+   so it has to be absent from the source paths for both instances
+   to get their own fill correctly. */
+#washTitleGroup {
+    fill: black;
+    transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Carries only the delayed opacity fade now -- the transform
+   lives on the .title-outline root (below). No transform
+   transition on either, on purpose: JS snaps the layer straight
+   to the title's target position on every state flip, and the
+   group is invisible during the rise anyway (opacity 0 until the
+   delay below), so the browser isn't re-stroking this shape for
+   2s of motion it doesn't need to (a stroke is pricier to
+   repaint than a fill). The fade is delayed via transitionDelay
+   set in applyState() until the title's own 2s rise has actually
+   finished, so the outline doesn't visibly trail behind the
+   moving letters. */
+#outlineGroup {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+/* The outline's own top-level layer (see the markup comment at
+   the .title-outline SVG for why it moved out of the .wash SVG).
+   Title-sized, z-index 4 -- one above .title-window, so the full
+   stroke (inner AND outer half) traces the letters over the
+   photo fill and over the scrolling content. */
+.title-outline {
+    position: fixed;
+    left: 50%;
+    top: 0;
+    /* width + height set by JS */
+    transform: translate(-50%, 0);
+    z-index: 4;
+    overflow: visible; /* half the stroke sits outside the viewBox edges -- let it show */
+    pointer-events: none;
+}
+
+/* A second, independent copy of the pinned title -- solid
+   backdrop plus solid-filled glyphs, no photo-through-the-letters
+   mask -- that sits ABOVE .page-content instead of below it.
+   Why a duplicate instead of just raising .hero's own z-index:
+   .hero-image (the photo) fills the entire viewport at all times,
+   so raising all of .hero above .page-content would hide the
+   whole page below the title, not just cover the title's own
+   row. This element only ever needs to be exactly as tall as the
+   title itself (--title-height, reintroduced here for that one
+   purpose), so raising just this is safe.
+
+   Why no mask/photo-reveal here (unlike .wash below): once
+   .page-content has scrolled up far enough to reach this row,
+   there's no clean way to also show it *through* the letter
+   shapes without reintroducing the exact illegible-overlap bug
+   this element exists to fix. Solid backdrop + solid glyphs
+   keeps the title legible and .page-content's content cleanly
+   hidden behind it here, at the cost of the window-onto-the-photo
+   effect only in this one specific circumstance (title pinned
+   *and* scrolled deep into .page-content) -- everywhere else
+   (at rest, right as it pins, right as .page-content first
+   appears) .wash and #outlineGroup below still do the real
+   window effect exactly as before; this is purely a legibility
+   backstop for deep scrolling. */
+.title-cap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--title-height, 0px);
+    overflow: hidden;
+    z-index: 5; /* above .title-window (3) and #outlineLayer (4): the solid version, when enabled, always wins */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.title-cap-bg {
+    fill: var(--wash-color);
+}
+
+/* Filled (not stroked) glyphs, in the same ink as the rest of
+   .page-content's text -- reads as a plain, legible header once
+   content is scrolling underneath it, consistent with the page's
+   own type color rather than introducing a new one. */
+#titleCapGlyphs {
+    fill: var(--page-text);
+}
+
+/* The dicho: visible at rest alongside the bottom title, fades out
+   the moment the title starts rising (same trigger, same timing --
+   it reads as one scene leaving together, not two unrelated
+   fades). Sits in the upper-middle of the frame so it never
+   competes with the title's own space at the bottom.
+
+   Legibility: no background treatment at all (see history below --
+   both attempts at one looked or read wrong). Instead, JS samples
+   the actual photo pixels behind this box once on load and sets
+   --ink / --ink-shadow to plain dark or light ink, like a designer
+   choosing type color by eye per photo. Defaults below are the
+   fallback for the instant before that sample runs.
+
+   Tried first: mix-blend-mode: difference (inverts text against
+   whatever's behind it, no image analysis needed) -- fell apart on
+   mixed-tone backdrops, e.g. a horizon half blue sky / half gray
+   mountain turned the text a muddy low-contrast brown, since the
+   invert is computed per pixel against two very different regions
+   at once.
+   Tried second: a blurred dark radial-gradient scrim behind the
+   text -- fixed contrast everywhere, but reads as a visible
+   dark smudge/halo sitting on the photo, which doesn't belong. */
+.quote {
+    margin: 0; /* reset the UA default blockquote margin -- it would throw off the centering transform below */
+    position: absolute;
+    top: 34%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(80vw, 640px);
+    text-align: center;
+    --ink: #fff;
+    --ink-shadow: rgba(0, 0, 0, 0.6);
+    color: var(--ink);
+    text-shadow: 0 1px 3px var(--ink-shadow);
+    transition: opacity 2s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease, text-shadow 0.4s ease;
+}
+
+.quote p {
+    margin: 0;
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: clamp(1.3rem, 2.9vw, 1.9rem);
+    line-height: 1.35;
+    letter-spacing: 0.015em; /* all-caps italic reads a touch cramped otherwise */
+}
+
+/* Byline: same face as the quote, not a third typeface -- upright
+   (not italic), uppercase, and tracked out wide enough to read as
+   a distinct, more legible register on its own rather than a
+   smaller/fainter copy of the quote above it. */
+.quote-attribution {
+    margin-top: 1.1em;
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+/* "Read our full history" link under the intro copy. */
+.page-copy-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    color: #1e4a26;
+    text-decoration: none;
+    transition: gap 0.2s ease;
+}
+
+.page-copy-more:hover {
+    gap: 10px;
+}

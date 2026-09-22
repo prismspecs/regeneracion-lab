@@ -1,5 +1,7 @@
 # Mask Experiment
 
+> **Status (2026-09):** this prototype is now the WordPress theme's design. Its CSS/JS live in `regen_wp/assets/` and are shared by the theme and these static pages (no copies); page content is edited in WordPress. The rest of this document describes how the hero mask effect was built and tuned.
+
 A standalone prototype (`index.html`, no build step) for a hero
 interaction: **the site title starts as plain white
 text at the bottom of the screen, and scrolling sends it gliding up to a

@@ -1,17 +1,14 @@
-                </div><!-- #mainContent -->
-            </div><!-- .content-wrapper -->
+<?php
+/**
+ * Site footer. Inner pages: the footer sits inside <main> so it shares the
+ * page column width (header.php opens <main>). The homepage prints its own.
+ */
+if ( ! is_front_page() ) :
+    get_template_part( 'template-parts/site-footer' );
+    ?>
+    </main>
+<?php endif; ?>
 
-            <footer class="site-footer">
-                <p>&copy; <span id="currentYear"></span> <?php bloginfo( 'name' ); ?>. All rights reserved.</p>
-                <p class="site-designer-credit">Website designed by <a href="https://hire.graysonearle.com" target="_blank" rel="noopener noreferrer">Grayson Earle</a></p>
-            </footer>
-        </div><!-- .mockup -->
-    </div><!-- .app-container -->
-
-    <script>
-        // Set current year in footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-    </script>
     <?php wp_footer(); ?>
 </body>
 

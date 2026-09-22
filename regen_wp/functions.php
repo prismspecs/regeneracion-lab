@@ -117,17 +117,138 @@ add_action( 'save_post_resident', 'regen_wp_save_resident_meta' );
  * Regeneración Lab Theme Functions
  */
 
-function regen_wp_enqueue_scripts() {
-    // Enqueue main stylesheet
-    wp_enqueue_style( 'regen-main-style', get_stylesheet_uri() );
-    
-    // Enqueue Google Fonts (from index.html)
-    wp_enqueue_style( 'regen-google-fonts', 'https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Roboto:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap', array(), null );
+require_once get_template_directory() . '/inc/helpers.php';
+require_once get_template_directory() . '/inc/page-fields.php';
+require_once get_template_directory() . '/inc/programs.php';
+require_once get_template_directory() . '/inc/patterns.php';
+require_once get_template_directory() . '/inc/hero-photos.php';
 
-    // PJAX-style nav swaps (keeps clean URLs)
-    wp_enqueue_script( 'regen-pjax', get_template_directory_uri() . '/pjax.js', array(), null, true );
+function regen_wp_enqueue_scripts() {
+    $uri = get_template_directory_uri() . '/assets/';
+    $dir = get_template_directory() . '/assets/';
+    $ver = static function ( $file ) use ( $dir ) {
+        return file_exists( $dir . $file ) ? filemtime( $dir . $file ) : null;
+    };
+
+    // Instrument Serif is the only web font; body copy is Georgia.
+    // Self-hosted (assets/fonts/) so no render-blocking request leaves this
+    // server — a slow or blocked fonts.googleapis.com stalls first paint.
+    wp_enqueue_style( 'regen-fonts', $uri . 'fonts/instrument-serif.css', array(), $ver( 'fonts/instrument-serif.css' ) );
+
+    // Shared chrome (tokens, top bar, drawer, footer) loads on every page.
+    wp_enqueue_style( 'regen-site', $uri . 'site.css', array( 'regen-fonts' ), $ver( 'site.css' ) );
+    wp_enqueue_script( 'regen-site', $uri . 'site.js', array(), $ver( 'site.js' ), true );
+
+    // Content-page components (masthead, prose, forms...) load everywhere but the hero homepage.
+    if ( ! is_front_page() ) {
+        wp_enqueue_style( 'regen-page', $uri . 'page.css', array( 'regen-site' ), $ver( 'page.css' ) );
+    }
+
+    // Per-template styles.
+    $page_styles = array(
+        'residents' => is_page( 'residents' ) || is_singular( 'resident' ),
+        'students'  => is_page( 'students' ),
+    );
+    foreach ( $page_styles as $name => $needed ) {
+        if ( $needed ) {
+            wp_enqueue_style( 'regen-page-' . $name, $uri . 'pages/' . $name . '.css', array( 'regen-page' ), $ver( 'pages/' . $name . '.css' ) );
+        }
+    }
+
+    // Homepage: pinned title hero + scroll behaviour.
+    if ( is_front_page() ) {
+        wp_enqueue_style( 'regen-home', $uri . 'home.css', array( 'regen-site', 'regen-cards', 'regen-support' ), $ver( 'home.css' ) );
+        wp_enqueue_script( 'regen-home', $uri . 'home.js', array( 'regen-site' ), $ver( 'home.js' ), true );
+        wp_add_inline_script( 'regen-home', 'window.REGEN_HOME = ' . wp_json_encode( array(
+            'imageBase' => get_template_directory_uri() . '/images/',
+            'photos'    => regen_wp_hero_photo_urls(),
+        ) ) . ';', 'before' );
+    }
+
+    // Project cards: homepage grid + Projects page.
+    if ( is_front_page() || is_page( 'projects' ) ) {
+        wp_enqueue_style( 'regen-cards', $uri . 'cards.css', array( 'regen-site' ), $ver( 'cards.css' ) );
+    }
+
+    // Support call-to-action + donation modal: homepage + Support page.
+    if ( is_front_page() || is_page( 'support' ) ) {
+        wp_enqueue_style( 'regen-support', $uri . 'support.css', array( 'regen-site' ), $ver( 'support.css' ) );
+        wp_enqueue_script( 'regen-support', $uri . 'support.js', array( 'regen-site' ), $ver( 'support.js' ), true );
+    }
+
+    // Theme header stylesheet: WP-specific rules only.
+    wp_enqueue_style( 'regen-theme', get_stylesheet_uri(), array( 'regen-site' ), $ver( '../style.css' ) );
 }
 add_action( 'wp_enqueue_scripts', 'regen_wp_enqueue_scripts' );
+
+/**
+ * Primary-menu walker: emits the plain <li><a> markup that site.css styles.
+ * Pass true for the mobile drawer (adds .mobile-nav-link and stagger index).
+ */
+class Regen_Nav_Walker extends Walker_Nav_Menu {
+    private $mobile;
+    private $index = 0;
+
+    public function __construct( $mobile = false ) {
+        $this->mobile = $mobile;
+    }
+
+    public function start_lvl( &$output, $depth = 0, $args = null ) {}
+    public function end_lvl( &$output, $depth = 0, $args = null ) {}
+
+    public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
+        if ( $depth > 0 ) {
+            return;
+        }
+        $active  = regen_wp_nav_item_is_active( $item );
+        $classes = array();
+        if ( $this->mobile ) {
+            $classes[] = 'mobile-nav-link';
+        }
+        if ( $active ) {
+            $classes[] = 'is-active';
+        }
+        $li_style = $this->mobile ? ' style="--i: ' . (int) $this->index++ . ';"' : '';
+        $target   = ( ! empty( $item->target ) ) ? ' target="' . esc_attr( $item->target ) . '" rel="noopener"' : '';
+
+        $output .= '<li' . $li_style . '><a href="' . esc_url( $item->url ) . '"'
+            . ( $classes ? ' class="' . esc_attr( implode( ' ', $classes ) ) . '"' : '' )
+            . ( $active ? ' aria-current="page"' : '' )
+            . $target . '>' . esc_html( $item->title ) . '</a>';
+    }
+
+    public function end_el( &$output, $item, $depth = 0, $args = null ) {
+        if ( $depth > 0 ) {
+            return;
+        }
+        $output .= '</li>';
+    }
+}
+
+/**
+ * A menu item is active when WP says it is current, or when the request sits
+ * under its path (so /projects/research-justice/ keeps "Projects" lit).
+ */
+function regen_wp_nav_item_is_active( $item ) {
+    if ( $item->current || $item->current_item_ancestor || $item->current_item_parent ) {
+        return true;
+    }
+    $home_path = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+    $strip     = static function ( $path ) use ( $home_path ) {
+        $path = trim( (string) $path, '/' );
+        if ( $home_path !== '' && 0 === strpos( $path, $home_path ) ) {
+            $path = trim( substr( $path, strlen( $home_path ) ), '/' );
+        }
+        return $path;
+    };
+    $item_path = $strip( wp_parse_url( $item->url, PHP_URL_PATH ) );
+    if ( '' === $item_path ) {
+        return is_front_page();
+    }
+    global $wp;
+    $request = isset( $wp->request ) ? trim( $wp->request, '/' ) : '';
+    return $request === $item_path || 0 === strpos( $request, $item_path . '/' );
+}
 
 // Disable CF7 auto-paragraph so our custom form-floating markup isn't broken by extra <p> tags.
 add_filter( 'wpcf7_autop_or_not', '__return_false' );
@@ -143,23 +264,6 @@ function regen_wp_register_menus() {
     ) );
 }
 add_action( 'after_setup_theme', 'regen_wp_register_menus' );
-
-// Add nav-link class to primary menu anchors for styling parity
-function regen_wp_nav_link_class( $atts, $item, $args ) {
-    if ( isset( $args->theme_location ) && 'primary' === $args->theme_location ) {
-        $classes = array( 'nav-link' );
-        
-        // Add active class if this is the current item or an ancestor
-        if ( $item->current || $item->current_item_ancestor || $item->current_item_parent ) {
-            $classes[] = 'active';
-        }
-
-        $existing_class = isset( $atts['class'] ) ? $atts['class'] . ' ' : '';
-        $atts['class'] = trim( $existing_class . implode( ' ', $classes ) );
-    }
-    return $atts;
-}
-add_filter( 'nav_menu_link_attributes', 'regen_wp_nav_link_class', 10, 3 );
 
 // Theme options via Customizer (hero and support CTA)
 function regen_wp_customize_register( $wp_customize ) {
@@ -193,16 +297,6 @@ function regen_wp_customize_register( $wp_customize ) {
         'type'    => 'text',
     ) );
 
-    // Hero background image
-    $wp_customize->add_setting( 'regen_hero_image', array(
-        'sanitize_callback' => 'absint',
-    ) );
-    $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'regen_hero_image', array(
-        'label'    => __( 'Hero Background Image', 'regen-wp' ),
-        'section'  => $section_id,
-        'mime_type'=> 'image',
-    ) ) );
-
     // Support heading
     $wp_customize->add_setting( 'regen_support_heading', array(
         'default'           => 'Support Our Work',
@@ -234,6 +328,17 @@ function regen_wp_customize_register( $wp_customize ) {
         'label'   => __( 'Support URL', 'regen-wp' ),
         'section' => $section_id,
         'type'    => 'url',
+    ) );
+
+    // Support note under the button
+    $wp_customize->add_setting( 'regen_support_note', array(
+        'default'           => 'When you check out, please specify that your donation is for <em>Regeneración Lab</em>.',
+        'sanitize_callback' => 'wp_kses_post',
+    ) );
+    $wp_customize->add_control( 'regen_support_note', array(
+        'label'   => __( 'Support Note (under the button)', 'regen-wp' ),
+        'section' => $section_id,
+        'type'    => 'textarea',
     ) );
 
     // Support button label
@@ -271,8 +376,6 @@ function regen_wp_customize_register( $wp_customize ) {
 }
 add_action( 'customize_register', 'regen_wp_customize_register' );
 
-// Note: SPA hash-routing has been removed from enqueue; app.js remains in the theme for reference if hash navigation is ever needed again.
-
 // Custom post types for structured content
 function regen_wp_register_cpts() {
     register_post_type( 'project', array(
@@ -281,7 +384,7 @@ function regen_wp_register_cpts() {
             'singular_name' => __( 'Project', 'regen-wp' ),
         ),
         'public' => true,
-        'has_archive' => true,
+        'has_archive' => false, // /projects/ is an editable Page (page-projects.php)
         'menu_position' => 5,
         'show_in_rest' => true,
         'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
@@ -294,7 +397,7 @@ function regen_wp_register_cpts() {
             'singular_name' => __( 'Resident', 'regen-wp' ),
         ),
         'public' => true,
-        'has_archive' => true,
+        'has_archive' => false, // /residents/ is an editable Page (page-residents.php)
         'menu_position' => 6,
         'show_in_rest' => true,
         'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
@@ -328,6 +431,15 @@ function regen_wp_register_cpts() {
     ) );
 }
 add_action( 'init', 'regen_wp_register_cpts' );
+
+// Flush permalinks once when the routing model changes (projects/residents became Pages).
+function regen_wp_maybe_flush_rewrites() {
+    if ( '2' !== get_option( 'regen_rewrite_version' ) ) {
+        flush_rewrite_rules();
+        update_option( 'regen_rewrite_version', '2' );
+    }
+}
+add_action( 'init', 'regen_wp_maybe_flush_rewrites', 99 );
 
 // Project meta (badge/meta/link label) with editor-friendly UI
 function regen_wp_register_project_meta() {
@@ -399,7 +511,18 @@ function regen_wp_register_project_meta() {
     register_post_meta( 'post', 'update_links', array(
         'type'              => 'array',
         'single'            => true,
-        'show_in_rest'      => true,
+        'show_in_rest'      => array(
+            'schema' => array(
+                'type'  => 'array',
+                'items' => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'label' => array( 'type' => 'string' ),
+                        'url'   => array( 'type' => 'string' ),
+                    ),
+                ),
+            ),
+        ),
         'sanitize_callback' => 'regen_wp_sanitize_update_links',
     ) );
 
@@ -836,6 +959,41 @@ function regen_wp_block_category( $categories ) {
 }
 add_filter( 'block_categories_all', 'regen_wp_block_category' );
 
+/**
+ * One person as the "director profile" layout (photo, name, role, bio, contact
+ * link). Used by the Person Card block and the [person_card] shortcode.
+ */
+function regen_wp_person_card_html( $person_id ) {
+    $post = get_post( $person_id );
+    if ( ! $post || 'person' !== $post->post_type ) {
+        return '';
+    }
+
+    $title   = esc_html( get_the_title( $post ) );
+    $role    = esc_html( get_post_meta( $person_id, 'person_role', true ) );
+    $label   = esc_html( get_post_meta( $person_id, 'person_link_label', true ) );
+    $url     = esc_url( get_post_meta( $person_id, 'person_link_url', true ) );
+    $content = regen_person_get_content( $person_id );
+
+    $html = '<div class="director-profile">';
+    if ( has_post_thumbnail( $person_id ) ) {
+        $html .= '<div class="director-photo-wrap">'
+            . get_the_post_thumbnail( $person_id, 'large', array( 'class' => 'director-photo', 'loading' => 'lazy' ) )
+            . '</div>';
+    }
+    $html .= '<div class="director-content"><h3>' . $title . '</h3>';
+    if ( $role ) {
+        $html .= '<span class="director-title">' . $role . '</span>';
+    }
+    if ( $content ) {
+        $html .= '<div class="director-bio">' . $content . '</div>';
+    }
+    if ( $label && $url ) {
+        $html .= '<a href="' . $url . '" class="director-contact-link">' . $label . ' &rarr;</a>';
+    }
+    return $html . '</div></div>';
+}
+
 // Render callback for the Person Card dynamic block.
 function regen_render_person_card_block( $attributes ) {
     $person_id = isset( $attributes['personId'] ) ? absint( $attributes['personId'] ) : 0;
@@ -850,74 +1008,7 @@ function regen_render_person_card_block( $attributes ) {
         return '<div class="person-card-placeholder">Select a valid person.</div>';
     }
 
-    $title   = esc_html( get_the_title( $post ) );
-    $role    = esc_html( get_post_meta( $person_id, 'person_role', true ) );
-    $years   = esc_html( get_post_meta( $person_id, 'person_years', true ) );
-    $label   = esc_html( get_post_meta( $person_id, 'person_link_label', true ) );
-    $url     = esc_url( get_post_meta( $person_id, 'person_link_url', true ) );
-    $content = regen_person_get_content( $person_id );
-
-    $image_html = '';
-    if ( has_post_thumbnail( $person_id ) ) {
-        $img_class = ( 'resident' === $variant ) ? 'resident-avatar' : 'about-profile-image';
-        $image_html = get_the_post_thumbnail( $person_id, 'large', array( 'class' => $img_class ) );
-    }
-
-    $button_html = '';
-    if ( $label && $url ) {
-        $button_html = '<div class="wp-block-buttons"><div class="wp-block-button is-style-outline"><a class="wp-block-button__link" href="' . $url . '" target="_blank" rel="noopener">' . $label . '</a></div></div>';
-    }
-
-    $meta_line = '';
-    if ( $role || $years ) {
-        $meta_line = '<p><strong>' . $role . '</strong>' . ( $years ? ' <span style="margin-left:12px;">' . $years . '</span>' : '' ) . '</p>';
-    }
-
-    // Order badge for resident variant
-    $order_badge = '';
-    if ( 'resident' === $variant ) {
-        $order_meta = get_post_meta( $person_id, 'person_order', true );
-        $order_val  = ( '' !== $order_meta ) ? absint( $order_meta ) : (int) get_post_field( 'menu_order', $person_id );
-        if ( $order_val ) {
-            $order_badge = '<span class="person-order-badge">' . str_pad( (string) $order_val, 2, '0', STR_PAD_LEFT ) . '</span>';
-        }
-    }
-
-    if ( 'resident' === $variant ) {
-        $html  = '<div class="project-card resident-card person-card person-card--resident" data-variant="resident">';
-        $html .= '<div class="wp-block-columns are-vertically-aligned-top">';
-        $html .= '<div class="wp-block-column" style="flex-basis:30%">' . $image_html . '</div>';
-        $html .= '<div class="wp-block-column" style="flex-basis:70%">';
-        if ( $order_badge ) {
-            $html .= '<p class="person-order">' . $order_badge . '</p>';
-        }
-        if ( $meta_line ) {
-            $html .= '<p class="person-meta-line"><span class="person-role">' . $role . '</span>' . ( $years ? ' <span class="person-years" style="margin-left:12px;">' . $years . '</span>' : '' ) . '</p>';
-        }
-        $html .= '<h3 class="card-title">' . $title . '</h3>';
-        if ( $content ) {
-            $html .= '<div class="card-text">' . $content . '</div>';
-        }
-        $html .= $button_html;
-        $html .= '</div></div></div>';
-        return $html;
-    }
-
-    // About/default variant
-    $html  = '<div class="project-card full-width">';
-    $html .= '<div class="about-profile-container">';
-    $html .= $image_html ? $image_html : '';
-    $html .= '<div class="about-profile-content">';
-    $html .= '<h3 class="about-profile-name">' . $title . '</h3>';
-    if ( $content ) {
-        $html .= $content;
-    }
-    if ( $button_html ) {
-        $html .= $button_html;
-    }
-    $html .= '</div></div></div>';
-
-    return $html;
+    return regen_wp_person_card_html( $person_id );
 }
 
 // Register the Person Card dynamic block and its editor script.
@@ -1027,39 +1118,7 @@ function regen_person_card_shortcode( $atts ) {
         return '';
     }
 
-    $title   = esc_html( get_the_title( $post ) );
-    $role    = esc_html( get_post_meta( $post_id, 'person_role', true ) );
-    $years   = esc_html( get_post_meta( $post_id, 'person_years', true ) );
-    $label   = esc_html( get_post_meta( $post_id, 'person_link_label', true ) );
-    $url     = esc_url( get_post_meta( $post_id, 'person_link_url', true ) );
-    $content = regen_person_get_content( $post_id );
-
-    $img_html = '';
-    if ( has_post_thumbnail( $post_id ) ) {
-        $img_html = get_the_post_thumbnail( $post_id, 'large', array( 'class' => 'resident-avatar' ) );
-    }
-
-    $button_html = '';
-    if ( $label && $url ) {
-        $button_html = '<div class="wp-block-buttons"><div class="wp-block-button is-style-outline"><a class="wp-block-button__link" href="' . $url . '" target="_blank" rel="noopener">' . $label . '</a></div></div>';
-    }
-
-    $meta_line = '';
-    if ( $role || $years ) {
-        $meta_line = '<p><strong>' . $role . '</strong>' . ( $years ? ' <span style="margin-left:12px;">' . $years . '</span>' : '' ) . '</p>';
-    }
-
-    $html  = '<div class="project-card full-width">';
-    $html .= '<div class="wp-block-columns are-vertically-aligned-top">';
-    $html .= '<div class="wp-block-column" style="flex-basis:28%">' . $img_html . '</div>';
-    $html .= '<div class="wp-block-column" style="flex-basis:72%">';
-    $html .= '<h3 class="card-title">' . $title . '</h3>';
-    $html .= $meta_line;
-    $html .= $content ? '<div class="card-text">' . $content . '</div>' : '';
-    $html .= $button_html;
-    $html .= '</div></div></div>';
-
-    return $html;
+    return regen_wp_person_card_html( $post_id );
 }
 add_shortcode( 'person_card', 'regen_person_card_shortcode' );
 
@@ -1142,18 +1201,6 @@ function regen_wp_register_block_patterns() {
         )
     );
 
-    // Profile card for About/Team sections
-    register_block_pattern(
-        'regen/profile-card',
-        array(
-            'title'       => __( 'Profile Card', 'regen-wp' ),
-            'description' => __( 'Director / Principal Investigator profile card with image and bio.', 'regen-wp' ),
-            'categories'  => array( 'regen' ),
-            'content'     => '<!-- wp:group {"className":"about-profile-card"} -->
-<div class="about-profile-card"><img class="about-profile-image" src="https://via.placeholder.com/180x240" alt="Profile"/><div class="about-profile-content"><h3 class="about-profile-name">Amrah Salomon</h3><p>Amrah Salomon is a scholar, creative writer, and practitioner of research justice working at the intersections of Ethnic Studies, Indigenous studies, Women of Color feminisms and Queer theory, environmental justice, and decolonial methodologies.</p><p>At the Regeneracion Lab, Dr. Salomon develops collaborative projects with communities, supports resident scholars and artists, and builds educational resources for students and activists.</p></div></div>
-<!-- /wp:group -->',
-        )
-    );
 
 }
 add_action( 'init', 'regen_wp_register_block_patterns' );
@@ -1165,6 +1212,15 @@ function regen_wp_favicon() {
     }
 }
 add_action( 'wp_head', 'regen_wp_favicon' );
+
+// Start the self-hosted web fonts downloading before the CSS is parsed.
+function regen_wp_preload_fonts() {
+    $base = get_template_directory_uri() . '/assets/fonts/';
+    foreach ( array( 'instrument-serif-latin.woff2', 'instrument-serif-italic-latin.woff2' ) as $file ) {
+        printf( '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin="anonymous" />' . "\n", esc_url( $base . $file ) );
+    }
+}
+add_action( 'wp_head', 'regen_wp_preload_fonts', 1 );
 
 // Mobile hamburger nav toggle + scroll detection
 function regen_wp_mobile_nav_script() {

@@ -1,109 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REGENERACIÓN LAB — Mask Experiment</title>
-    <!-- Instrument Serif is --font-serif in design-revamp/new-test/styles.css
-         -- reused here rather than picking something new. One typeface for
-         both the quote and its byline (upright/uppercase/tracked instead of
-         italic, not a second family) since the title's own vector lettering
-         is already a distinct face -- three on one screen felt like one too
-         many. Only external dependency in this otherwise self-contained file. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../../regen_wp/assets/site.css">
-    <link rel="stylesheet" href="../../../regen_wp/assets/cards.css">
-    <link rel="stylesheet" href="../../../regen_wp/assets/support.css">
-    <link rel="stylesheet" href="../../../regen_wp/assets/home.css">
-</head>
-
-<body>
-
-    <!-- Slim top bar: glides down when scrolling deep into the page,
-         replacing the giant title that scrolled off the top. Features
-         the site title on the left in Instrument Serif italic (matching
-         the Projects heading style), desktop nav items on the right,
-         and a minimal 2-line hairline hamburger menu for mobile. -->
-    <header class="slim-topbar" id="slimTopbar" aria-label="Site Navigation">
-        <div class="slim-topbar-inner">
-            <a href="#top" class="slim-topbar-title">Regeneraci&oacute;n Lab</a>
-            <nav class="slim-topbar-nav" aria-label="Main Menu">
-                <ul>
-                    <li><a href="#top">Home</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="#projects">Projects</a></li>
-                    <li><a href="residents.html">Residents</a></li>
-                    <li><a href="students.html">Students</a></li>
-                    <li><a href="#support">Support</a></li>
-                </ul>
-            </nav>
-            <button class="slim-topbar-burger" id="slimTopbarBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavDrawer">
-                <span class="burger-box">
-                    <span class="burger-bar burger-bar--top"></span>
-                    <span class="burger-bar burger-bar--bot"></span>
-                </span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Hero nav: landing-screen version of the slim top bar's menu. -->
-    <nav class="hero-nav" id="heroNav" aria-label="Main Menu (Landing)">
-        <ul>
-            <li><a href="#top">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="residents.html">Residents</a></li>
-            <li><a href="students.html">Students</a></li>
-            <li><a href="#support">Support</a></li>
-        </ul>
-    </nav>
-
-    <!-- Mobile Navigation Overlay Drawer -->
-    <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
-        <div class="mobile-nav-panel">
-            <nav class="mobile-nav-menu" aria-label="Mobile Menu">
-                <ul class="mobile-nav-links">
-                    <li style="--i: 0;"><a href="#top" class="mobile-nav-link">Home</a></li>
-                    <li style="--i: 1;"><a href="about.html" class="mobile-nav-link">About</a></li>
-                    <li style="--i: 2;"><a href="#projects" class="mobile-nav-link">Projects</a></li>
-                    <li style="--i: 3;"><a href="residents.html" class="mobile-nav-link">Residents</a></li>
-                    <li style="--i: 4;"><a href="students.html" class="mobile-nav-link">Students</a></li>
-                    <li style="--i: 5;"><a href="#support" class="mobile-nav-link">Support</a></li>
-                </ul>
-            </nav>
-            <div class="mobile-nav-footer">
-                <p class="mobile-nav-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Support Modal Popover -->
-    <div class="support-modal" id="supportModal" hidden>
-        <div class="support-modal-backdrop" data-support-close></div>
-        <div class="support-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="supportModalTitle">
-            <h3 id="supportModalTitle" class="support-modal-title">Support Our Work</h3>
-            <p class="support-modal-text">When you check out, please specify that the donation is for <strong>Regeneraci&oacute;n Lab</strong>.</p>
-            <div class="support-modal-actions">
-                <button type="button" class="support-modal-cancel" data-support-close>Cancel</button>
-                <a href="https://give.ucsb.edu/campaigns/58594/donations/new" target="_blank" rel="noopener" class="support-modal-continue" data-support-continue>Continue &rarr;</a>
-            </div>
-        </div>
-    </div>
-
+<?php
+/**
+ * Homepage hero: the pinned title mask, wash, and quote. Driven by
+ * assets/home.js (scroll state) and assets/home.css. The quote and its
+ * attribution come from Appearance > Customize > Regeneracion Theme Options.
+ */
+$quote       = trim( get_theme_mod( 'regen_hero_quote', "THEY TRIED TO BURY US BUT THEY DIDN\u{2019}T KNOW\nWE WERE SEEDS" ), " \t\n\r\0\x0B\"\u{201C}\u{201D}" );
+$attribution = get_theme_mod( 'regen_hero_attribution', 'Mexican revolutionary dicho, circa 1910' );
+?>
     <div class="hero" id="hero" role="region" aria-label="Hero">
-        <!-- src is picked at random from IMAGE_POOL below on every load.
-             Note: since these photos are wider than the viewport (not
-             taller), object-fit:cover only ever crops left/right -- the
-             full image height always renders, so only its TOP strip ever
-             shows through the pinned title. Photos with sky/negative space
-             along the top edge (e.g. JumpinCholla.jpg) will wash the
-             pinned title out blank on that side; that's expected until a
-             final image is chosen. -->
-        <img class="hero-image" id="heroImage" alt="">
-
+                <img class="hero-image" id="heroImage" alt="">
         <svg class="wash" id="wash" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <mask id="titleHoleMask" maskUnits="userSpaceOnUse">
@@ -127,10 +32,8 @@
                     </g>
                 </mask>
             </defs>
-
             <rect class="wash-rect" width="100%" height="100%" mask="url(#titleHoleMask)" />
         </svg>
-
         <svg class="title-white" id="titleWhite" viewBox="0 0 1281.50 97.00" preserveAspectRatio="xMidYMid meet">
             <path fill="white" d="M66 38.30L66 38.30Q66 46.60 61.20 52.20Q56.40 57.80 45.90 59.70L45.90 59.70L69.10 86.30Q71.50 89.10 74.80 90.55Q78.10 92 81.50 92L81.50 92L81.50 96L57.80 96L33 65.60Q31.40 63.60 30 62.50Q28.60 61.40 27.45 60.95Q26.30 60.50 25.20 60.50L25.20 60.50L25.20 80.10Q25.20 85 26.20 87.60Q27.20 90.20 30.30 91.10Q33.40 92 39.70 92L39.70 92L39.70 96L0 96L0 92Q4.40 92 6.65 91.10Q8.90 90.20 9.70 87.75Q10.50 85.30 10.50 80.60L10.50 80.60L10.50 34.40Q10.50 29.70 9.85 27.35Q9.20 25 7.20 24.10Q5.20 23.20 1.10 23L1.10 23L1.10 19L35.70 19Q50.10 19 58.05 24.10Q66 29.20 66 38.30ZM25.20 26.30L25.20 26.30L25.20 54.50L31.70 54.50Q41.10 54.50 45.75 50.80Q50.40 47.10 50.40 38.80L50.40 38.80Q50.40 32.40 46.50 28.50Q42.60 24.60 35.70 24.60L35.70 24.60L27 24.60Q25.20 24.60 25.20 26.30Z" />
             <path fill="white" d="M106.70 28L106.70 28L106.70 53.40Q113.10 53.40 117 53Q120.90 52.60 123.05 51.35Q125.20 50.10 126.15 47.65Q127.10 45.20 127.50 41.20L127.50 41.20L131.20 41.20L131.20 70.50L127.50 70.50Q126.90 66.40 125.85 64Q124.80 61.60 122.70 60.45Q120.60 59.30 116.80 58.90Q113 58.50 106.70 58.50L106.70 58.50L106.70 79.10Q106.70 83.40 108.30 85.90Q109.90 88.40 113.65 89.45Q117.40 90.50 123.80 90.50L123.80 90.50Q131.40 90.50 135.95 89Q140.50 87.50 143 83.70Q145.50 79.90 146.90 73.10L146.90 73.10L150.90 73.10L149.30 96L81.50 96L81.50 92Q86 91.80 88.25 90.95Q90.50 90.10 91.25 87.70Q92 85.30 92 80.60L92 80.60L92 34.40Q92 29.70 91.30 27.35Q90.60 25 88.60 24.10Q86.60 23.20 82.60 23L82.60 23L82.60 19L145.80 19L146.50 38.60L142.20 38.60Q141.40 33 139.30 29.90Q137.20 26.80 133.05 25.55Q128.90 24.30 121.80 24.30L121.80 24.30L110.50 24.30Q108 24.30 107.35 24.95Q106.70 25.60 106.70 28Z" transform="translate(6, 0)" />
@@ -148,39 +51,15 @@
             <path fill="white" d="M1061.50 96L1034.10 96L1034.10 92Q1038.90 91.50 1041.40 89.85Q1043.90 88.20 1045.60 83.90L1045.60 83.90L1071.90 18L1079.30 18L1103.20 76.40Q1105.30 81.50 1106.80 84.45Q1108.30 87.40 1109.90 88.90Q1111.50 90.40 1113.65 91Q1115.80 91.60 1119.20 91.90L1119.20 91.90L1119.20 96L1081.40 96L1081.40 91.90Q1086.20 91.70 1088.30 90.90Q1090.40 90.10 1090.40 87.70L1090.40 87.70Q1090.40 86.30 1089.70 84.05Q1089 81.80 1087.80 78.70L1087.80 78.70L1085.50 72.70L1057.20 72.70Q1054.80 78.10 1053.65 81.70Q1052.50 85.30 1052.50 87.40L1052.50 87.40Q1052.50 90.40 1054.75 91.20Q1057 92 1061.50 92L1061.50 92L1061.50 96ZM1071.40 36.40L1059.50 66.70L1083.30 66.70L1071.80 36.40L1071.40 36.40Z" transform="translate(83.8, 0)" />
             <path fill="white" d="M1158.10 96L1119.60 96L1119.60 92Q1124.10 91.80 1126.35 90.95Q1128.60 90.10 1129.40 87.70Q1130.20 85.30 1130.20 80.60L1130.20 80.60L1130.20 34.40Q1130.20 29.70 1129.60 27.35Q1129.00 25 1127.15 24.10Q1125.30 23.20 1121.70 23L1121.70 23L1121.70 19L1153.80 19Q1168.80 19 1177.00 23.90Q1185.20 28.80 1185.20 37.70L1185.20 37.70Q1185.20 43.70 1180.95 47.85Q1176.70 52 1168.10 54.50L1168.10 54.50L1168.10 54.90Q1175.50 54.90 1180.85 57.60Q1186.20 60.30 1189.15 65Q1192.10 69.70 1192.10 75.70L1192.10 75.70Q1192.10 80.80 1189.65 84.60Q1187.20 88.40 1182.60 91L1182.60 91Q1178.20 93.50 1172.00 94.75Q1165.80 96 1158.10 96L1158.10 96ZM1158.80 89.90L1158.80 89.90Q1174.90 89.90 1174.90 75.40L1174.90 75.40Q1174.90 71 1173.50 67.75Q1172.10 64.50 1169.10 62.40L1169.10 62.40Q1166.10 60.30 1161.30 59.40Q1156.50 58.50 1149.70 58.50L1149.70 58.50L1144.90 58.50L1144.90 78.50Q1144.90 84.60 1148.10 87.25Q1151.30 89.90 1158.80 89.90ZM1144.90 26.80L1144.90 52.50L1150.80 52.50Q1155.30 52.50 1158.65 51.65Q1162.00 50.80 1164.20 49.20L1164.20 49.20Q1166.70 47.50 1167.85 44.90Q1169.00 42.30 1169.00 38.90L1169.00 38.90Q1169.00 31.60 1165.40 28.35Q1161.80 25.10 1153.80 25.10L1153.80 25.10L1146.70 25.10Q1144.90 25.10 1144.90 26.80L1144.90 26.80Z" transform="translate(89.4, 0)" />
         </svg>
-
         <blockquote class="quote" id="quote">
-            <p>THEY TRIED TO BURY US BUT THEY DIDN&rsquo;T KNOW<br>WE WERE SEEDS</p>
-            <p class="quote-attribution">&mdash; Mexican revolutionary dicho, circa 1910</p>
+            <p><?php echo wp_kses( nl2br( esc_html( $quote ) ), array( 'br' => array() ) ); ?></p>
+            <p class="quote-attribution">&mdash; <?php echo esc_html( $attribution ); ?></p>
         </blockquote>
     </div>
-
-    <!-- Option B's mask title (TITLE_RENDERER = 'window'), as a
-         top-level fixed layer rather than a child of .hero: .hero forms
-         its own stacking context (position: fixed always creates one),
-         so a title INSIDE it -- however high its z-index -- paints below
-         .page-content (z-index 2) and gets scrolled over. Out here, the
-         window's own z-index (3) puts the photo-filled letters above the
-         content: text passes UNDER the title, visible only in the gaps
-         between letters, instead of double-exposing over the glyph
-         fills. Same mask story as before: element-local mask-image built
-         at startup from the same paths the SVG mask holds; the photo
-         inside is counter-translated so it stays viewport-registered
-         while this element rises. See the .title-window CSS above. -->
-    <div class="title-window" id="titleWindow">
+        <div class="title-window" id="titleWindow">
         <img class="title-window-photo" id="titleWindowPhoto" alt="">
     </div>
-
-    <!-- The outline, as its own title-sized fixed layer (z-index 4, one
-         above .title-window) so the full stroke -- inner AND outer half
-         -- traces the letters above the photo fill and above the page
-         content too. It used to live inside the full-viewport .wash SVG,
-         which could never be raised above .page-content (raising it
-         would raise the whole wash with it); a title-sized layer has no
-         such problem. References the same glyph paths as everything else
-         via <use>; its <g> keeps the snap/delay fade behavior the old
-         in-SVG group had. -->
-    <svg class="title-outline" id="outlineLayer" viewBox="0 0 1281.50 97.00" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <svg class="title-outline" id="outlineLayer" viewBox="0 0 1281.50 97.00" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         <g id="outlineGroup">
             <use href="#glyph0" />
             <use href="#glyph1" />
@@ -199,15 +78,7 @@
             <use href="#glyph14" />
         </g>
     </svg>
-
-    <!-- Sits above .page-content (see .title-cap CSS above for why this
-         is a whole separate element, not just a z-index change on .hero)
-         so the title stays legible and on top once content has scrolled
-         up far enough to otherwise reach this row. Reuses the same
-         glyph <path>s as the mask/outline above via <use> -- one source
-         of truth for the letterforms, same as #outlineGroup already
-         does. -->
-    <div class="title-cap" id="titleCap">
+        <div class="title-cap" id="titleCap">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <rect class="title-cap-bg" width="100%" height="100%" />
             <g id="titleCapGlyphs">
@@ -229,216 +100,5 @@
             </g>
         </svg>
     </div>
-
-    <!-- Reserves scroll room for the hero interaction above (height set by
-         JS, same formula that used to live on <body> directly). Nothing
-         visible -- just space. -->
-    <div class="hero-spacer" id="heroSpacer"></div>
-
-    <!-- Where the page "emerges" once the title pins -- normal document
-         flow that fades in on the same trigger as everything else in
-         .hero (see applyState() below), then scrolls up and covers the
-         still-pinned title as you keep going (see the .page-content CSS
-         comment above for why it's not a fixed overlay anymore). The
-         live homepage's first three paragraphs (WP page ID 7): paragraph
-         one gets the canvas-drawn drop cap (see the second <script> below,
-         reused from design-revamp/pretext-experiment/); the other two are
-         plain HTML -- no need to reflow around a growing shape once the
-         drop cap has already settled.
-
-         Below that: three real `project` posts, pulled via
-         `wp post get <id>` / `wp post meta list <id>` rather than typed
-         out by hand. Picked for range, not any particular order: #17
-         (Indigenous Border Studies -- no project_style set, defaults to
-         turquoise, has a badge), #20 (Safiya Henderson Holmes... --
-         project_style brown, a manual project_title_line1/2 break), #30
-         (Museum of Us Exhibit -- turquoise, no badge, an external
-         project_link_url). This is a genuinely different kind of content
-         than the paragraphs above -- headings, short meta lines, card
-         backgrounds -- worth testing against the wash/photo the same way.
-         Two differences from how the live theme renders these: badges
-         show whenever project_badge is set (the live front-page.php only
-         ever shows a badge when its text is literally "Ongoing",
-         case-insensitive -- looks like an unintentional bug there, since
-         #17 and #20 both have project_badge "NEW" that never actually
-         renders on the live site); and #17/#20's "Explore" links go
-         nowhere (href="#") since their real target is a WordPress
-         permalink this static prototype doesn't have. -->
-    <main class="page-content" id="pageContent">
-        <!-- The live site's tagline (blogdescription) + primary menu
-             (Home / About / Projects / Residents / Students / Support, in
-             WP menu order), pulled from the local install for reference.
-             Links are href="#" -- their real targets are WP permalinks
-             this static prototype doesn't have, same as the project
-             cards' Explore links below. -->
-        <header class="page-header">
-            <nav class="page-nav" aria-label="Primary">
-                <ul>
-                    <li><a href="#top">Home</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="#projects">Projects</a></li>
-                    <li><a href="residents.html">Residents</a></li>
-                    <li><a href="#students">Students</a></li>
-                    <li><a href="#support">Support</a></li>
-                </ul>
-            </nav>
-            <p class="page-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
-        </header>
-        <div class="page-copy" id="about">
-            <p class="dropcap-paragraph" id="dropcapContainer"><span class="dropcap-letter" id="dropcapLetter">R</span>egeneration has become one of the most commercialized and co-opted terms of the 21st century. It is commonly used to market a plethora of ventures that greenwash extractive and colonial land relations, sell products and settler ways of life, and envision alternatives that may delink from one system but reproduce others.</p>
-            <p>However, the Spanish term regeneraci&oacute;n has been a rebellious political concept, philosophy, and battle cry for over a hundred years. In this context, regeneraci&oacute;n developed as a rejection of eugenics that connected movements engaged in anti-racism, abolition of slavery and mass incarceration, and decolonial resistances rooted in Indigenous and fugitive land relations.</p>
-            <p>The Regeneraci&oacute;n Lab is grounded in this older, otherwise meaning of the term that emerged in the late nineteenth century and inspired the 1910 Mexican revolution. Our regenerative work centers community-based research justice, creative-critical practices, and decolonial praxis.</p>
-            <p style="margin-top: 20px;"><a class="page-copy-more" href="about.html">Read our full history, research praxis &amp; leadership &rarr;</a></p>
-        </div>
-        <section class="page-projects" id="projects">
-            <h2>Projects</h2>
-            <div class="project-grid">
-                <div class="project-card project-card--turquoise">
-                    <div class="project-eyebrow">
-                        <span class="eyebrow-mark"></span>
-                        <span class="project-badge">New</span>
-                        <span class="project-meta-sep">&bull;</span>
-                        <span class="project-meta">Ongoing</span>
-                    </div>
-                    <h3>Indigenous Border Studies</h3>
-                    <p>A popular education platform offering thematic modules, scholarly research, readings, films, and community dialogue centering Indigenous perspectives on borders, sovereignty, and movement.</p>
-                    <a href="#">Explore &rarr;</a>
-                </div>
-                <div class="project-card project-card--brown">
-                    <div class="project-eyebrow">
-                        <span class="eyebrow-mark"></span>
-                        <span class="project-badge">New</span>
-                        <span class="project-meta-sep">&bull;</span>
-                        <span class="project-meta">2025&ndash;2026</span>
-                    </div>
-                    <h3>Safiya Henderson Holmes<br>Black Arts &amp; Radicalism Archive</h3>
-                    <p>A research justice and critical archival praxis collaboration with the family of acclaimed Black Arts Movement poet Safiya Henderson Holmes to preserve and digitize her manuscripts, papers, and a wide array of Black feminist, radical movement, and arts ephemera.</p>
-                    <a href="#">Explore &rarr;</a>
-                </div>
-                <div class="project-card project-card--brown">
-                    <div class="project-eyebrow">
-                        <span class="eyebrow-mark"></span>
-                        <span class="project-badge">Active</span>
-                        <span class="project-meta-sep">&bull;</span>
-                        <span class="project-meta">Ongoing</span>
-                    </div>
-                    <h3>O&rsquo;odham and Yoeme of the Colorado &amp; Gila River Confluence</h3>
-                    <p>A community-based research initiative with the descendants of O&rsquo;odham, Yoeme, and other lower Colorado River region Indigenous communities.</p>
-                    <a href="#">Explore &rarr;</a>
-                </div>
-                <div class="project-card project-card--turquoise">
-                    <div class="project-eyebrow">
-                        <span class="eyebrow-mark"></span>
-                        <span class="project-badge">Active</span>
-                        <span class="project-meta-sep">&bull;</span>
-                        <span class="project-meta">Ongoing</span>
-                    </div>
-                    <h3>Research Justice</h3>
-                    <p>More information about our framework for community-based research praxis featuring a TEDx talk, scholarly publications, and links to resources.</p>
-                    <a href="research-justice.html">Learn More &rarr;</a>
-                </div>
-                <div class="project-card project-card--turquoise">
-                    <div class="project-eyebrow">
-                        <span class="eyebrow-mark"></span>
-                        <span class="project-meta">2021&ndash;Current</span>
-                    </div>
-                    <h3>Museum of Us Exhibit &ndash; O&rsquo;odham Land Acknowledgement</h3>
-                    <p>A response to the impacts of border militarization and deaths of migrants in the Sonoran desert with O&rsquo;odham perspectives and Indigenous histories of colonial occupation and partition. Up now as part of the exhibit Hostile Terrain &lsquo;94 at the Museum of Us in San Diego, CA.</p>
-                    <a href="https://museumofus.org/exhibits/hostile-terrain-94" target="_blank" rel="noopener">Visit Exhibit &rarr;</a>
-                </div>
-                <div class="project-card project-card--amber">
-                    <div class="project-eyebrow">
-                        <span class="eyebrow-mark"></span>
-                        <span class="project-meta">2019</span>
-                    </div>
-                    <h3>Reclaiming Homelands: Indigenous North San Diego County</h3>
-                    <p>A collaborative project with Pay&oacute;mkawichum and Kumeyaay youth to recover the Indigenous place-names of the North San Diego County &ldquo;Mission Trail&rdquo;, part of the UC Critical Mission Studies Initiative.</p>
-                    <a href="https://storymaps.arcgis.com/stories/de868339c9a84afb920ead88bf65ccc3" target="_blank" rel="noopener">View Project &rarr;</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="page-section" id="residents">
-            <h2 class="page-section-header">Collaborations</h2>
-            <div class="three-col-grid">
-                <div class="collab-card">
-                    <h3>Water Justice &amp; Technology</h3>
-                    <p>A gathering place for research, stories, art, and calls to action that critically confront the ways that technology intersects with water.</p>
-                    <a href="https://waterjustice-tech.org/" target="_blank" rel="noopener">Discover &rarr;</a>
-                </div>
-                <div class="collab-card">
-                    <h3>CIEJ: Center for Interdisciplinary Environmental Justice</h3>
-                    <p>A collective of scholars, artists, scientists, outdoors practitioners, and parents engaged in feminist decolonial science for climate justice.</p>
-                    <a href="http://www.the-ciej.org/" target="_blank" rel="noopener">Learn More &rarr;</a>
-                </div>
-                <div class="collab-card">
-                    <h3>Finding Ceremony</h3>
-                    <p>A descendant community-controlled reparationist process, restoring the lineages of care, reverence and spiritual memory to the work of caring for our dead and decolonizing museums.</p>
-                    <a href="https://findingceremony.com/" target="_blank" rel="noopener">Visit &rarr;</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="page-section" id="students">
-            <h2 class="page-section-header">Recent Updates</h2>
-            <div class="three-col-grid">
-                <div class="update-card">
-                    <h3>2025&ndash;2026 Reading Group:<br>Critical Temporalities</h3>
-                    <p>Join the Regeneraci&oacute;n Lab and the UCSB English Department Lit &amp; Environment research center for an interdisciplinary reading group on time, space, and environment.</p>
-                    <div class="card-links">
-                        <a href="students.html#reading-groups">Join &rarr;</a>
-                    </div>
-                </div>
-                <div class="update-card">
-                    <h3>2025&ndash;2026 Scholar in Residence Announced</h3>
-                    <p>We're excited to welcome B.T. Werner as our 2025&ndash;2026 scholar in residence! B.T. (they / them) is a subversive physicist conducting transdisciplinary research into the ways that resistance movements affect relationships between societies and the More-Than-Human World.</p>
-                    <div class="card-links">
-                        <a href="residents.html#current">Read More &rarr;</a>
-                    </div>
-                </div>
-                <div class="update-card">
-                    <h3>Indigenous Border Studies &ndash; American Quarterly Call for Papers</h3>
-                    <p>Special issue of American Quarterly centering Indigenous perspectives on borders, militarization, and decolonial futures.</p>
-                    <div class="card-links">
-                        <a href="#">View CFP &rarr;</a>
-                        <a href="https://www.americanquarterly.org/" target="_blank" rel="noopener">American Quarterly &rarr;</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="page-section page-section--support" id="support">
-            <div class="support-content">
-                <h2 class="page-section-header">Support Our Work</h2>
-                <p class="support-description">Regeneraci&oacute;n Lab operates through community support and grant funding. Your contribution helps us maintain this platform, support resident scholars, and keep these resources freely accessible.</p>
-                <div class="support-actions">
-                    <button type="button" class="support-button" id="supportOpenBtn">
-                        Contribute &rarr;
-                    </button>
-                    <p class="support-note">When you check out, please specify that your donation is for <em>Regeneraci&oacute;n Lab</em>.</p>
-                </div>
-            </div>
-        </section>
-
-        <footer class="site-footer">
-            <div class="footer-inner">
-                <div class="footer-brand">
-                    <span class="footer-logo">Regeneraci&oacute;n Lab</span>
-                    <p class="footer-tagline">Laboratory for community-based and research justice orientated media, creative-critical research, and decolonial praxis.</p>
-                </div>
-                <div class="footer-meta">
-                    <p class="footer-copy">&copy; <span id="currentYear">2026</span> Regeneraci&oacute;n Lab. All rights reserved.</p>
-                    <p class="footer-credit">Website designed by <a href="https://hire.graysonearle.com" target="_blank" rel="noopener noreferrer">Grayson Earle</a></p>
-                    <a href="#top" class="footer-back-to-top" id="backToTopBtn">Back to top &uarr;</a>
-                </div>
-            </div>
-        </footer>
-    </main>
-
-    <script src="../../../regen_wp/assets/site.js"></script>
-    <script src="../../../regen_wp/assets/support.js"></script>
-    <script>window.REGEN_HOME = { imageBase: '../../../regen_wp/images/' };</script>
-    <script src="../../../regen_wp/assets/home.js"></script>
-</body>
-
-</html>
+        <div class="hero-spacer" id="heroSpacer"></div>
+    
