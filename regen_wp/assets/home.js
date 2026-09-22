@@ -434,6 +434,23 @@ let isGated = false;
 let gateTimer = null;
 let exitTimer = null;
 
+// Programmatic scroll resets must not animate. The stylesheet sets
+// `html { scroll-behavior: smooth }`, and the two-arg scrollTo() form
+// uses behavior:'auto', which HONOURS that CSS -- so the exit's reset
+// to 0 would glide over several hundred ms, and the scroll events it
+// fires after the gate lifts (scrollY still > DEACTIVATE_AT) get
+// misread as a fresh scroll-down, re-triggering the entrance: the
+// title bobs back up for a moment before dropping again. Forcing
+// behavior 'auto' inline (which means "instant" regardless of CSS)
+// removes the race entirely.
+function instantScrollTo(y) {
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    window.scrollTo(0, y);
+    html.style.scrollBehavior = prev;
+}
+
 function triggerEntrance() {
     if (activated) return;
     activated = true;
@@ -441,7 +458,7 @@ function triggerEntrance() {
     notifyDropcap();
 
     isGated = true;
-    window.scrollTo(0, LANDING_SCROLL_Y);
+    instantScrollTo(LANDING_SCROLL_Y);
 
     clearTimeout(exitTimer);
     clearTimeout(gateTimer);
@@ -470,10 +487,22 @@ function triggerExit() {
     // Once page-content is fully transparent (opacity: 0), reset scroll to 0 and ungate.
     // This guarantees the body text NEVER shifts down on reverse.
     exitTimer = setTimeout(() => {
-        window.scrollTo(0, 0);
-        requestAnimationFrame(() => {
-            isGated = false;
-        });
+        instantScrollTo(0);
+        // Ungate only once the scroll reset has actually landed (scrollY === 0).
+        // The reset can glide asynchronously (Firefox APZ applies the programmatic
+        // scroll over several frames), and every intermediate scroll event passes
+        // back through the ACTIVATE_AT band -- if the gate were already lifted,
+        // onScroll would misread that as a fresh scroll-down and re-trigger the
+        // entrance: the title bobs back up for a moment before dropping again.
+        const settle = () => {
+            if (window.scrollY === 0 || performance.now() - exitStartedAt > 1500) {
+                requestAnimationFrame(() => { isGated = false; });
+            } else {
+                requestAnimationFrame(settle);
+            }
+        };
+        const exitStartedAt = performance.now();
+        settle();
     }, 500);
 }
 
