@@ -179,6 +179,17 @@ function regen_wp_enqueue_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'regen_wp_enqueue_scripts' );
 
+// Upgrade the font host hints from dns-prefetch to preconnect (one real
+// round trip saved on first paint: this is a render-blocking stylesheet).
+function regen_wp_font_preconnect( $hints, $relation_type ) {
+    if ( 'preconnect' === $relation_type ) {
+        $hints[] = array( 'href' => 'https://fonts.googleapis.com', 'crossorigin' => '' );
+        $hints[] = array( 'href' => 'https://fonts.gstatic.com', 'crossorigin' => '' );
+    }
+    return $hints;
+}
+add_filter( 'wp_resource_hints', 'regen_wp_font_preconnect', 10, 2 );
+
 /**
  * Primary-menu walker: emits the plain <li><a> markup that site.css styles.
  * Pass true for the mobile drawer (adds .mobile-nav-link and stagger index).
